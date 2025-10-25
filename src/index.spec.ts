@@ -6,8 +6,7 @@ import * as chai from 'chai';
 // import lib from '../dist/index.js';
 const lib = require(process.browser
   ? path.resolve(__dirname, '../dist/index.js')
-  : path.resolve(__dirname, '../dist/node.js'))
-  ;
+  : path.resolve(__dirname, '../dist/node.js'));
 
 const toBigIntBE = lib.toBigIntBE;
 const toBigIntLE = lib.toBigIntLE;

@@ -2,7 +2,6 @@
   "name": "bigint-conversion",
   "version": "2.4.3",
   "description": "Convert to/from BigInt from/to Buffer, ArrayBuffer, hex string, utf8-encoded text string.",
-  "type": "module",
   "keywords": [
     "BigInt",
     "bignum",
@@ -33,7 +32,7 @@
         },
         "require": {
           "types": "./dist/index.d.ts",
-          "default": "./dist/cjs/index.node.js"
+          "default": "./dist/node.js"
         }
       },
       "script": "./dist/bundle.iife.js",
@@ -96,10 +95,11 @@
     "build:js": "rollup -c build/rollup.config.ts",
     "typecheck": "tsc --noEmit",
     "postbuild:js": "run-s _build:cleantypes _build:cjsAndesmPkgJsons",
-    "test:node": "mocha --loader ts-node/esm src/**/*.spec.ts --timeout 40000",
+    "test:node": "mocha --loader ts-node/esm file://$(pwd)/src/**/*.spec.ts --timeout 40000",
     "clean": "rimraf .mocha-ts coverage dist .types docs",
     "coverage": "c8 --clean --check-coverage --exclude \"{src/ts/**/*.spec.ts,src/ts/**/*.test.ts,test,test-vectors,build}\" --exclude-after-remap --reporter=text --reporter=lcov node ./build/bin/mocha-ts.js --commonjs ",
-"docs": "typedoc --plugin typedoc-plugin-markdown --entryModule API.md --readme none --excludePrivate --out docs src/ts/index.ts",    "mocha-ts": "node --experimental-modules --experimental-json-modules --es-module-specifier-resolution=node ./build/bin/mocha-ts.js ",
+    "docs": "typedoc --plugin typedoc-plugin-markdown --entryModule API.md --readme none --excludePrivate --out docs src/ts/index.ts",
+    "mocha-ts": "node --experimental-modules --experimental-json-modules --es-module-specifier-resolution=node ./build/bin/mocha-ts.js ",
     "mocha-ts:cjs": "node ./build/bin/mocha-ts.js --commonjs ",
     "mocha-ts:watch": "npm run mocha-ts:cjs -- --watch --timeout 0",
     "mocha-ts:browser": "node build/testing/browser/index.js ",
@@ -170,7 +170,8 @@
     "tslib": "^2.8.1",
     "typedoc": "^0.28.14",
     "typedoc-plugin-markdown": "^4.9.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.3"
   },
   "peerDependencies": {
     "@juanelas/base64": "^1.1.5"

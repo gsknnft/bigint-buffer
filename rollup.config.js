@@ -3,7 +3,7 @@ import replace from '@rollup/plugin-replace';
 export default {
   input: 'build/src/index.js',
   output: {
-    format: 'cjs',
+    format: 'esm',
     file: 'dist/node.js'
   },
   external: ['bindings'], // ← This is the fix
