@@ -1,5 +1,5 @@
 {
-  "name": "@sigilnet/bigint-buffer",
+  "name": "@gsknnft/bigint-buffer",
   "version": "1.2.0",
   "description": "bigint to buffer conversion with native support",
   "main": "dist/index.js",
@@ -31,11 +31,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/no2chem/bigint-buffer.git"
+    "url": "https://github.com/gsknnft/bigint-buffer.git"
   },
   "bugs": {
-    "url": "https://github.com/no2chem/bigint-buffer/issues"
+    "url": "https://github.com/gsknnft/bigint-buffer/issues"
   },
+  "homepage": "https://github.com/gsknnft/bigintbuffer",
   "keywords": [
     "bigint",
     "bignum",
@@ -93,6 +94,7 @@
     "access": "public"
   },
   "contributors": [
+    "Gordon Skinner <gsknnft@gmail.com> (https://github.com/gsknnft)",
     "Michael Wei <mwei@vmware.com> (https://github.com/no2chem)"
   ]
 }
