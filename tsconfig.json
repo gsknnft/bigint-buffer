@@ -1,0 +1,23 @@
+{
+  "extends": "./node_modules/gts/tsconfig-google.json",
+  "compilerOptions": {
+    "composite": true,
+    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "rootDir": ".",
+    "outDir": "build",
+    "target" : "esnext",
+    "lib" : [ "esnext" ],
+    "sourceMap": true,
+    "rootDirs": ["src", "src/conversion"],
+    "tsBuildInfoFile": "build/main.tsbuildinfo"
+  },
+  "include": [
+    "src/*.ts",
+    "test/*.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

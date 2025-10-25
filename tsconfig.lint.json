@@ -1,0 +1,5 @@
+// tsconfig.lint.json
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}
