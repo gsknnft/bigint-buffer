@@ -40,9 +40,54 @@ If you're using `bigint-buffer` in a secure or reproducible system, **migrate to
 It is the only currently known secure, reproducible implementation of BigInt ↔ Buffer conversion with native fallback.
 
 ---
+
+### 🚀 Conversion Utilities (Built-In)
+
+`@gsknnft/bigint-buffer` includes direct conversion tools — no need to install `bigint-conversion` separately.
+
+>You no longer need `bigint-conversion` as a separate dependency.
+
+#### Importing
+
+```ts
+import {
+  bigintToBuf,
+  bufToBigint,
+  bigintToHex,
+  hexToBigint,
+  bigintToText,
+  textToBigint,
+  bigintToBase64,
+  base64ToBigint
+} from '@gsknnft/bigint-buffer';
+```
+
+#### Examples
+
+```ts
+const hex = bigintToHex(123456789n); // → "075bcd15"
+const buf = bigintToBuf(123456789n); // → <Buffer 07 5b cd 15>
+const text = bigintToText(123456789n); // → "123456789"
+const base64 = bigintToBase64(123456789n); // → "B1vNFQ=="
+```
+
+> All conversions are endian-safe, round-trip validated, and available in both Node and browser environments.
+
+---
+
+### 🧠 Why This Matters
+
+- ✅ No audit vulnerabilities  
+- ✅ Native bindings preserved  
+- ✅ Conversion logic fused directly into the core  
+- ✅ Unified types and exports  
+- ✅ No need for `bigint-conversion` or external wrappers
+
+---
+
 The original  introduced utilities for converting TC39 BigInts to and from buffers. This fork builds on that foundation with modern tooling, patched bindings, and reproducible builds.
 
-[bigint-buffer](https://www.npmjs.org/package/bigint-buffer) is a utility converts [TC39 Proposed BigInts](https://github.com/tc39/proposal-bigint) to and from buffers. This utility is necessary because BigInts, as proposed, do not support direct conversion between Buffers (or UInt8Arrays), but rather require conversion from buffers to hexadecimal strings then to BigInts, which is suboptimal. This utility includes N-API bindings, so under node, conversion is performed without generating a hexadecimal string. In the browser, normal string conversion is used.
+This utility is necessary because BigInts, as proposed, do not support direct conversion between Buffers (or UInt8Arrays), but rather require conversion from buffers to hexadecimal strings then to BigInts, which is suboptimal. This utility includes N-API bindings, so under node, conversion is performed without generating a hexadecimal string. In the browser, normal string conversion is used.
 
 ---
 
@@ -137,8 +182,6 @@ BE bigint to hex string to buffer (large): 1714292±1.35% ops/s 583.33±37.995 n
 BE bigint-buffer to buffer (large, truncated): 5977218±4.68% ops/s 167.30±37.284 ns/op (87 runs)
 ```
 
-You can run the benchmarks by running `npm run benchmark`.
-
 # Typescript Support
 
 bigint-buffer supplies typescript bindings, but BigInts are still not supported in typescript, though
@@ -162,4 +205,4 @@ the name of the original functions to meet style guidelines.
 
 # Benchmarks
 
-Benchmarks can be run by executing `npm run benchmark` from the package directory.
+Benchmarks can be run by executing `pnpm run benchmark` from the package directory.
