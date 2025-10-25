@@ -1,7 +1,7 @@
 {
   "name": "@gsknnft/bigint-buffer",
   "version": "1.3.0",
-  "description": "bigint to buffer conversion with native support",
+  "description": "Patched & Secure to/from BigInt from/to Buffer, ArrayBuffer, hex string, utf8-encoded text string. Full bigint buffer conversion with native support",
   "main": "dist/index.js",
   "browser": {
     "./dist/node.js": "./dist/browser.js"
@@ -73,6 +73,12 @@
   },
   "homepage": "https://github.com/gsknnft/bigintbuffer",
   "keywords": [
+    "solana",
+    "buffer",
+    "crypto",
+    "binary",
+    "esm",
+    "polyfill",
     "bigint",
     "bignum",
     "tc39-bigint",
