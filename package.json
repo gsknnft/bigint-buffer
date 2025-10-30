@@ -20,7 +20,7 @@
     "_build:cleantypes": "rimraf .types",
     "_build:cjsAndesmPkgJsons": "node ./build/bin/post-build.js",
     "build": "run-s lint:src build:js lint:test docs",
-    "build:js": "rollup -c build/rollup.config.mjs",
+    "build:js": "rollup -c build/rollup.config.js",
     "postbuild:js": "run-s _build:cleantypes _build:cjsAndesmPkgJsons",
     "clean": "rimraf .mocha-ts coverage dist .types docs",
     "coverage": "c8 --clean --check-coverage --exclude \"{src/ts/**/*.spec.ts,src/ts/**/*.test.ts,test,test-vectors,build}\" --exclude-after-remap --reporter=text --reporter=lcov node ./build/bin/mocha-ts.js --commonjs ",
