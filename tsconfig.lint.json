@@ -1,5 +1,12 @@
-// tsconfig.lint.json
 {
   "extends": "./tsconfig.json",
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": [
+    "src",
+    "src/conversion/src/ts",
+    "src/conversion/test",
+    "helper/**/*.ts",
+    "helper/**/*.d.ts",
+    "vitest.config.ts",
+    "test/**/*.ts"
+  ]
 }
