@@ -1,7 +1,9 @@
 
 // etc.
+// import bindings from 'bindings'
+// const native = bindings('bigint_buffer')
+
 import bindings from 'bindings'
-const native = bindings('bigint_buffer')
 
 interface ConverterInterface {
   toBigInt: (buf: Buffer, bigEndian?: boolean) => bigint
@@ -11,19 +13,16 @@ interface ConverterInterface {
 declare let process: { browser: boolean }
 
 let converter: ConverterInterface
-
 export let isNative = false
 
 if (!process.browser) {
   try {
-    converter = require('bindings')('bigint_buffer')
-    isNative = !process.browser && converter !== undefined
-  } catch (e) {
-    console.warn(
-      'bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)')
+    converter = bindings('bigint_buffer')
+    isNative = converter !== undefined
+  } catch {
+    console.warn('bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)')
   }
 }
-
 /**
  * Convert a little-endian buffer into a BigInt.
  * @param buf The little-endian buffer to convert

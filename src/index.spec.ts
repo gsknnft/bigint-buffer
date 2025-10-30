@@ -1,13 +1,15 @@
 import 'mocha'
 import { expect } from 'chai'
-import path from 'path'
 import * as chai from 'chai'
+
 declare let process: { browser: boolean }
 // import lib from '../dist/index.js';
-const lib = require(process.browser
-  ? path.resolve(__dirname, '../dist/index.js')
-  : path.resolve(__dirname, '../dist/node.js'))
-
+let lib: any
+if (process.browser) {
+  lib = require('../dist/index.js')
+} else {
+  lib = require('../dist/node.js')
+}
 const toBigIntBE = lib.toBigIntBE
 const toBigIntLE = lib.toBigIntLE
 const toBufferBE = lib.toBufferBE
@@ -18,7 +20,14 @@ const toBufferLE = lib.toBufferLE
 
 chai.should()
 
-const assertEquals = (n0: bigint, n1: bigint) => {
+/**
+ * Asserts that two bigint values are equal by comparing their hexadecimal string representations.
+ *
+ * @param n0 - The first bigint value to compare.
+ * @param n1 - The second bigint value to compare.
+ * @returns void
+ */
+const assertEquals = (n0: bigint, n1: bigint): void => {
   chai.expect(n0.toString(16)).to.equal(n1.toString(16))
 }
 

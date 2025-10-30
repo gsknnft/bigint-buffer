@@ -30,7 +30,7 @@ describe('hexToBuf', function () {
       describe(`bufToHex([${(new Uint8Array(test.buf)).toString()}])`, function () {
         const byteLength = test.buf.byteLength
         const expected = bc.parseHex(test.hex, false, byteLength)
-        it(`should return ${expected}`, function () {
+        it(`should return ${String(expected)}`, function () {
           const ret = bc.bufToHex(test.buf)
           chai.expect(ret).to.equal(expected)
         })
@@ -38,7 +38,7 @@ describe('hexToBuf', function () {
       describe(`bufToHex(hexToBuf(${test.hex}))`, function () {
         const byteLength = test.buf.byteLength
         const expected = bc.parseHex(test.hex, false, byteLength)
-        it(`should return ${expected}`, function () {
+        it(`should return ${String(expected)}`, function () {
           const buf = bc.hexToBuf(test.hex)
           const ret = bc.bufToHex(buf)
           chai.expect(ret).to.equal(expected)

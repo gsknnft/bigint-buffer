@@ -3,7 +3,7 @@ import * as benchmark from 'benchmark'
 
 import { toBigIntBE, toBigIntLE, toBufferBE, toBufferLE } from './index.js'
 
-const BN = require('bn.js')
+import BN from 'bn.js'
 
 // This file contains the benchmark test suite. It includes the benchmark and
 // some lightweight boilerplate code for running benchmark.js. To
@@ -105,7 +105,7 @@ suite.add('BE bigint to hex string to buffer (small)', () => {
 
 const bnSmallValue = new BN('12345678', 10)
 suite.add('BN to buffer (small)', () => {
-  return bnSmallValue.toBuffer(8)
+  return Buffer.from(bnSmallValue.toArrayLike(Buffer, 'be', 8))
 })
 
 suite.add('LE bigint-buffer to buffer (small)', () => {
@@ -131,7 +131,7 @@ const bnLargeValue = new BN(
   'badc0ffee0ddf00dbadc0ffee0ddf00dbadc0ffee0ddf00dbadc0ffee0ddf00dbadc0ffee0ddf00dbadc0ffee0ddf00d',
   16)
 suite.add('BN to buffer (large)', () => {
-  return bnLargeValue.toBuffer(24)
+  return Buffer.from(bnLargeValue.toArrayLike(Buffer, 'be', 24))
 })
 
 suite.add('LE bigint-buffer to buffer (large)', () => {

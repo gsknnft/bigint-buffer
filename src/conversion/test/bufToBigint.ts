@@ -17,8 +17,8 @@ describe('bufToBigint', function () {
     }
   ]
   for (const test of tests) {
-    describe(`bufToBigint(${bc.bufToHex(test.input)})`, function () {
-      it(`should return ${test.output.toString()}`, function () {
+    describe(`bufToBigint(${String(bc.bufToHex(test.input))})`, function () {
+      it(`should return ${String(test.output.toString())}`, function () {
         const ret = bc.bufToBigint(test.input)
         chai.expect(ret.toString()).to.equal(test.output.toString())
       })
