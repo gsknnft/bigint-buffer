@@ -13,10 +13,7 @@
     "tsBuildInfoFile": "build/main.tsbuildinfo"
   },
   "include": [
-    "src",
-    "src/conversion/src/ts",
-    "src/conversion/test",
-    "src/*.ts",
+    "src/**/*", 
     "test/*.ts",
     "test/**/*.ts"
   ],

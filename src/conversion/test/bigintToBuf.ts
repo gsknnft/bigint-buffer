@@ -1,6 +1,6 @@
 import * as bc from '#pkg'
 import * as chai from 'chai'
-import { describe, it } from 'mocha';
+import { describe, it } from 'mocha'
 
 describe('bigintToBuf', function () {
   const inputs = [
