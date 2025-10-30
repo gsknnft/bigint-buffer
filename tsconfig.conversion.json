@@ -1,0 +1,8 @@
+// tsconfig.conversion.json
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/conversion/src/ts",
+    "src/conversion/test"
+  ]
+}

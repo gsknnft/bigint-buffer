@@ -1,5 +1,10 @@
 {
   "parserOptions": {
-  "project": "./tsconfig.lint.json"
+  "project": [
+    "./tsconfig.lint.json",
+    "./tsconfig.json",
+    "./tsconfig.conversion.json"
+
+  ]
 }
 }
