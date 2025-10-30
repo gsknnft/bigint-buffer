@@ -1,6 +1,6 @@
 const webpack = require('webpack')
 module.exports = function (config) {
-   const configuration = {
+  const configuration = {
     browserNoActivityTimeout: 120000,
     frameworks: ['mocha'],
     files: [
@@ -9,13 +9,13 @@ module.exports = function (config) {
     preprocessors: {
       './build/src//*.spec.js': ['webpack', 'env']
     },
-    webpack : {
-      mode: "production",
+    webpack: {
+      mode: 'production',
       devtool: 'inline-source-map',
       module: {
-          // Suppress warning from mocha: "Critical dependency: the request of a dependency is an expression"
-          // @see https://webpack.js.org/configuration/module/#module-contexts
-          exprContextCritical: false
+        // Suppress warning from mocha: "Critical dependency: the request of a dependency is an expression"
+        // @see https://webpack.js.org/configuration/module/#module-contexts
+        exprContextCritical: false
       },
       // Suppress fatal error: Cannot resolve module 'fs'
       // @relative https://github.com/pugjs/pug-loader/issues/8
@@ -23,14 +23,15 @@ module.exports = function (config) {
       node: {
         fs: 'empty',
         bindings: 'empty'
-      }, 
+      },
       resolve: {
         extensions: ['.ts', '.js', '.json']
-      }, plugins: [ new webpack.NormalModuleReplacementPlugin(
-          /\.\/index/,
-          './build/src/bromwser.js'
-        ),
-      ],
+      },
+      plugins: [new webpack.NormalModuleReplacementPlugin(
+        /\.\/index/,
+        './build/src/bromwser.js'
+      )
+      ]
     },
     singleRun: true,
     reporters: ['mocha'],
@@ -42,7 +43,7 @@ module.exports = function (config) {
       'karma-mocha-reporter'
     ],
     mime: {
-      'text/x-typescript': ['ts','tsx']
+      'text/x-typescript': ['ts', 'tsx']
     },
     browsers: ['Chrome'],
     customLaunchers: {
@@ -51,12 +52,11 @@ module.exports = function (config) {
         flags: ['--no-sandbox']
       }
     }
-   };
+  }
 
-    if(process.env.TRAVIS) {
-      configuration.browsers = ['Chrome_travis_ci'];
-    }
+  if (process.env.TRAVIS) {
+    configuration.browsers = ['Chrome_travis_ci']
+  }
 
-    config.set(configuration);
+  config.set(configuration)
 }
-

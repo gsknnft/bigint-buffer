@@ -12,11 +12,15 @@
     "rootDirs": ["src", "src/conversion"],
     "tsBuildInfoFile": "build/main.tsbuildinfo"
   },
-  "include": [
-    "src/**/*", 
-    "test/*.ts",
-    "test/**/*.ts"
-  ],
+"include": [
+  "src",
+  "src/conversion/src/ts",
+  "src/conversion/test",
+  "helper/**/*.ts",
+  "helper/**/*.d.ts",
+  "vitest.config.ts",
+  "test/**/*.ts"
+],
   "exclude": [
     "node_modules"
   ]
