@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "include": [
     "src",
+    "src/**/*.ts", "test/**/*.ts",
     "src/conversion/src/ts",
     "src/conversion/test",
     "helper/**/*.ts",
