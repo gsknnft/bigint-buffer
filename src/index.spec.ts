@@ -4,8 +4,9 @@ declare var process: {browser: boolean;};
 import * as chai from 'chai';
 import * as path from 'path';
 
-const lib = process.browser ? require('../../dist/browser') :
-                              require(path.join(__dirname, '../dist/node'));
+const lib = process.browser ?
+    require('../../dist/index.js') :
+    require(path.join(__dirname, '../../dist/index.cjs'));
 const toBigIntBE = lib.toBigIntBE;
 const toBigIntLE = lib.toBigIntLE;
 const toBufferBE = lib.toBufferBE;
@@ -297,7 +298,7 @@ describe('Conversion Utilities - bigintToBuf and bufToBigint', () => {
 
   it('should convert small number to buffer', () => {
     const buf = bigintToBuf(BigInt(123456789));
-    bufToBigint(buf).should.equal(BigInt(123456789));
+    assertEquals(bufToBigint(buf), BigInt(123456789));
   });
 
   it('should round-trip convert medium numbers', () => {
