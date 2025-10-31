@@ -3,7 +3,6 @@
   "version": "1.3.1",
   "description": "bigint to buffer conversion with native support",
   "main": "dist/index.js",
-  "type": "module",
   "browser": {
     "./dist/node.js": "./dist/browser.js"
   },
@@ -17,14 +16,13 @@
     "prepare": "npm run compile",
     "prepublishOnly": "rm -rf build/Release; rm build/Makefile; rm build/gyp-*; rm build/*.mk; rm build/*.Makefile; rm *.tgz",
     "test:browser": "karma start karma.conf.js",
-    "test:node": "mocha -r ts-node/register src/**/*.spec.ts --timeout 40000",
+    "test:node": "mocha build/src/**/*.spec.js --timeout 40000",
     "benchmark": "node -r ts-node/register src/index.bench.ts",
     "typedoc": "typedoc --out docs $(pwd)/src $(pwd)/helper --target es6 --mode file --tsconfig ./tsconfig.json --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*+(spec|bench).ts'",
     "rebuild": "node-gyp rebuild",
     "check": "gts check",
     "clean": "gts clean",
-    "compile": "tsc -p . && rollup -c rollup.cjs.config.js && rollup -c rollup.esm.config.js && cpy build/src/*.d.ts dist",
-    "compileOG": "mkdirp dist && tsc -p . && rollup -c > dist/node.js && cross-env BROWSER=true rollup -c > dist/browser.js && cpx \"build/src/*.d.ts\" dist",
+    "compile": "tsc -p . && rollup -c rollup.cjs.config.js && rollup -c rollup.esm.config.js && cp build/src/index.d.ts dist/index.d.ts",
     "fix": "gts fix",
     "pretest": "npm run compile",
     "posttest": "npm run check"

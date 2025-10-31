@@ -93,3 +93,118 @@ export function toBufferBE(num: bigint, width: number): Buffer {
   }
   return converter.fromBigInt(num, Buffer.allocUnsafe(width), true);
 }
+
+// ========== Conversion Utilities ==========
+
+/**
+ * Convert a bigint to a Buffer with automatic sizing.
+ * Uses big-endian encoding and calculates the minimum buffer size needed.
+ * @param num The bigint to convert
+ * @returns A big-endian Buffer representation
+ */
+export function bigintToBuf(num: bigint): Buffer {
+  if (num < BigInt(0)) {
+    throw new Error('bigintToBuf: negative bigint values are not supported');
+  }
+  if (num === BigInt(0)) {
+    return Buffer.from([0]);
+  }
+  // Calculate the number of bytes needed
+  const hex = num.toString(16);
+  const width = Math.ceil(hex.length / 2);
+  return toBufferBE(num, width);
+}
+
+/**
+ * Convert a Buffer to a bigint.
+ * Assumes big-endian encoding.
+ * @param buf The buffer to convert
+ * @returns A bigint representation of the buffer
+ */
+export function bufToBigint(buf: Buffer): bigint {
+  return toBigIntBE(buf);
+}
+
+/**
+ * Convert a bigint to a hexadecimal string.
+ * @param num The bigint to convert
+ * @returns A hexadecimal string (without '0x' prefix)
+ */
+export function bigintToHex(num: bigint): string {
+  if (num < BigInt(0)) {
+    throw new Error('bigintToHex: negative bigint values are not supported');
+  }
+  const hex = num.toString(16);
+  // Ensure even length for proper byte representation
+  return hex.length % 2 === 0 ? hex : '0' + hex;
+}
+
+/**
+ * Convert a hexadecimal string to a bigint.
+ * @param hex The hexadecimal string (with or without '0x' prefix)
+ * @returns A bigint representation
+ */
+export function hexToBigint(hex: string): bigint {
+  // Remove '0x' prefix if present
+  const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex;
+  if (cleanHex.length === 0) {
+    return BigInt(0);
+  }
+  return BigInt(`0x${cleanHex}`);
+}
+
+/**
+ * Convert a bigint to a decimal text string.
+ * @param num The bigint to convert
+ * @returns A decimal string representation
+ */
+export function bigintToText(num: bigint): string {
+  return num.toString(10);
+}
+
+/**
+ * Convert a decimal text string to a bigint.
+ * @param text The decimal string to convert
+ * @returns A bigint representation
+ */
+export function textToBigint(text: string): bigint {
+  if (!text?.trim()) {
+    throw new Error('textToBigint: input string cannot be empty');
+  }
+  try {
+    return BigInt(text);
+  } catch (e) {
+    throw new Error(`textToBigint: invalid decimal string "${text}"`);
+  }
+}
+
+/**
+ * Convert a bigint to a base64 string.
+ * @param num The bigint to convert
+ * @returns A base64 string representation
+ */
+export function bigintToBase64(num: bigint): string {
+  if (num < BigInt(0)) {
+    throw new Error('bigintToBase64: negative bigint values are not supported');
+  }
+  const buf = bigintToBuf(num);
+  return buf.toString('base64');
+}
+
+/**
+ * Convert a base64 string to a bigint.
+ * @param base64 The base64 string to convert
+ * @returns A bigint representation
+ */
+export function base64ToBigint(base64: string): bigint {
+  if (!base64?.trim()) {
+    throw new Error('base64ToBigint: input string cannot be empty');
+  }
+  // Trim whitespace and validate base64 format (allows padding)
+  const cleaned = base64.trim();
+  if (!/^[A-Za-z0-9+/]+=*$/.test(cleaned)) {
+    throw new Error('base64ToBigint: invalid base64 string format');
+  }
+  const buf = Buffer.from(cleaned, 'base64');
+  return bufToBigint(buf);
+}
