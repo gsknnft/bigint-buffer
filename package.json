@@ -22,7 +22,7 @@
     "rebuild": "node-gyp rebuild",
     "check": "gts check",
     "clean": "gts clean",
-"compile": "tsc -p . && rollup -c rollup.cjs.config.js && rollup -c rollup.esm.config.js && cp build/src/index.d.ts dist/index.d.ts",
+    "compile": "tsc -p . && rollup -c rollup.cjs.config.js && rollup -c rollup.esm.config.js && cp build/src/index.d.ts dist/index.d.ts",
     "fix": "gts fix",
     "pretest": "npm run compile",
     "posttest": "npm run check"

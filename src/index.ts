@@ -168,7 +168,7 @@ export function bigintToText(num: bigint): string {
  * @returns A bigint representation
  */
 export function textToBigint(text: string): bigint {
-  if (!text || text.trim().length === 0) {
+  if (!text?.trim()) {
     throw new Error('textToBigint: input string cannot be empty');
   }
   try {
@@ -197,13 +197,14 @@ export function bigintToBase64(num: bigint): string {
  * @returns A bigint representation
  */
 export function base64ToBigint(base64: string): bigint {
-  if (!base64 || base64.trim().length === 0) {
+  if (!base64?.trim()) {
     throw new Error('base64ToBigint: input string cannot be empty');
   }
-  // Validate base64 format
-  if (!/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) {
+  // Trim whitespace and validate base64 format (allows padding)
+  const cleaned = base64.trim();
+  if (!/^[A-Za-z0-9+/]+=*$/.test(cleaned)) {
     throw new Error('base64ToBigint: invalid base64 string format');
   }
-  const buf = Buffer.from(base64, 'base64');
+  const buf = Buffer.from(cleaned, 'base64');
   return bufToBigint(buf);
 }
