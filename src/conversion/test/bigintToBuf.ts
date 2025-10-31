@@ -1,4 +1,4 @@
-import * as bc from '#pkg'
+import * as bc from '../src/ts/index.js'
 import * as chai from 'chai'
 import { describe, it } from 'mocha'
 

@@ -7,7 +7,7 @@
     "rootDir": ".",
     "outDir": "build",
     "target" : "esnext",
-    "lib" : [ "esnext" ],
+    "lib" : [ "esnext", "DOM" ],
     "sourceMap": true,
     "rootDirs": ["src", "src/conversion"],
     "tsBuildInfoFile": "build/main.tsbuildinfo"
