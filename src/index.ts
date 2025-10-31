@@ -97,3 +97,21 @@ export function toBufferBE (num: bigint, width: number): Buffer {
   }
   return converter.fromBigInt(num, Buffer.allocUnsafe(width), true)
 }
+
+// Export all conversion utilities from the integrated bigint-conversion module
+export {
+  parseHex,
+  bigintToBuf,
+  bufToBigint,
+  bigintToHex,
+  hexToBigint,
+  bigintToText,
+  textToBigint,
+  bufToText,
+  textToBuf,
+  bufToHex,
+  hexToBuf,
+  bigintToBase64,
+  base64ToBigint,
+  type TypedArray
+} from './conversion/src/ts/index.js'
