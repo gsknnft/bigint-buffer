@@ -285,3 +285,131 @@ describe('Try bigint conversion (big endian)', () => {
         ]));
   });
 });
+
+describe('Conversion Utilities - bigintToBuf and bufToBigint', () => {
+  const bigintToBuf = lib.bigintToBuf;
+  const bufToBigint = lib.bufToBigint;
+
+  it('should convert 0 to buffer', () => {
+    const buf = bigintToBuf(BigInt(0));
+    buf.should.deep.equal(Buffer.from([0]));
+  });
+
+  it('should convert small number to buffer', () => {
+    const buf = bigintToBuf(BigInt(123456789));
+    bufToBigint(buf).should.equal(BigInt(123456789));
+  });
+
+  it('should round-trip convert medium numbers', () => {
+    const original = BigInt('0xdeadbeef');
+    const buf = bigintToBuf(original);
+    const result = bufToBigint(buf);
+    assertEquals(result, original);
+  });
+
+  it('should round-trip convert large numbers', () => {
+    const original = BigInt('0xbadc0ffee0ddf00ddeadbeef');
+    const buf = bigintToBuf(original);
+    const result = bufToBigint(buf);
+    assertEquals(result, original);
+  });
+});
+
+describe('Conversion Utilities - bigintToHex and hexToBigint', () => {
+  const bigintToHex = lib.bigintToHex;
+  const hexToBigint = lib.hexToBigint;
+
+  it('should convert 0 to hex', () => {
+    bigintToHex(BigInt(0)).should.equal('00');
+  });
+
+  it('should convert small number to hex', () => {
+    bigintToHex(BigInt(255)).should.equal('ff');
+  });
+
+  it('should convert number to even-length hex', () => {
+    bigintToHex(BigInt(15)).should.equal('0f');
+  });
+
+  it('should convert hex string to bigint', () => {
+    assertEquals(hexToBigint('deadbeef'), BigInt('0xdeadbeef'));
+  });
+
+  it('should handle hex string with 0x prefix', () => {
+    assertEquals(hexToBigint('0xdeadbeef'), BigInt('0xdeadbeef'));
+  });
+
+  it('should round-trip convert', () => {
+    const original = BigInt('0xbadc0ffee0ddf00ddeadbeef');
+    const hex = bigintToHex(original);
+    const result = hexToBigint(hex);
+    assertEquals(result, original);
+  });
+
+  it('should handle empty string', () => {
+    assertEquals(hexToBigint(''), BigInt(0));
+  });
+});
+
+describe('Conversion Utilities - bigintToText and textToBigint', () => {
+  const bigintToText = lib.bigintToText;
+  const textToBigint = lib.textToBigint;
+
+  it('should convert 0 to text', () => {
+    bigintToText(BigInt(0)).should.equal('0');
+  });
+
+  it('should convert positive number to text', () => {
+    bigintToText(BigInt(123456789)).should.equal('123456789');
+  });
+
+  it('should convert large number to text', () => {
+    bigintToText(BigInt('0xdeadbeef')).should.equal('3735928559');
+  });
+
+  it('should convert text to bigint', () => {
+    assertEquals(textToBigint('123456789'), BigInt(123456789));
+  });
+
+  it('should round-trip convert', () => {
+    const original = BigInt('9876543210123456789');
+    const text = bigintToText(original);
+    const result = textToBigint(text);
+    assertEquals(result, original);
+  });
+});
+
+describe('Conversion Utilities - bigintToBase64 and base64ToBigint', () => {
+  const bigintToBase64 = lib.bigintToBase64;
+  const base64ToBigint = lib.base64ToBigint;
+
+  it('should convert 0 to base64', () => {
+    const b64 = bigintToBase64(BigInt(0));
+    b64.should.be.a('string');
+    assertEquals(base64ToBigint(b64), BigInt(0));
+  });
+
+  it('should convert small number to base64', () => {
+    const original = BigInt(123456789);
+    const b64 = bigintToBase64(original);
+    b64.should.equal('B1vNFQ==');
+  });
+
+  it('should convert base64 to bigint', () => {
+    assertEquals(base64ToBigint('B1vNFQ=='), BigInt(123456789));
+  });
+
+  it('should round-trip convert medium numbers', () => {
+    const original = BigInt('0xdeadbeef');
+    const b64 = bigintToBase64(original);
+    const result = base64ToBigint(b64);
+    assertEquals(result, original);
+  });
+
+  it('should round-trip convert large numbers', () => {
+    const original = BigInt('0xbadc0ffee0ddf00ddeadbeef');
+    const b64 = bigintToBase64(original);
+    const result = base64ToBigint(b64);
+    assertEquals(result, original);
+  });
+});

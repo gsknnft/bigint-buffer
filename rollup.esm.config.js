@@ -3,11 +3,13 @@ import replace from 'rollup-plugin-replace';
 export default {
     input: 'build/src/index.js',
     output: {
-        format: 'cjs'
+        file: 'dist/index.js',
+        format: 'esm'
     },
+    external: ['bindings'],
     plugins: [
         replace({
-            'process.browser': process.env.BROWSER === "true"
+            'process.browser': 'false'
         })
     ]
 };
