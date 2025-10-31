@@ -314,6 +314,10 @@ describe('Conversion Utilities - bigintToBuf and bufToBigint', () => {
     const result = bufToBigint(buf);
     assertEquals(result, original);
   });
+
+  it('should throw error for negative bigint', () => {
+    chai.expect(() => bigintToBuf(BigInt(-1))).to.throw('negative bigint');
+  });
 });
 
 describe('Conversion Utilities - bigintToHex and hexToBigint', () => {
@@ -350,6 +354,10 @@ describe('Conversion Utilities - bigintToHex and hexToBigint', () => {
   it('should handle empty string', () => {
     assertEquals(hexToBigint(''), BigInt(0));
   });
+
+  it('should throw error for negative bigint', () => {
+    chai.expect(() => bigintToHex(BigInt(-1))).to.throw('negative bigint');
+  });
 });
 
 describe('Conversion Utilities - bigintToText and textToBigint', () => {
@@ -377,6 +385,14 @@ describe('Conversion Utilities - bigintToText and textToBigint', () => {
     const text = bigintToText(original);
     const result = textToBigint(text);
     assertEquals(result, original);
+  });
+
+  it('should throw error for empty string', () => {
+    chai.expect(() => textToBigint('')).to.throw('cannot be empty');
+  });
+
+  it('should throw error for invalid decimal string', () => {
+    chai.expect(() => textToBigint('abc')).to.throw('invalid decimal');
   });
 });
 
@@ -412,5 +428,17 @@ describe('Conversion Utilities - bigintToBase64 and base64ToBigint', () => {
     const b64 = bigintToBase64(original);
     const result = base64ToBigint(b64);
     assertEquals(result, original);
+  });
+
+  it('should throw error for negative bigint', () => {
+    chai.expect(() => bigintToBase64(BigInt(-1))).to.throw('negative bigint');
+  });
+
+  it('should throw error for empty base64 string', () => {
+    chai.expect(() => base64ToBigint('')).to.throw('cannot be empty');
+  });
+
+  it('should throw error for invalid base64 string', () => {
+    chai.expect(() => base64ToBigint('invalid!@#')).to.throw('invalid base64');
   });
 });

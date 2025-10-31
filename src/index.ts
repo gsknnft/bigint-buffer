@@ -103,6 +103,9 @@ export function toBufferBE(num: bigint, width: number): Buffer {
  * @returns A big-endian Buffer representation
  */
 export function bigintToBuf(num: bigint): Buffer {
+  if (num < BigInt(0)) {
+    throw new Error('bigintToBuf: negative bigint values are not supported');
+  }
   if (num === BigInt(0)) {
     return Buffer.from([0]);
   }
@@ -128,6 +131,9 @@ export function bufToBigint(buf: Buffer): bigint {
  * @returns A hexadecimal string (without '0x' prefix)
  */
 export function bigintToHex(num: bigint): string {
+  if (num < BigInt(0)) {
+    throw new Error('bigintToHex: negative bigint values are not supported');
+  }
   const hex = num.toString(16);
   // Ensure even length for proper byte representation
   return hex.length % 2 === 0 ? hex : '0' + hex;
@@ -162,7 +168,14 @@ export function bigintToText(num: bigint): string {
  * @returns A bigint representation
  */
 export function textToBigint(text: string): bigint {
-  return BigInt(text);
+  if (!text || text.trim().length === 0) {
+    throw new Error('textToBigint: input string cannot be empty');
+  }
+  try {
+    return BigInt(text);
+  } catch (e) {
+    throw new Error(`textToBigint: invalid decimal string "${text}"`);
+  }
 }
 
 /**
@@ -171,6 +184,9 @@ export function textToBigint(text: string): bigint {
  * @returns A base64 string representation
  */
 export function bigintToBase64(num: bigint): string {
+  if (num < BigInt(0)) {
+    throw new Error('bigintToBase64: negative bigint values are not supported');
+  }
   const buf = bigintToBuf(num);
   return buf.toString('base64');
 }
@@ -181,6 +197,13 @@ export function bigintToBase64(num: bigint): string {
  * @returns A bigint representation
  */
 export function base64ToBigint(base64: string): bigint {
+  if (!base64 || base64.trim().length === 0) {
+    throw new Error('base64ToBigint: input string cannot be empty');
+  }
+  // Validate base64 format
+  if (!/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) {
+    throw new Error('base64ToBigint: invalid base64 string format');
+  }
   const buf = Buffer.from(base64, 'base64');
   return bufToBigint(buf);
 }
