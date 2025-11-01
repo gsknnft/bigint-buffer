@@ -10,7 +10,7 @@
 
 As of October 2025, `bigint-buffer@1.1.5` is **compromised and flagged by multiple audit tools** due to unresolved vulnerabilities in its native bindings and transitive dependencies. No upstream patch has been published.
 
-This fork — `@gsknnft/bigint-buffer@1.2.0` — is a **sovereign override**:
+This fork — `@gsknnft/bigint-buffer@1.3.2` — is a **sovereign override**:
 - ✅ Rebuilt with modern TypeScript and Rollup
 - ✅ Native bindings patched and rebuilt via `node-gyp`
 - ✅ Browser fallback formalized via `"browser"` field
@@ -22,7 +22,7 @@ If you're using `bigint-buffer` in a secure or reproducible system, **migrate to
 ```json
 "pnpm": {
   "overrides": {
-    "bigint-buffer": "@gsknnft/bigint-buffer@1.2.0"
+    "bigint-buffer": "@gsknnft/bigint-buffer@1.3.2"
   }
 }
 ```
