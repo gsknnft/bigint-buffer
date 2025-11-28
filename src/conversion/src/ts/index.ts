@@ -374,9 +374,9 @@ export function bufToHex(
     if (ArrayBuffer.isView(input)) {
       buf = new Uint8Array(input.buffer.slice(
           input.byteOffset, input.byteOffset + input.byteLength));
-    } else {
-      return parseHex(Buffer.from(input).toString('hex'), prefix0x, byteLength);
     }
+    return parseHex(
+        Buffer.from(toBuffer(buf)).toString('hex'), prefix0x, byteLength);
   }
 }
 
