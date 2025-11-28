@@ -8,11 +8,14 @@ Modern, secure BigInt ↔ Buffer conversion with native bindings, browser fallba
 ---
 
 ## 🔐 Security Notice: This Module Has Been Reclaimed
+This fork (`@gsknnft/bigint-buffer`) is actively maintained, secure, and recommended for all users. Native now builds clean. All conversion helpers are live and set.
+
+---
+
+Modern, secure BigInt ↔ Buffer conversion with native bindings, browser fallbacks, and the full `bigint-conversion` API built in.
 
 As of October 2025, `bigint-buffer@1.1.5` is **compromised and flagged by multiple audit tools** due to unresolved vulnerabilities in its native bindings and transitive dependencies. No upstream patch has been published.
 As the original `bigint-buffer` package is deprecated. This repo (`@gsknnft/bigint-buffer`) is the official, actively maintained successor. All users should migrate for security, performance, and modern features.
-
-## 🚨 Migration Notice
 
 This repo — `@gsknnft/bigint-buffer@1.4.0` — is a **sovereign override**:
 - ✅ Rebuilt with modern TypeScript and Rollup
