@@ -1,10 +1,10 @@
-import { defineConfig } from "vite";
-import path from "path";
+import path from 'path';
+import {defineConfig} from 'vite';
 
-export default defineConfig({
+export const config = defineConfig({
   resolve: {
     alias: {
-      "#pkg": path.resolve(__dirname, "src/ts/index.ts"),
+      '#pkg': path.resolve(__dirname, 'src/ts/index.ts'),
     },
   },
 });

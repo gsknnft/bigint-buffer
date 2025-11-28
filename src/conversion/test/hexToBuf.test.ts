@@ -1,28 +1,13 @@
 import * as bc from '#pkg';
-import { describe, it, expect } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 describe('hexToBuf', () => {
   const tests = [
-    {
-      buf: new Uint8Array([9, 255]),
-      hex: '09ff'
-    },
-    {
-      buf: new Uint16Array([5, 256]),
-      hex: '05000001'
-    },
-    {
-      buf: new ArrayBuffer(2),
-      hex: '000'
-    },
-    {
-      buf: new Uint8Array([1, 1]),
-      hex: '0x101'
-    },
-    {
-      buf: new Uint8Array([1, 1, 1]),
-      hex: '10101'
-    }
+    {buf: new Uint8Array([9, 255]), hex: '09ff'},
+    {buf: new Uint16Array([5, 256]), hex: '05000001'},
+    {buf: new ArrayBuffer(2), hex: '000'},
+    {buf: new Uint8Array([1, 1]), hex: '0x101'},
+    {buf: new Uint8Array([1, 1, 1]), hex: '10101'}
   ];
 
   describe('hexToBuf and bufToHex', () => {

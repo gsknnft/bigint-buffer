@@ -1,38 +1,17 @@
-import { describe, it, expect } from 'vitest';
 import * as bc from '#pkg';
+import {describe, expect, it} from 'vitest';
 
 describe('bigintToBase64', () => {
   const inputs = [
-    {
-      bi: BigInt(1),
-      base64: 'AQ',
-      urlsafe: true,
-      padding: false
-    },
-    {
-      bi: BigInt(31),
-      base64: 'Hw==',
-      urlsafe: true,
-      padding: undefined
-    },
-    {
-      bi: BigInt(3855),
-      base64: 'Dw8',
-      urlsafe: undefined,
-      padding: false
-    },
-    {
+    {bi: BigInt(1), base64: 'AQ', urlsafe: true, padding: false},
+    {bi: BigInt(31), base64: 'Hw==', urlsafe: true, padding: undefined},
+    {bi: BigInt(3855), base64: 'Dw8', urlsafe: undefined, padding: false}, {
       bi: BigInt('12485413541784539569456874935679853424678352483761'),
       base64: 'CIr5Tmsemfi/OwHtthnKqmVqXHWx',
       urlsafe: false,
       padding: true
     },
-    {
-      bi: BigInt('-4'),
-      base64: '',
-      urlsafe: true,
-      padding: false
-    }
+    {bi: BigInt('-4'), base64: '', urlsafe: true, padding: false}
   ];
 
   for (const input of inputs) {

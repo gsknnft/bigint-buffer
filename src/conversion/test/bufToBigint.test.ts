@@ -1,17 +1,10 @@
 import * as bc from '#pkg';
-import { describe, it, expect } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 describe('bufToBigint', () => {
   const tests = [
-    {
-      input: new Uint32Array(2),
-      output: BigInt(0)
-    },
-    {
-      input: bc.hexToBuf('ffffffff'),
-      output: BigInt('4294967295')
-    },
-    {
+    {input: new Uint32Array(2), output: BigInt(0)},
+    {input: bc.hexToBuf('ffffffff'), output: BigInt('4294967295')}, {
       input: new Uint16Array(bc.hexToBuf('ffffffff', true)),
       output: BigInt('4294967295')
     }
