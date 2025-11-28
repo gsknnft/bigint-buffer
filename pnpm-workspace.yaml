@@ -1,0 +1,14 @@
+packages:
+  - src/conversion/*
+
+ignoredBuiltDependencies:
+  - inotify
+
+onlyBuiltDependencies:
+  - core-js
+  - es5-ext
+  - esbuild
+  - fsevents
+  - microtime
+  - pre-commit
+  - spawn-sync

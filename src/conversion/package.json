@@ -1,0 +1,181 @@
+{
+  "name": "bigint-conversion",
+  "version": "2.4.3",
+  "description": "Convert to/from BigInt from/to Buffer, ArrayBuffer, hex string, utf8-encoded text string.",
+  "keywords": [
+    "BigInt",
+    "bignum",
+    "big integer",
+    "text",
+    "utf8",
+    "hex",
+    "Buffer",
+    "ArrayBuffer",
+    "TypedArray"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Juan Hernández Serrano",
+    "email": "j.hernandez@upc.edu",
+    "url": "https://github.com/juanelas"
+  },
+  "repository": "github:juanelas/bigint-conversion",
+  "main": "./dist/cjs/index.node.js",
+  "browser": "./dist/esm/index.browser.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "node": {
+        "import": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/esm/index.node.js"
+        },
+        "require": {
+          "types": "./dist/index.d.ts",
+          "default": "./dist/node.js"
+        }
+      },
+      "script": "./dist/bundle.iife.js",
+      "default": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/esm/index.browser.js"
+      }
+    },
+    "./esm-browser-bundle": "./dist/esm/bundle.min.js",
+    "./dist/esm/bundle.min.js": "./dist/esm/bundle.min.js",
+    "./esm-browser-bundle-nomin": "./dist/esm/bundle.js",
+    "./dist/esm/bundle.js": "./dist/esm/bundle.js",
+    "./iife-browser-bundle": "./dist/bundle.iife.js",
+    "./dist/bundle.iife.js": "./dist/bundle.iife.js",
+    "./umd-browser-bundle": "./dist/bundle.umd.js",
+    "./dist/bundle.umd.js": "./dist/bundle.umd.js",
+    "./dist/cjs/index.node": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/cjs/index.node.js"
+    },
+    "./dist/esm/index.node": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/esm/index.node.js"
+    },
+    "./dist/esm/index.browser": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/esm/index.browser.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "imports": {
+    "#pkg": {
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/cjs/index.node.js"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/esm/index.node.js"
+      },
+      "default": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/esm/index.browser.js"
+      }
+    }
+  },
+  "directories": {
+    "build": "./build",
+    "dist": "./dist",
+    "docs": "./docs",
+    "src": "./src",
+    "test": "./test"
+  },
+  "scripts": {
+    "_build:cleantypes": "rimraf .types",
+    "_build:cjsAndesmPkgJsons": "node ./build/bin/post-build.ts",
+    "build": "run-s build:js docs copy:types",
+    "build:js": "rollup -c build/rollup.config.ts",
+    "typecheck": "tsc --noEmit",
+    "postbuild:js": "run-s _build:cleantypes _build:cjsAndesmPkgJsons",
+    "test:node": "vitest run",
+    "clean": "rimraf coverage dist .types docs",
+    "coverage": "c8 --clean --check-coverage --exclude \"{src/ts/**/*.spec.ts,src/ts/**/*.test.ts,test,test-vectors,build}\" --exclude-after-remap --reporter=text --reporter=lcov node ./build/bin/mocha-ts.js --commonjs ",
+    "docs": "typedoc --plugin typedoc-plugin-markdown --entryModule API.md --readme none --excludePrivate --out docs src/ts/index.ts",
+    "mocha-ts": "node --experimental-modules --experimental-json-modules --es-module-specifier-resolution=node ./build/bin/mocha-ts.js ",
+    "mocha-ts:cjs": "node ./build/bin/mocha-ts.js --commonjs ",
+    "mocha-ts:watch": "npm run mocha-ts:cjs -- --watch --timeout 0",
+    "mocha-ts:browser": "node build/testing/browser/index.js ",
+    "mocha-ts:browser-headless": "node build/testing/browser/index.js headless ",
+    "preversion": "run-s clean build:js coverage test:browser-headless",
+    "version": "run-s docs git:add",
+    "postversion": "git push --follow-tags",
+    "test": "vitest run",
+    "test:browser": "npm run mocha-ts:browser",
+    "test:browser-headless": "npm run mocha-ts:browser-headless",
+    "test:node:og": "run-s test:node-cjs test:node-esm",
+    "test:node-cjs": "npm run mocha-ts:cjs ",
+    "test:node-esm": "npm run mocha-ts ",
+    "watch": "npm run mocha-ts:watch "
+  },
+  "copy:types": "cpy ./build/index.d.ts ./dist/ --flat",
+  "ts-standard": {
+    "project": "tsconfig.json",
+    "env": [
+      "mocha"
+    ],
+    "globals": [
+      "IS_BROWSER",
+      "browser",
+      "page",
+      "chai"
+    ],
+    "ignore": [
+      "dist/**/*",
+      "examples/**/*",
+      "types/**/*",
+      "benchmark/**/*"
+    ]
+  },
+  "nodeBrowserSkel": {
+    "badges": {
+      "workflow": true,
+      "coveralls": true
+    },
+    "git": {
+      "branch": "main"
+    }
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.9",
+    "@rollup/plugin-inject": "^5.0.5",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-multi-entry": "^7.0.1",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-replace": "^6.0.2",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "c8": "^10.1.3",
+    "chai": "^6.2.0",
+    "esbuild-register": "^3.6.0",
+    "glob": "^11.0.3",
+    "json5": "^2.2.3",
+    "minimatch": "^10.0.3",
+    "mocha": "^11.7.4",
+    "npm-run-all": "^4.1.5",
+    "pirates": "^4.0.7",
+    "puppeteer": "^24.26.1",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.52.5",
+    "rollup-plugin-dts": "^6.2.3",
+    "ts-standard": "^12.0.2",
+    "tslib": "^2.8.1",
+    "typedoc": "^0.28.14",
+    "typedoc-plugin-markdown": "^4.9.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.3"
+  },
+  "peerDependencies": {
+    "@juanelas/base64": "^1.1.5"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  }
+}

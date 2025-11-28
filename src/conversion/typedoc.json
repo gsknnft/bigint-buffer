@@ -1,0 +1,5 @@
+{
+  "readme": "none",
+  "excludePrivate": true,
+  "plugin": ["typedoc-plugin-markdown"]
+}

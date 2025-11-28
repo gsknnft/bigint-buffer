@@ -1,43 +1,48 @@
-# 💪🔢 @gsknnft/bigint-buffer: Secure Buffer Utilities for TC39 BigInt Proposal
 
-[![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
-[![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
-[![Maintained Fork](https://img.shields.io/badge/fork-maintained-blue?style=flat-square)](https://github.com/gsknnft/bigintbuffer)
+# @gsknnft/bigint-buffer
+
+**Modern, secure, and officially maintained BigInt ↔ Buffer conversion utilities.**
 
 ---
 
-## 🔐 Security Notice: This Module Has Been Reclaimed
+## 🚨 Deprecation Notice
 
-As of October 2025, `bigint-buffer@1.1.5` is **compromised and flagged by multiple audit tools** due to unresolved vulnerabilities in its native bindings and transitive dependencies. No upstream patch has been published.
+The original `bigint-buffer` package is now deprecated and should no longer be used. This repository (`@gsknnft/bigint-buffer`) is the official, actively maintained, and optimized successor. All users are strongly encouraged to migrate.
 
-This fork — `@gsknnft/bigint-buffer@1.3.2` — is a **sovereign override**:
-- ✅ Rebuilt with modern TypeScript and Rollup
-- ✅ Native bindings patched and rebuilt via `node-gyp`
-- ✅ Browser fallback formalized via `"browser"` field
-- ✅ ESM/CJS duality declared via `"exports"`
-- ✅ Peer dependency alignment and audit compliance restored
+---
 
-If you're using `bigint-buffer` in a secure or reproducible system, **migrate to `@gsknnft/bigint-buffer`** or override via `pnpm`:
+## 📦 Universal Installation
 
-```json
-"pnpm": {
-  "overrides": {
-    "bigint-buffer": "@gsknnft/bigint-buffer@1.3.2"
-  }
-}
+Install with your favorite package manager:
+
+```bash
+# pnpm
+pnpm add @gsknnft/bigint-buffer
+# npm
+npm install @gsknnft/bigint-buffer
+# yarn
+yarn add @gsknnft/bigint-buffer
 ```
-## 🔍 Differences from Upstream
-
-- Rebuilt native bindings with modern Node compatibility
-- Scoped under `@gsknnft` for audit clarity
-- Uses `cpy-cli` instead of deprecated `cpx`
-- Rollup-based bundling for ESM/CJS duality
-- Peer dependency alignment and reproducibility guarantees
 
 ---
 
-**This fork is maintained by CoreFlame/GSKNNFT as part of the SigilNet ecosystem.**
-It is the only currently known secure, reproducible implementation of BigInt ↔ Buffer conversion with native fallback.
+## 🧪 Modern Testing
+
+This package uses [Vitest](https://vitest.dev) for fast, modern, and type-safe testing. Run tests with:
+
+```bash
+pnpm run test
+# or
+npm run test
+# or
+yarn test
+```
+
+---
+
+## 🔥 About This Repo
+
+This is the official repo for `@gsknnft/bigint-buffer`, maintained by GSKNNFT/CoreFlame. It is part of the SigilNet ecosystem and is the only secure, reproducible implementation of BigInt ↔ Buffer conversion with native fallback. All code is rebuilt with modern TypeScript, Rollup, and patched native bindings.
 
 ---
 
@@ -60,6 +65,12 @@ import {
   bigintToBase64,
   base64ToBigint
 } from '@gsknnft/bigint-buffer';
+```
+
+Need only the conversion helpers? Import them directly with:
+
+```ts
+import * as conversion from '@gsknnft/bigint-buffer/conversion';
 ```
 
 #### Examples

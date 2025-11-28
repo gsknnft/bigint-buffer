@@ -2,16 +2,24 @@
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
     "composite": true,
-    "rootDir": ".",
+    "rootDir": "./src",
     "outDir": "build",
+    "declaration": true,
     "target" : "esnext",
-    "lib" : [ "esnext" ],
-    "sourceMap": true
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true,
+    "lib" : [ "esnext", "dom" ],
+    "sourceMap": true,
+    "types": ["node"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "paths": {
+      "#pkg": ["./src/conversion/src/ts/index.ts"],
+      "@gsknnft/bigint-buffer/conversion": ["./src/conversion/src/ts/index.ts"]
+    }
   },
   "include": [
-    "src/*.ts",
-    "src/**/*.ts",
-    "test/*.ts",
+    "src",
     "test/**/*.ts"
   ],
   "exclude": [
