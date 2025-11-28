@@ -19,8 +19,10 @@
     }
   },
   "include": [
-    "src",
-    "test"
+    "src/*.ts",
+    "src/**/*.ts",
+    "src/conversion/src/ts/**/*.ts",
+    "src/conversion/test/**/*.ts"
   ],
   "exclude": [
     "node_modules"
