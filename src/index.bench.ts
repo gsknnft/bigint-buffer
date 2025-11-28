@@ -2,7 +2,7 @@
 import benchmark from 'benchmark';
 import BN from 'bn.js';
 
-import {toBigIntBE, toBigIntLE, toBufferBE, toBufferLE} from './index.js';
+import {toBigIntBE, toBigIntLE, toBufferBE, toBufferLE} from './index';
 
 
 // This file contains the benchmark test suite. It includes the benchmark and
