@@ -5,6 +5,10 @@ npm-debug.log*
 
 # Dependency directories
 node_modules
+.rollup.cache
+# Build output
+dist
+build
 
 # Output of 'npm pack'
 *.tgz
