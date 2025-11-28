@@ -12,6 +12,8 @@ export default defineConfig({
       reporter: ["text", "lcov"],
     },
     alias: {
+      '#pkg': '/src/conversion/src/ts/index.ts',
+      '@gsknnft/bigint-buffer/conversion': '/src/conversion/src/ts/index.ts',
       qwormhole: path.resolve(__dirname, "src"),
     },
   },

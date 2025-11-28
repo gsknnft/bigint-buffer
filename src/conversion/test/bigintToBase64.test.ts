@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as bc from '#pkg';
 
-describe('bigintToBase64', function () {
+describe('bigintToBase64', () => {
   const inputs = [
     {
       bi: BigInt(1),
@@ -37,20 +37,20 @@ describe('bigintToBase64', function () {
 
   for (const input of inputs) {
     if (input.bi >= 0) {
-      describe(`bigintToBase64(${input.bi})`, function () {
-        it(`should return ${input.base64}`, function () {
+      describe(`bigintToBase64(${input.bi})`, () => {
+        it(`should return ${input.base64}`, () => {
           const ret = bc.bigintToBase64(input.bi, input.urlsafe, input.padding);
           expect(ret).to.equal(input.base64);
         });
       });
-      describe(`base64ToBigint(${input.base64})`, function () {
-        it(`should return ${input.bi}`, function () {
+      describe(`base64ToBigint(${input.base64})`, () => {
+        it(`should return ${input.bi}`, () => {
           const ret = bc.base64ToBigint(input.base64);
           expect(ret).to.equal(input.bi);
         });
       });
     } else {
-      it('should throw RangeError', function () {
+      it('should throw RangeError', () => {
         expect(() => bc.bigintToHex(input.bi)).to.throw(RangeError);
       });
     }

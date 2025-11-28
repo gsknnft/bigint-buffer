@@ -1,7 +1,7 @@
 language: node_js
 node_js:
 - node
-- '10'
+- '24'
 sudo : false
 env:
   global:
@@ -16,19 +16,19 @@ services:
   - xvfb
 cache:
   directories:
-   - $HOME/.npm
+   - $HOME/.pnpm
 matrix:
   fast_finish: true
   include:
   - os: linux
-    node_js: '10'
+    node_js: '24'
     env: TEST_SUITE=test:browser
   - os: windows
-    node_js: '10'
+    node_js: '24'
     env: TEST_SUITE=test:node
-script: npm run $TEST_SUITE
+script: pnpm run $TEST_SUITE
 before_deploy:
-- npm pack
+- pnpm pack
 deploy:
 - provider: releases
   api_key: "$GITHUB_TOKEN"
@@ -36,16 +36,16 @@ deploy:
   file: bigint-buffer-*.tgz
   skip_cleanup: true
   on:
-    branch: master
+    branch: main
     node: '10'
     condition: "$TEST_SUITE = test:node"
     tags: true
 - provider: npm
   api_key: "$NPM_TOKEN"
   skip_cleanup: true
-  email: mwei@cs.ucsd.edu
+  email: gsknnft@gmail.com
   on:
-    branch: master
-    node: '10'
+    branch: main
+    node: '24'
     condition: "$TEST_SUITE = test:node"
     tags: true

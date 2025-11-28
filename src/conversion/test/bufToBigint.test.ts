@@ -1,7 +1,7 @@
 import * as bc from '#pkg';
 import { describe, it, expect } from 'vitest';
 
-describe('bufToBigint', function () {
+describe('bufToBigint', () => {
   const tests = [
     {
       input: new Uint32Array(2),
@@ -17,8 +17,8 @@ describe('bufToBigint', function () {
     }
   ];
   for (const test of tests) {
-    describe(`bufToBigint(${String(bc.bufToHex(test.input))})`, function () {
-      it(`should return ${String(test.output.toString())}`, function () {
+    describe(`bufToBigint(${String(bc.bufToHex(test.input))})`, () => {
+      it(`should return ${String(test.output.toString())}`, () => {
         const ret = bc.bufToBigint(test.input);
         expect(ret.toString()).to.equal(test.output.toString());
       });

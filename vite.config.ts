@@ -35,6 +35,7 @@ export default defineConfig({
         return `index.${format}.js`;
       }
     },
+    
     outDir: "dist",
     rollupOptions: {
       external: [...externalDeps, ...tsPaths],

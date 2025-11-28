@@ -1,7 +1,7 @@
 import * as bc from '#pkg';
 import { describe, it, expect } from 'vitest';
 
-describe('textToBuf', function () {
+describe('bigintToText', () => {
   const inputs = [
     'Hello World',
     'Apañarse por qué?',
@@ -12,17 +12,20 @@ describe('textToBuf', function () {
   Lorem ipsum dolor si amet, consectetur adipiscing incidunt ut labore et dolore magna aliquam erat nostrud exercitation ullamcorper suscipit laboris nis duis autem vel eum irure dolor in reprehenderit i dolore eu fugiat nulla pariatur. At vero eos et accus praesant luptatum delenit aigue duos dolor et mol provident, simil tempor sunt in culpa qui officia de fuga. Et harumd dereud facilis est er expedit disti eligend oprio congue nihil impedit doming id quod assumenda est, omnis dolor repellend. Temporibud`
   ];
 
-  let returnArrayBuffer = false;
-
-  for (const input of inputs) {
-    describe(`bufToText(textToBuf(${input.substring(0, 8)}...))`, function () {
-      it(`should return ${input.substring(0, 8)}...`, function () {
-      /* eslint-disable no-unneeded-ternary */
-        returnArrayBuffer = returnArrayBuffer ? false : true;
-        /* eslint-enable no-unneeded-ternary */
-        const ret = bc.bufToText(bc.textToBuf(input, returnArrayBuffer));
-        expect(ret).to.equal(input);
+  describe('bigintToText((textToBigint(str))) === str ', () => {
+    for (const input of inputs) {
+      describe(`bigintToText((textToBigint(${input})))`, () => {
+        it(`should return ${input}`, () => {
+          const ret = bc.bigintToText(bc.textToBigint(input));
+          expect(ret).to.equal(input);
+        });
       });
+    }
+  });
+
+  describe('bigintToText(-6n)', () => {
+    it('should throw RangeError', () => {
+      expect(() => bc.bigintToText(BigInt('-6'))).to.throw(RangeError);
     });
-  }
+  });
 });

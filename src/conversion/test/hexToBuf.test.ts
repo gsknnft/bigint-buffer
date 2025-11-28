@@ -1,7 +1,7 @@
 import * as bc from '#pkg';
 import { describe, it, expect } from 'vitest';
 
-describe('hexToBuf', function () {
+describe('hexToBuf', () => {
   const tests = [
     {
       buf: new Uint8Array([9, 255]),
@@ -25,27 +25,27 @@ describe('hexToBuf', function () {
     }
   ];
 
-  describe('hexToBuf and bufToHex', function () {
+  describe('hexToBuf and bufToHex', () => {
     for (const test of tests) {
-      describe(`bufToHex([${(new Uint8Array(test.buf)).toString()}])`, function () {
+      describe(`bufToHex([${(new Uint8Array(test.buf)).toString()}])`, () => {
         const byteLength = test.buf.byteLength;
         const expected = bc.parseHex(test.hex, false, byteLength);
-        it(`should return ${String(expected)}`, function () {
+        it(`should return ${String(expected)}`, () => {
           const ret = bc.bufToHex(test.buf);
           expect(ret).to.equal(expected);
         });
       });
-      describe(`bufToHex(hexToBuf(${test.hex}))`, function () {
+      describe(`bufToHex(hexToBuf(${test.hex}))`, () => {
         const byteLength = test.buf.byteLength;
         const expected = bc.parseHex(test.hex, false, byteLength);
-        it(`should return ${String(expected)}`, function () {
+        it(`should return ${String(expected)}`, () => {
           const buf = bc.hexToBuf(test.hex);
           const ret = bc.bufToHex(buf);
           expect(ret).to.equal(expected);
         });
       });
-      describe('hexToBuf(\'12412fgt3\')', function () {
-        it('should throw RangeError', function () {
+      describe('hexToBuf(\'12412fgt3\')', () => {
+        it('should throw RangeError', () => {
           expect(() => bc.hexToBuf('12412fgt3')).to.throw(RangeError);
         });
       });

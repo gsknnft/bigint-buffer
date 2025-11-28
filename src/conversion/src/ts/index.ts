@@ -1,5 +1,6 @@
 import * as b64 from '@juanelas/base64';
 import path from 'path';
+import fs from 'fs';
 
 interface ConverterInterface {
   toBigInt: (buf: Buffer, bigEndian?: boolean) => bigint;
@@ -13,19 +14,29 @@ let nativeLoadError: unknown;
 
 const IS_BROWSER = typeof globalThis !== 'undefined' && typeof (globalThis as any).document !== 'undefined';
 
-const getModuleRoot = (): string => {
-  if (typeof __dirname === 'string') {
-    // from src/conversion/src/ts → project root
-    return path.resolve(__dirname, '../../../../');
+const candidateRoots = [
+  // when running from dist/
+  path.resolve(__dirname, '..'),
+  // when running from build/conversion/src/ts
+  path.resolve(__dirname, '../../..'),
+  // when running from src/conversion/src/ts
+  path.resolve(__dirname, '../../../../')
+];
+
+const findModuleRoot = (): string => {
+  for (const root of candidateRoots) {
+    const candidate = path.join(root, 'build', 'Release', 'bigint_buffer.node');
+    if (fs.existsSync(candidate)) return root;
   }
-  return process.cwd();
+  return candidateRoots[0];
 };
 
 const loadNative = (): ConverterInterface | undefined => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const bindings = require('bindings');
-    return bindings({ bindings: 'bigint_buffer', module_root: getModuleRoot() }) as ConverterInterface;
+    const moduleRoot = findModuleRoot();
+    return bindings({ bindings: 'bigint_buffer', module_root: moduleRoot }) as ConverterInterface;
   } catch (err) {
     nativeLoadError = err;
     return undefined;
@@ -352,6 +363,7 @@ export function hexToBuf (hexStr: string, returnArrayBuffer = false): ArrayBuffe
  * Thrown if a < 0
  */
 export function bigintToBase64 (a: bigint, urlsafe = false, padding = true): string {
+  if (a < 0n) throw new RangeError('negative bigint');
   return b64.encode(bigintToBuf(a), urlsafe, padding);
 }
 
@@ -361,5 +373,8 @@ export function bigintToBase64 (a: bigint, urlsafe = false, padding = true): str
  * @returns a bigint
  */
 export function base64ToBigint (a: string): bigint {
-  return bufToBigint(b64.decode(a));
+  if (!a || a.trim() === '') return 0n;
+  const cleaned = a.trim();
+  if (!/^[A-Za-z0-9+/=_-]*$/.test(cleaned)) throw new RangeError('invalid base64');
+  return bufToBigint(b64.decode(cleaned));
 }

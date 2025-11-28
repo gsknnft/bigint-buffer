@@ -1,7 +1,7 @@
 import * as bc from '#pkg';
 import { describe, it, expect } from 'vitest';
 
-describe('hexToBigint', function () {
+describe('hexToBigint', () => {
   const inputs = [
     {
       bi: BigInt(1),
@@ -17,10 +17,10 @@ describe('hexToBigint', function () {
     }
   ];
 
-  describe('hexToBigint', function () {
+  describe('hexToBigint', () => {
     for (const input of inputs) {
-      describe(`hexToBigint(${input.hex})`, function () {
-        it(`should return ${input.bi}`, function () {
+      describe(`hexToBigint(${input.hex})`, () => {
+        it(`should return ${input.bi}`, () => {
           const ret = bc.hexToBigint(input.hex);
           expect(ret).to.equal(input.bi);
         });

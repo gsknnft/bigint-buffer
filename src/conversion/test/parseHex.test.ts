@@ -1,7 +1,7 @@
 import * as bc from '#pkg';
 import { describe, it, expect } from 'vitest';
 
-describe('parseHex', function () {
+describe('parseHex', () => {
   const vectors = [
     {
       input: '0x234FE678',
@@ -17,25 +17,25 @@ describe('parseHex', function () {
     }
   ];
   for (const vector of vectors) {
-    it(`parseHex('${vector.input}') should return '${vector.output}'`, function () {
+    it(`parseHex('${vector.input}') should return '${vector.output}'`, () => {
       const ret = bc.parseHex(vector.input);
       expect(ret).to.equal(vector.output);
     });
-    it(`parseHex('${vector.input}', true) should return '0x${vector.output}'`, function () {
+    it(`parseHex('${vector.input}', true) should return '0x${vector.output}'`, () => {
       const ret = bc.parseHex(vector.input, true);
       expect(ret).to.equal('0x' + vector.output);
     });
   }
-  it('parseHex(\'adge3\') should throw error', function () {
+  it('parseHex(\'adge3\') should throw error', () => {
     expect(() => {
       bc.parseHex('adge3');
     }).to.throw(RangeError);
   });
-  it("parseHex('1287a3', undefined, 4) should return '001287a3'", function () {
+  it("parseHex('1287a3', undefined, 4) should return '001287a3'", () => {
     const ret = bc.parseHex('1287a3', undefined, 4);
     expect(ret).to.equal('001287a3');
   });
-  it('parseHex(\'1287542fe21\', true, 4) should throw error', function () {
+  it('parseHex(\'1287542fe21\', true, 4) should throw error', () => {
     expect(() => {
       bc.parseHex('1287542fe21', true, 4);
     }).to.throw(RangeError);
