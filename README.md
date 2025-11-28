@@ -26,7 +26,7 @@ If you're using `bigint-buffer` in a secure or reproducible system, **migrate to
 ```json
 "pnpm": {
   "overrides": {
-    "bigint-buffer": "@gsknnft/bigint-buffer@1.3.2"
+    "bigint-buffer": "@gsknnft/bigint-buffer@1.4.0"
   }
 }
 ```
