@@ -10,6 +10,27 @@ Modern, secure BigInt ↔ Buffer conversion with native bindings, browser fallba
 ## 🔐 Security Notice: This Module Has Been Reclaimed
 
 As of October 2025, `bigint-buffer@1.1.5` is **compromised and flagged by multiple audit tools** due to unresolved vulnerabilities in its native bindings and transitive dependencies. No upstream patch has been published.
+As the original `bigint-buffer` package is deprecated. This repo (`@gsknnft/bigint-buffer`) is the official, actively maintained successor. All users should migrate for security, performance, and modern features.
+
+## 🚨 Migration Notice
+
+This repo — `@gsknnft/bigint-buffer@1.4.0` — is a **sovereign override**:
+- ✅ Rebuilt with modern TypeScript and Rollup
+- ✅ Native bindings patched and rebuilt via `node-gyp`
+- ✅ Browser fallback formalized via `"browser"` field
+- ✅ ESM/CJS duality declared via `"exports"`
+- ✅ Peer dependency alignment and audit compliance restored
+
+If you're using `bigint-buffer` in a secure or reproducible system, **migrate to `@gsknnft/bigint-buffer`** or override via `pnpm`:
+
+```json
+"pnpm": {
+  "overrides": {
+    "bigint-buffer": "@gsknnft/bigint-buffer@1.3.2"
+  }
+}
+```
+
 
 **This fork is maintained by CoreFlame/GSKNNFT as part of the SigilNet ecosystem.**
 
@@ -52,29 +73,6 @@ It is the only currently known secure, reproducible implementation of BigInt ↔
 - Uses `cpy-cli` instead of deprecated `cpx`
 - Rollup-based bundling for ESM/CJS duality
 - Peer dependency alignment and reproducibility guarantees
-
----
-
-## 🚨 Migration Notice
-
-The original `bigint-buffer` package is deprecated. This repo (`@gsknnft/bigint-buffer`) is the official, actively maintained successor. All users should migrate for security, performance, and modern features.
-
-This repo — `@gsknnft/bigint-buffer@1.4.0` — is a **sovereign override**:
-- ✅ Rebuilt with modern TypeScript and Rollup
-- ✅ Native bindings patched and rebuilt via `node-gyp`
-- ✅ Browser fallback formalized via `"browser"` field
-- ✅ ESM/CJS duality declared via `"exports"`
-- ✅ Peer dependency alignment and audit compliance restored
-
-If you're using `bigint-buffer` in a secure or reproducible system, **migrate to `@gsknnft/bigint-buffer`** or override via `pnpm`:
-
-```json
-"pnpm": {
-  "overrides": {
-    "bigint-buffer": "@gsknnft/bigint-buffer@1.3.2"
-  }
-}
-```
 
 ---
 
