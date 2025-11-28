@@ -104,11 +104,27 @@ bigintToBase64(123456789n);                 // "B1vNFQ=="
 
 ---
 
-### 🚀 Conversion Utilities (Built-In)
+### 🚀 Advanced Conversion Utilities (Built-In)
 
 Need only the conversion helpers?
+## Usage
+
+### Classic Buffer/BigInt API
+
+```js
+import { toBigIntLE, toBigIntBE, toBufferLE, toBufferBE } from '@gsknnft/bigint-buffer';
+
+const bigInt = toBigIntBE(Buffer.from('deadbeef', 'hex'));
+const buf = toBufferLE(123456789n, 8);
+```
+
 ```ts
-import * as conversion from '@gsknnft/bigint-buffer/conversion';
+import { conversionUtils } from '@gsknnft/bigint-buffer';
+
+// TypedArray, ArrayBuffer, hex/text/base64 helpers
+const arrBuf = conversionUtils.bigintToBuf(123456789n, true); // ArrayBuffer
+const hex = conversionUtils.bigintToHex(123456789n, true);    // '0x...' format
+const text = conversionUtils.bigintToText(123456789n);
 ```
 
 > All conversions are endian-safe, round-trip validated, and available in both Node and browser environments.
