@@ -10,7 +10,12 @@ export default {
     context: 'globalThis',
     external: ['bindings', '@juanelas/base64'],
     plugins: [
-        commonjs(),
+        commonjs({
+            include: /node_modules/,
+            namedExports: {
+                '@juanelas/base64': ['encode', 'decode']
+            }
+        }),
         replace({
             preventAssignment: true,
             'process.browser': 'false'

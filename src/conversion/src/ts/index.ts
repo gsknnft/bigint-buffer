@@ -1,57 +1,64 @@
-import * as b64 from '@juanelas/base64';
-import fs from 'fs';
-import path from 'path';
+import * as b64 from "@juanelas/base64";
+import fs from "fs";
+import path from "path";
 
 interface ConverterInterface {
   toBigInt: (buf: Buffer, bigEndian?: boolean) => bigint;
   fromBigInt: (num: bigint, buf: Buffer, bigEndian?: boolean) => Buffer;
 }
 
-
 export let isNative = false;
-let converter: ConverterInterface|undefined;
+let converter: ConverterInterface | undefined;
 let nativeLoadError: unknown;
 
-const IS_BROWSER = typeof globalThis !== 'undefined' &&
-    typeof (globalThis as {document?: unknown}).document !== 'undefined';
+const IS_BROWSER =
+  typeof globalThis !== "undefined" &&
+  typeof (globalThis as { document?: unknown }).document !== "undefined";
 
 const candidateRoots = [
   // when running from dist/
-  path.resolve(__dirname, '..'),
+  path.resolve(__dirname, ".."),
   // when running from build/conversion/src/ts
-  path.resolve(__dirname, '../../..'),
+  path.resolve(__dirname, "../../.."),
   // when running from src/conversion/src/ts
-  path.resolve(__dirname, '../../../../')
+  path.resolve(__dirname, "../../../../"),
 ];
 
 const findModuleRoot = (): string => {
   for (const root of candidateRoots) {
-    const candidate = path.join(root, 'build', 'Release', 'bigint_buffer.node');
+    const candidate = path.join(root, "build", "Release", "bigint_buffer.node");
     if (fs.existsSync(candidate)) return root;
   }
   return candidateRoots[0];
 };
 
-const loadNative = (): ConverterInterface|undefined => {
+function loadNative(): ConverterInterface | undefined {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const bindings = require('bindings');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const bindings = require("bindings");
     const moduleRoot = findModuleRoot();
-    return bindings({bindings: 'bigint_buffer', module_root: moduleRoot}) as
-        ConverterInterface;
+    return bindings({
+      bindings: "bigint_buffer",
+      module_root: moduleRoot,
+    }) as ConverterInterface;
   } catch (err) {
     nativeLoadError = err;
     return undefined;
   }
-};
+}
 
 if (!IS_BROWSER) {
   converter = loadNative();
   isNative = converter !== undefined;
-  if (!isNative && nativeLoadError !== undefined && process.env?.BIGINT_BUFFER_SILENT_NATIVE_FAIL !== '1') {
+  if (
+    !isNative &&
+    nativeLoadError !== undefined &&
+    process.env?.BIGINT_BUFFER_SILENT_NATIVE_FAIL !== "1"
+  ) {
     console.warn(
-        'bigint-buffer: Failed to load native bindings; using pure JS fallback. Run npm run rebuild to restore native.',
-        nativeLoadError);
+      "bigint-buffer: Failed to load native bindings; using pure JS fallback. Run npm run rebuild to restore native.",
+      nativeLoadError
+    );
   }
 }
 
@@ -61,18 +68,18 @@ if (converter === undefined) {
     toBigInt: (buf: Buffer, bigEndian = true) => {
       const copy = Buffer.from(buf);
       if (!bigEndian) copy.reverse();
-      const hex = copy.toString('hex');
+      const hex = copy.toString("hex");
       return hex.length === 0 ? 0n : BigInt(`0x${hex}`);
     },
     fromBigInt: (num: bigint, buf: Buffer, bigEndian = true) => {
       const hex = num.toString(16);
       const width = buf.length;
-      const filled = hex.padStart(width * 2, '0').slice(0, width * 2);
-      const tmp = Buffer.from(filled, 'hex');
+      const filled = hex.padStart(width * 2, "0").slice(0, width * 2);
+      const tmp = Buffer.from(filled, "hex");
       if (!bigEndian) tmp.reverse();
       tmp.copy(buf);
       return buf;
-    }
+    },
   };
 }
 
@@ -85,7 +92,7 @@ export function toBigIntLE(buf: Buffer): bigint {
   if (IS_BROWSER || converter === undefined) {
     const reversed = Buffer.from(buf);
     reversed.reverse();
-    const hex = reversed.toString('hex');
+    const hex = reversed.toString("hex");
     if (hex.length === 0) {
       return BigInt(0);
     }
@@ -110,7 +117,7 @@ export function validateBigIntBuffer(): boolean {
  */
 export function toBigIntBE(buf: Buffer): bigint {
   if (IS_BROWSER || converter === undefined) {
-    const hex = buf.toString('hex');
+    const hex = buf.toString("hex");
     if (hex.length === 0) {
       return BigInt(0);
     }
@@ -128,8 +135,10 @@ export function toBigIntBE(buf: Buffer): bigint {
 export function toBufferLE(num: bigint, width: number): Buffer {
   if (IS_BROWSER || converter === undefined) {
     const hex = num.toString(16);
-    const buffer =
-        Buffer.from(hex.padStart(width * 2, '0').slice(0, width * 2), 'hex');
+    const buffer = Buffer.from(
+      hex.padStart(width * 2, "0").slice(0, width * 2),
+      "hex"
+    );
     buffer.reverse();
     return buffer;
   }
@@ -146,14 +155,23 @@ export function toBufferLE(num: bigint, width: number): Buffer {
 export function toBufferBE(num: bigint, width: number): Buffer {
   if (IS_BROWSER || converter === undefined) {
     const hex = num.toString(16);
-    return Buffer.from(hex.padStart(width * 2, '0').slice(0, width * 2), 'hex');
+    return Buffer.from(hex.padStart(width * 2, "0").slice(0, width * 2), "hex");
   }
   return converter.fromBigInt(num, Buffer.allocUnsafe(width), true);
 }
 
 export type TypedArray =
-    Int8Array|Uint8Array|Uint8ClampedArray|Int16Array|Uint16Array|Int32Array|
-    Uint32Array|Float32Array|Float64Array|BigInt64Array|BigUint64Array;
+  | Int8Array
+  | Uint8Array
+  | Uint8ClampedArray
+  | Int16Array
+  | Uint16Array
+  | Int32Array
+  | Uint32Array
+  | Float32Array
+  | Float64Array
+  | BigInt64Array
+  | BigUint64Array;
 
 /**
  * Parses a hexadecimal string for correctness and returns it with or without
@@ -169,21 +187,28 @@ export type TypedArray =
  * @throws {@link RangeError} if requested byte length is less than the input byte length
  */
 export function parseHex(
-    a: string, prefix0x = false, byteLength?: number): string {
+  a: string,
+  prefix0x = false,
+  byteLength?: number
+): string {
   const hexMatch = a.match(/^(0x)?([\da-fA-F]+)$/);
   if (hexMatch == null) {
     throw new RangeError(
-        'input must be a hexadecimal string, e.g. \'0x124fe3a\' or \'0214f1b2\'');
+      "input must be a hexadecimal string, e.g. '0x124fe3a' or '0214f1b2'"
+    );
   }
   let hex = hexMatch[2];
   if (byteLength !== undefined) {
     if (byteLength < hex.length / 2) {
-      throw new RangeError(`expected byte length ${
-          byteLength} < input hex byte length ${Math.ceil(hex.length / 2)}`);
+      throw new RangeError(
+        `expected byte length ${byteLength} < input hex byte length ${Math.ceil(
+          hex.length / 2
+        )}`
+      );
     }
-    hex = hex.padStart(byteLength * 2, '0');
+    hex = hex.padStart(byteLength * 2, "0");
   }
-  return (prefix0x) ? '0x' + hex : hex;
+  return prefix0x ? "0x" + hex : hex;
 }
 
 /**
@@ -199,11 +224,14 @@ export function parseHex(
  *
  * @throws {@link RangeError} if a < 0.
  */
-export function bigintToBuf(a: bigint, returnArrayBuffer = false): ArrayBuffer|
-    Buffer {
+export function bigintToBuf(
+  a: bigint,
+  returnArrayBuffer = false
+): ArrayBuffer | Buffer {
   if (a < 0) {
     throw RangeError(
-        'a should be a non-negative integer. Negative values are not supported');
+      "a should be a non-negative integer. Negative values are not supported"
+    );
   }
   return hexToBuf(bigintToHex(a), returnArrayBuffer);
 }
@@ -213,7 +241,7 @@ export function bigintToBuf(a: bigint, returnArrayBuffer = false): ArrayBuffer|
  * @param buf
  * @returns a bigint
  */
-export function bufToBigint(buf: ArrayBuffer|TypedArray|Buffer): bigint {
+export function bufToBigint(buf: ArrayBuffer | TypedArray | Buffer): bigint {
   let bits = 8n;
   if (ArrayBuffer.isView(buf)) {
     bits = BigInt(buf.BYTES_PER_ELEMENT * 8);
@@ -222,7 +250,7 @@ export function bufToBigint(buf: ArrayBuffer|TypedArray|Buffer): bigint {
   }
 
   let ret = 0n;
-  for (const i of (buf).values()) {
+  for (const i of buf.values()) {
     const bi = BigInt(i);
     ret = (ret << bits) + bi;
   }
@@ -241,10 +269,14 @@ export function bufToBigint(buf: ArrayBuffer|TypedArray|Buffer): bigint {
  * @throws {@link RangeError} if a < 0
  */
 export function bigintToHex(
-    a: bigint, prefix0x = false, byteLength?: number): string {
+  a: bigint,
+  prefix0x = false,
+  byteLength?: number
+): string {
   if (a < 0) {
     throw RangeError(
-        'a should be a non-negative integer. Negative values are not supported');
+      "a should be a non-negative integer. Negative values are not supported"
+    );
   }
   return parseHex(a.toString(16), prefix0x, byteLength);
 }
@@ -276,7 +308,8 @@ export function hexToBigint(hexStr: string): bigint {
 export function bigintToText(a: bigint): string {
   if (a < 0) {
     throw RangeError(
-        'a should be a non-negative integer. Negative values are not supported');
+      "a should be a non-negative integer. Negative values are not supported"
+    );
   }
   return bufToText(hexToBuf(a.toString(16)));
 }
@@ -291,7 +324,7 @@ export function bigintToText(a: bigint): string {
 export function textToBigint(text: string): bigint {
   return hexToBigint(bufToHex(textToBuf(text)));
 }
-function toBuffer(input: ArrayBuffer|TypedArray|Buffer): Buffer {
+function toBuffer(input: ArrayBuffer | TypedArray | Buffer): Buffer {
   if (Buffer.isBuffer(input)) {
     return input;
   }
@@ -304,7 +337,7 @@ function toBuffer(input: ArrayBuffer|TypedArray|Buffer): Buffer {
     return Buffer.from(new Uint8Array(input));
   }
 
-  throw new TypeError('Unsupported input type for Buffer.from');
+  throw new TypeError("Unsupported input type for Buffer.from");
 }
 /**
  * Converts an ArrayBuffer, TypedArray or Buffer (in Node.js) containing utf-8
@@ -314,7 +347,7 @@ function toBuffer(input: ArrayBuffer|TypedArray|Buffer): Buffer {
  *
  * @returns a string text with utf-8 encoding
  */
-export function bufToText(buf: ArrayBuffer|TypedArray|Buffer): string {
+export function bufToText(buf: ArrayBuffer | TypedArray | Buffer): string {
   const input = toBuffer(buf);
   if (IS_BROWSER) {
     return new TextDecoder().decode(new Uint8Array(input));
@@ -333,8 +366,10 @@ export function bufToText(buf: ArrayBuffer|TypedArray|Buffer): string {
  *
  * @returns an ArrayBuffer or a Buffer containing the utf-8 encoded text
  */
-export function textToBuf(str: string, returnArrayBuffer = false): ArrayBuffer|
-    Buffer {
+export function textToBuf(
+  str: string,
+  returnArrayBuffer = false
+): ArrayBuffer | Buffer {
   if (!IS_BROWSER && !returnArrayBuffer) {
     return Buffer.from(new TextEncoder().encode(str).buffer);
   }
@@ -352,14 +387,17 @@ export function textToBuf(str: string, returnArrayBuffer = false): ArrayBuffer|
  * @returns a string with a hexadecimal representation of the input buffer
  */
 export function bufToHex(
-    buf: ArrayBuffer|TypedArray|Buffer, prefix0x = false,
-    byteLength?: number): string {
+  buf: ArrayBuffer | TypedArray | Buffer,
+  prefix0x = false,
+  byteLength?: number
+): string {
   if (IS_BROWSER) {
-    let s = '';
-    const h = '0123456789abcdef';
+    let s = "";
+    const h = "0123456789abcdef";
     if (ArrayBuffer.isView(buf)) {
       buf = new Uint8Array(
-          buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+        buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength)
+      );
     } else {
       buf = new Uint8Array(buf);
     }
@@ -372,11 +410,18 @@ export function bufToHex(
   } else {
     const input = toBuffer(buf);
     if (ArrayBuffer.isView(input)) {
-      buf = new Uint8Array(input.buffer.slice(
-          input.byteOffset, input.byteOffset + input.byteLength));
+      buf = new Uint8Array(
+        input.buffer.slice(
+          input.byteOffset,
+          input.byteOffset + input.byteLength
+        )
+      );
     }
     return parseHex(
-        Buffer.from(toBuffer(buf)).toString('hex'), prefix0x, byteLength);
+      Buffer.from(toBuffer(buf)).toString("hex"),
+      prefix0x,
+      byteLength
+    );
   }
 }
 
@@ -392,22 +437,23 @@ export function bufToHex(
  * @throws {@link RangeError} if input string does not hold an hexadecimal number
  */
 export function hexToBuf(
-    hexStr: string, returnArrayBuffer = false): ArrayBuffer|Buffer {
+  hexStr: string,
+  returnArrayBuffer = false
+): ArrayBuffer | Buffer {
   let hex = parseHex(hexStr);
-  hex = parseHex(
-      hexStr, false,
-      Math.ceil(hex.length / 2));  // pad to have a length in bytes
+  hex = parseHex(hexStr, false, Math.ceil(hex.length / 2)); // pad to have a length in bytes
   if (IS_BROWSER) {
-    return Uint8Array
-        .from(hex.match(/[\da-fA-F]{2}/g)!.map((h) => {  // eslint-disable-line
-          return Number('0x' + h);
-        }))
-        .buffer;
+    return Uint8Array.from(
+      hex.match(/[\da-fA-F]{2}/g)!.map((h) => {
+        // ...existing code...
+        return Number("0x" + h);
+      })
+    ).buffer;
   } else {
-    const b = Buffer.from(hex, 'hex');
-    return returnArrayBuffer ?
-        b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) :
-        b;
+    const b = Buffer.from(hex, "hex");
+    return returnArrayBuffer
+      ? b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)
+      : b;
   }
 }
 
@@ -423,9 +469,12 @@ export function hexToBuf(
  * Thrown if a < 0
  */
 export function bigintToBase64(
-    a: bigint, urlsafe = false, padding = true): string {
+  a: bigint,
+  urlsafe = false,
+  padding = true
+): string {
   if (a < 0n) {
-    throw new RangeError('negative bigint');
+    throw new RangeError("negative bigint");
   }
   return b64.encode(bigintToBuf(a), urlsafe, padding);
 }
@@ -437,12 +486,12 @@ export function bigintToBase64(
  * @returns a bigint
  */
 export function base64ToBigint(a: string): bigint {
-  if (!a || a.trim() === '') {
+  if (!a || a.trim() === "") {
     return 0n;
   }
   const cleaned = a.trim();
   if (!/^[A-Za-z0-9+/=_-]*$/.test(cleaned)) {
-    throw new RangeError('invalid base64');
+    throw new RangeError("invalid base64");
   }
   return bufToBigint(b64.decode(cleaned));
 }
