@@ -19,6 +19,7 @@
     // "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
     // "noUncheckedIndexedAccess": true,      /* Include 'undefined' in index signature results */
     "tsBuildInfoFile": "build/main.tsbuildinfo",
+    "lib": [ "esnext", "dom" ],
 
     /* Module Resolution Options */
     "moduleResolution": "NodeNext",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
