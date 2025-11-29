@@ -9,7 +9,7 @@ Modern, secure BigInt ↔ Buffer conversion with native bindings, browser fallba
 
 ## 🔐 Security Notice: This Module Has Been Reclaimed
 This fork (`@gsknnft/bigint-buffer`) is actively maintained, secure, and recommended for all users. Native now builds clean. All conversion helpers are live and set.
-
+**removed useless deps - back to ZERO dependancies unless chosen native bindings**
 ---
 
 Modern, secure BigInt ↔ Buffer conversion with native bindings, browser fallbacks, and the full `bigint-conversion` API built in.

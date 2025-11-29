@@ -1,6 +1,6 @@
-import * as b64 from "@juanelas/base64";
-import fs from "fs";
-import path from "path";
+import { Buffer } from 'buffer';
+import path from 'path';
+import fs from 'fs';
 
 interface ConverterInterface {
   toBigInt: (buf: Buffer, bigEndian?: boolean) => bigint;
@@ -476,7 +476,17 @@ export function bigintToBase64(
   if (a < 0n) {
     throw new RangeError("negative bigint");
   }
-  return b64.encode(bigintToBuf(a), urlsafe, padding);
+  const buf = bigintToBuf(a);
+  let base64 = Buffer.isBuffer(buf)
+    ? buf.toString("base64")
+    : Buffer.from(buf as ArrayBuffer).toString("base64");
+  if (urlsafe) {
+    base64 = base64.replace(/\+/g, "-").replace(/\//g, "_");
+  }
+  if (!padding) {
+    base64 = base64.replace(/=+$/, "");
+  }
+  return base64;
 }
 
 /**
@@ -493,5 +503,12 @@ export function base64ToBigint(a: string): bigint {
   if (!/^[A-Za-z0-9+/=_-]*$/.test(cleaned)) {
     throw new RangeError("invalid base64");
   }
-  return bufToBigint(b64.decode(cleaned));
+  // Implementation now uses Buffer, see above
+  let base64 = cleaned.replace(/-/g, "+").replace(/_/g, "/");
+  // Pad base64 string if necessary
+  while (base64.length % 4 !== 0) {
+    base64 += "=";
+  }
+  const buf = Buffer.from(base64, "base64");
+  return bufToBigint(buf);
 }

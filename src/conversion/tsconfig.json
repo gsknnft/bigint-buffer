@@ -11,8 +11,7 @@
     "strict": true,   
     "declaration": true,
     "removeComments": true,
-    "typeRoots": ["../types"],
-    /* Additional Checks */
+    "typeRoots": ["../types", "../../node_modules/@types", "node_modules/@types"],    /* Additional Checks */
     // "noUnusedLocals": true,                /* Report errors on unused locals. */
     // "noUnusedParameters": true,            /* Report errors on unused parameters. */
     // "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
@@ -20,6 +19,7 @@
     // "noUncheckedIndexedAccess": true,      /* Include 'undefined' in index signature results */
     "tsBuildInfoFile": "build/main.tsbuildinfo",
     "lib": [ "esnext", "dom" ],
+    "types": ["node"],
 
     /* Module Resolution Options */
     "moduleResolution": "NodeNext",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
