@@ -17,7 +17,7 @@ Modern, secure BigInt ↔ Buffer conversion with native bindings, browser fallba
 As of October 2025, `bigint-buffer@1.1.5` is **compromised and flagged by multiple audit tools** due to unresolved vulnerabilities in its native bindings and transitive dependencies. No upstream patch has been published.
 As the original `bigint-buffer` package is deprecated. This repo (`@gsknnft/bigint-buffer`) is the official, actively maintained successor. All users should migrate for security, performance, and modern features.
 
-This repo — `@gsknnft/bigint-buffer@1.4.0` — is a **sovereign override**:
+This repo — `@gsknnft/bigint-buffer@1.4.2` — is a **sovereign override**:
 - ✅ Rebuilt with modern TypeScript and Rollup
 - ✅ Native bindings patched and rebuilt via `node-gyp`
 - ✅ Browser fallback formalized via `"browser"` field
@@ -29,7 +29,7 @@ If you're using `bigint-buffer` in a secure or reproducible system, **migrate to
 ```json
 "pnpm": {
   "overrides": {
-    "bigint-buffer": "@gsknnft/bigint-buffer@1.4.0"
+    "bigint-buffer": "@gsknnft/bigint-buffer@1.4.2"
   }
 }
 ```
@@ -199,7 +199,7 @@ All helpers are endian-safe and validated across Node and browser builds.
 ---
 
 ## Support & Project Status
-- Version: 1.4.0
+- Version: 1.4.2
 - Maintainer: GSKNNFT/CoreFlame
 - Node: ≥18 (native), browser bundle included
 - Issues: https://github.com/gsknnft/bigint-buffer/issues

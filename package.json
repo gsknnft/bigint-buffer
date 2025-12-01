@@ -1,6 +1,6 @@
 {
   "name": "@gsknnft/bigint-buffer",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "bigint to buffer conversion with native support and built-in conversion helpers",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -126,8 +126,5 @@
   "contributors": [
     "Gordon Skinner <gsknnft@gmail.com> (https://github.com/gsknnft)",
     "Michael Wei <mwei@vmware.com> (https://github.com/no2chem)"
-  ],
-  "dependencies": {
-    "@gsknnft/bigint-buffer": "file:gsknnft-bigint-buffer-1.4.1.tgz"
-  }
+  ]
 }
