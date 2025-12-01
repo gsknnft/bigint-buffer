@@ -13,6 +13,7 @@ Secure BigInt ⇆ Buffer conversion with native bindings, browser fallbacks, and
 ---
 
 ## Why This Package
+
 - Native N-API binding with pure-JS fallback for browsers and constrained environments.
 - Conversion helpers from `bigint-conversion` in-core (no extra deps).
 - ESM and CJS exports plus a UMD/browser bundle.
