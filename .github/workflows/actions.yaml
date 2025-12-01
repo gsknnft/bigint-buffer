@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Node ${{ matrix.node-version }} • ${{ matrix.os }}
+    name: Node ${{ matrix.node-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -22,15 +22,15 @@ jobs:
             node-version: 24
           - os: macos-latest
             node-version: 20
+          - os: macos-latest
+            node-version: 22
+          - os: macos-latest
+            node-version: 24
           - os: windows-latest
             node-version: 20
           - os: windows-latest
             node-version: 22
           - os: windows-latest
-            node-version: 24
-          - os: macos-latest
-            node-version: 22
-          - os: macos-latest
             node-version: 24
     steps:
       - name: Checkout
@@ -42,10 +42,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Rebuild native bindings
         run: npm run rebuild:native
@@ -55,4 +55,3 @@ jobs:
 
       - name: Run unit tests
         run: npm test
-

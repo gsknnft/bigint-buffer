@@ -1,6 +1,6 @@
 {
   "name": "@gsknnft/bigint-buffer",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "bigint to buffer conversion with native support and built-in conversion helpers",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -119,7 +119,7 @@
     "webpack-cli": "6.0.1"
   },
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=20.0.0",
     "npm": ">=9.0.0"
   },
   "publishConfig": {

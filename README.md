@@ -5,7 +5,7 @@
 
 Secure BigInt ⇆ Buffer conversion with native bindings, browser fallbacks, and the `bigint-conversion` helper APIs built in. This is the actively maintained fork of the original `bigint-buffer`.
 
-> **Upgrade notice:** Use `@gsknnft/bigint-buffer@1.4.3+` for verified bindings, fresh CI, and npm-based workflows across Node 18–24.
+> **Upgrade notice:** `1.4.4` is the CI-verified release (Node 20–24) and matches the 1.4.3 code. `1.4.3` was pre-green; move to 1.4.4 for a fully verified pipeline.
 
 [![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
 [![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
@@ -84,6 +84,6 @@ All helpers are endian-safe and validated across Node and browser builds.
 ---
 
 ## Support
-- Version: 1.4.3
-- Node: 18+ (tested through 24 LTS)
+- Version: 1.4.4 (CI-verified; 1.4.3 was pre-green)
+- Node: 20+ (tested through 24 LTS under CI)
 - Issues: https://github.com/gsknnft/bigint-buffer/issues
