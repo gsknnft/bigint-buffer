@@ -5,11 +5,14 @@ import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import ts from "./tsconfig.json";
 
-const nodeBuiltins = [...builtinModules, ...builtinModules.map((m) => `node:${m}`)];
-const externalDeps = ["bindings", "@juanelas/base64", ...nodeBuiltins];
+const nodeBuiltins = [
+  ...builtinModules,
+  ...builtinModules.map((m) => `node:${m}`),
+];
+const externalDeps = ["bindings", ...nodeBuiltins];
 
 const tsPaths = ts.compilerOptions?.paths
-  ? Object.keys(ts.compilerOptions.paths).map(key => key.replace("/*", ""))
+  ? Object.keys(ts.compilerOptions.paths).map((key) => key.replace("/*", ""))
   : [];
 
 export default defineConfig({
@@ -23,9 +26,9 @@ export default defineConfig({
         if (format === "cjs") return "index.cjs";
         if (format === "umd") return "index.umd.js";
         return `index.${format}.js`;
-      }
+      },
     },
-    
+
     outDir: "dist",
     rollupOptions: {
       external: [...externalDeps, ...tsPaths],

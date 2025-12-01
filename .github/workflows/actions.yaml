@@ -15,8 +15,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            node-version: 18
-          - os: ubuntu-latest
             node-version: 20
           - os: ubuntu-latest
             node-version: 22
@@ -26,6 +24,14 @@ jobs:
             node-version: 20
           - os: windows-latest
             node-version: 20
+          - os: windows-latest
+            node-version: 22
+          - os: windows-latest
+            node-version: 24
+          - os: macos-latest
+            node-version: 22
+          - os: macos-latest
+            node-version: 24
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,5 +56,3 @@ jobs:
       - name: Run unit tests
         run: npm test
 
-      - name: Run native mocha suite
-        run: npm run test:node

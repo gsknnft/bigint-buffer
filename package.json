@@ -36,7 +36,7 @@
     "prepublishOnly": "rm -rf build/Makefile; rm build/gyp-*; rm build/*.mk; rm build/*.Makefile; rm *.tgz",
     "clean:js": "npm clean && rm -rf build/* dist/*",
     "test:browser": "vite test --browser",
-    "test:node": "mocha build/src/**/*.spec.js --timeout 40000",
+    "test:node": "vitest run",
     "declare": "tsc -p . --declaration --emitDeclarationOnly --outDir dist/types",
     "benchmark": "node -r ts-node/register src/index.bench.ts",
     "typedoc": "typedoc --out docs $(pwd)/src $(pwd)/helper --target es6 --mode file --tsconfig ./tsconfig.json --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*+(spec|bench).ts'",
