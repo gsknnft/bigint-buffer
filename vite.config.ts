@@ -3,7 +3,6 @@ import { builtinModules } from "module";
 import path from "path";
 import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
-import polyfillNode from "rollup-plugin-polyfill-node";
 import ts from "./tsconfig.json";
 
 const nodeBuiltins = [...builtinModules, ...builtinModules.map((m) => `node:${m}`)];
