@@ -1,0 +1,20 @@
+{
+  "branches": ["main"],
+  "repositoryUrl": "https://github.com/gsknnft/bigint-buffer.git",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    "@semantic-release/npm",
+    [
+      "@semantic-release/github",
+      {
+        "assets": [],
+        "successComment": false,
+        "failComment": false,
+        "labels": ["release"],
+        "releasedLabels": ["released"]
+      }
+    ]
+  ]
+}
