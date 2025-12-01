@@ -1,22 +1,13 @@
 import { defineConfig } from "vite";
+import { builtinModules } from "module";
 import path from "path";
 import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
+import polyfillNode from "rollup-plugin-polyfill-node";
 import ts from "./tsconfig.json";
 
-const externalDeps = [
-  "fs", "path", "os", "http", "https", "stream", "zlib", "react",
-  'crypto', 'fs-extra', 'os', 'http', 'path', '@sigilnet/core',
-  "net", "tls", "dns", "string_decoder", "timers", "tty",
-  "cluster", "dgram", "@sigilnet/qtensors", "@sigilnet/qsignalsuite",
-  "@sigilnet/qhub", "@sigilnet/mse", "@sigilnet/core",
-  "protobufjs", "level", "vm", "constants", "process",
-  "events", "buffer", "util", "child_process", "readline",
-  "json2csv", "jsonwebtoken", "pako", "events", "node:events",
-  "eventemitter3", "borscht", "@solana/web3.js",
-  "@solana/spl-token", "@solana/bu",  // ... add other dependencies as needed
-  // keep only runtime externals here
-];
+const nodeBuiltins = [...builtinModules, ...builtinModules.map((m) => `node:${m}`)];
+const externalDeps = ["bindings", "@juanelas/base64", ...nodeBuiltins];
 
 const tsPaths = ts.compilerOptions?.paths
   ? Object.keys(ts.compilerOptions.paths).map(key => key.replace("/*", ""))
@@ -39,6 +30,14 @@ export default defineConfig({
     outDir: "dist",
     rollupOptions: {
       external: [...externalDeps, ...tsPaths],
-      plugins: [commonjs({ defaultIsModuleExports: true }), nodeResolve()],    },
+      output: {
+        globals: {
+          buffer: "Buffer",
+          path: "path",
+          fs: "fs",
+        },
+      },
+      plugins: [commonjs({ defaultIsModuleExports: true }), nodeResolve()],
+    },
   },
 });

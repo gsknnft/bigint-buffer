@@ -8,6 +8,6 @@ export default {
     exports: 'named'
   },
   context: 'globalThis',
-  external: ['bindings', '@juanelas/base64'],
+  external: ['bindings'],
   plugins: [commonjs()]
 };

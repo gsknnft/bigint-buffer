@@ -8,12 +8,11 @@ export default {
     format: 'esm'
   },
   context: 'globalThis',
-  external: ['bindings', '@juanelas/base64'],
+  external: ['bindings'],
   plugins: [
     commonjs({
       include: /node_modules/,
       namedExports: {
-        '@juanelas/base64': ['encode', 'decode']
       }
     }),
     replace({

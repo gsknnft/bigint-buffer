@@ -1,5 +1,4 @@
 {
-  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
     "composite": true,
     "rootDir": "./src",
@@ -12,7 +11,7 @@
     "lib" : [ "esnext", "dom" ],
     "sourceMap": true,
     "types": ["node"],
-    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "typeRoots": ["./src/types", "node_modules/@types"],
     "paths": {
       "#pkg": ["./src/conversion/src/ts/index.ts"],
       "@gsknnft/bigint-buffer/conversion": ["./src/conversion/src/ts/index.ts"]

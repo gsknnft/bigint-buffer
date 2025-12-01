@@ -1,88 +1,29 @@
-# 💪🔢 @gsknnft/bigint-buffer: Secure Buffer Utilities for TC39 BigInt Proposal
+![CI](https://github.com/gsknknft/bigint-buffer/actions/workflows/ci.yaml/badge.svg)
+![Release](https://github.com/gsknknft/bigint-buffer/actions/workflows/release.yaml/badge.svg)
+
+# @gsknnft/bigint-buffer
+
+Secure BigInt ⇆ Buffer conversion with native bindings, browser fallbacks, and the `bigint-conversion` helper APIs built in. This is the actively maintained fork of the original `bigint-buffer`.
+
+> **Upgrade notice:** Use `@gsknnft/bigint-buffer@1.4.3+` for verified bindings, fresh CI, and npm-based workflows across Node 18–24.
 
 [![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
 [![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
-[![Maintained Fork](https://img.shields.io/badge/fork-maintained-blue?style=flat-square)](https://github.com/gsknnft/bigint-buffer)
-Modern, secure BigInt ↔ Buffer conversion with native bindings, browser fallbacks, and the full `bigint-conversion` API built in.
 
 ---
 
-## 🔐 Security Notice: This Module Has Been Reclaimed
-This fork (`@gsknnft/bigint-buffer`) is actively maintained, secure, and recommended for all users. Native now builds clean. All conversion helpers are live and set.
-**removed useless deps - back to ZERO dependancies unless chosen native bindings**
----
-
-Modern, secure BigInt ↔ Buffer conversion with native bindings, browser fallbacks, and the full `bigint-conversion` API built in.
-
-As of October 2025, `bigint-buffer@1.1.5` is **compromised and flagged by multiple audit tools** due to unresolved vulnerabilities in its native bindings and transitive dependencies. No upstream patch has been published.
-As the original `bigint-buffer` package is deprecated. This repo (`@gsknnft/bigint-buffer`) is the official, actively maintained successor. All users should migrate for security, performance, and modern features.
-
-This repo — `@gsknnft/bigint-buffer@1.4.2` — is a **sovereign override**:
-- ✅ Rebuilt with modern TypeScript and Rollup
-- ✅ Native bindings patched and rebuilt via `node-gyp`
-- ✅ Browser fallback formalized via `"browser"` field
-- ✅ ESM/CJS duality declared via `"exports"`
-- ✅ Peer dependency alignment and audit compliance restored
-
-If you're using `bigint-buffer` in a secure or reproducible system, **migrate to `@gsknnft/bigint-buffer`** or override via `pnpm`:
-
-```json
-"pnpm": {
-  "overrides": {
-    "bigint-buffer": "@gsknnft/bigint-buffer@1.4.2"
-  }
-}
-```
-
-
-**This fork is maintained by CoreFlame/GSKNNFT as part of the SigilNet ecosystem.**
-
----
-
-## Why BigInts?
-
-BigInts are primitive arbitrary precision integers, overcoming the limitations of JS numbers (max 53 bits). They enable safe manipulation of 64, 128, 256+ bit values (e.g., database IDs, hashes) with much better performance than Buffer or BN.js.
-
-**Performance highlights:**
-
-```
-Buffer equality: 12M ops/s
-BigInt equality: 798M ops/s
-BN.js equality: 73M ops/s
-BN.js multiply: 4.7M ops/s
-BigInt multiply: 15M ops/s
-```
-
----
-
-## Why This Package?
-
-It is the only currently known secure, reproducible implementation of BigInt ↔ Buffer conversion with native fallback.
-
-- Efficient, secure conversion between BigInt and Buffer (native N-API bindings in Node, pure JS fallback in browser)
-- All conversion helpers built-in (no need for `bigint-conversion`)
-- Endian-safe, round-trip validated
-- Unified types and exports
-- No audit vulnerabilities
-- Patched and rebuilt native bindings (Node 18+)
-- First-class ESM/CJS exports plus browser bundle
-- Conversion helpers in-core (no separate `bigint-conversion`)
-- Actively maintained by GSKNNFT/CoreFlame
-
-## 🔍 Differences from Upstream
-
-- Rebuilt native bindings with modern Node compatibility
-- Scoped under `@gsknnft` for audit clarity
-- Uses `cpy-cli` instead of deprecated `cpx`
-- Rollup-based bundling for ESM/CJS duality
-- Peer dependency alignment and reproducibility guarantees
+## Why This Package
+- Native N-API binding with pure-JS fallback for browsers and constrained environments.
+- Conversion helpers from `bigint-conversion` in-core (no extra deps).
+- ESM and CJS exports plus a UMD/browser bundle.
+- Actively maintained; legacy `bigint-buffer` is deprecated and flagged by audits.
 
 ---
 
 ## Install
 ```bash
-pnpm add @gsknnft/bigint-buffer
-# or npm/yarn
+npm install @gsknnft/bigint-buffer
+# or pnpm/yarn if preferred
 ```
 
 ---
@@ -92,114 +33,57 @@ pnpm add @gsknnft/bigint-buffer
 import {
   toBigIntBE, toBigIntLE, toBufferBE, toBufferLE,
   bigintToBuf, bufToBigint, bigintToHex, hexToBigint,
-  bigintToText, textToBigint, bigintToBase64, base64ToBigint
-} from '@gsknnft/bigint-buffer';
+  bigintToText, textToBigint, bigintToBase64, base64ToBigint,
+} from "@gsknnft/bigint-buffer";
 
-toBigIntBE(Buffer.from('deadbeef', 'hex')); // 3735928559n
+toBigIntBE(Buffer.from("deadbeef", "hex")); // 3735928559n
 toBufferLE(0xdeadbeefn, 6);                 // <Buffer ef be ad de 00 00>
 bigintToHex(123456789n);                    // "075bcd15"
-textToBigint('Hello');                      // 0x48656c6c6f
+textToBigint("Hello");                      // 0x48656c6c6f
 bigintToBase64(123456789n);                 // "B1vNFQ=="
 ```
 
----
-
-### 🚀 Advanced Conversion Utilities (Built-In)
-
-Need only the conversion helpers?
-## Usage
-
-### Classic Buffer/BigInt API
-
-```js
-import { toBigIntLE, toBigIntBE, toBufferLE, toBufferBE } from '@gsknnft/bigint-buffer';
-
-const bigInt = toBigIntBE(Buffer.from('deadbeef', 'hex'));
-const buf = toBufferLE(123456789n, 8);
-```
-
+### Conversion Utilities
 ```ts
-import { conversionUtils } from '@gsknnft/bigint-buffer';
+import { conversionUtils } from "@gsknnft/bigint-buffer";
 
-// TypedArray, ArrayBuffer, hex/text/base64 helpers
 const arrBuf = conversionUtils.bigintToBuf(123456789n, true); // ArrayBuffer
 const hex = conversionUtils.bigintToHex(123456789n, true);    // '0x...' format
 const text = conversionUtils.bigintToText(123456789n);
 ```
 
-> All conversions are endian-safe, round-trip validated, and available in both Node and browser environments.
-
 ---
 
-### 🧠 Why This Matters
-
-- ✅ No audit vulnerabilities  
-- ✅ Native bindings preserved  
-- ✅ Conversion logic fused directly into the core  
-- ✅ Unified types and exports  
-- ✅ No need for `bigint-conversion` or external wrappers
-
-
----
-
-## Runtime: Native vs JS
-- Native binding lives at `build/Release/bigint_buffer.node` and loads automatically.
-- Check the path in use:
+## Runtime
+- Native binary: `build/Release/bigint_buffer.node` (loads automatically when available).
+- Fallback: pure JS bundle for browser and non-native installs.
+- Check which path loaded:
   ```ts
-  import { isNative } from '@gsknnft/bigint-buffer';
-  console.log(isNative); // true when native is loaded
+  import { isNative } from "@gsknnft/bigint-buffer";
+  console.log(isNative); // true when native binding is active
   ```
-- Pure JS fallback stays available for browsers and non-native installs.
-
----
-
-## Docs & Types
-- Core usage: this README
-- Full conversion docs: `src/conversion/docs/` (generated from `bigint-conversion`)
-- API: [gsknnft.github.io/bigint-buffer/](https://gsknnft.github.io/bigint-buffer/)
-- Types: ship in `dist/*.d.ts`
 
 ---
 
 ## Commands
-
 ```bash
-pnpm run build           # compile + bundle
-pnpm run test            # vitest (node + conversion tests)
-pnpm run coverage        # conversion coverage
-pnpm run rebuild:native  # rebuild the N-API binding
-```
-
-## Benchmarks
-
-Run benchmarks with:
-```bash
-pnpm run benchmark       # performance benchmarks
+npm run build           # bundle + declarations + type check
+npm test                # vitest with coverage
+npm run test:node       # mocha against built JS (after build/compile)
+npm run rebuild:native  # rebuild the N-API binding
 ```
 
 ---
 
-## Modern Testing
-
-Uses [Vitest](https://vitest.dev) for fast, type-safe tests and coverage:
-
-```bash
-pnpm run test      # run all tests
-pnpm run coverage  # see coverage report
-```
-
----
-
-## API Surface
-- Native: `toBigIntBE/LE`, `toBufferBE/LE`, `validateBigIntBuffer`, `isNative`
-- Conversion: `bigintToBuf`, `bufToBigint`, `bigintToHex`, `hexToBigint`, `bigintToText`, `textToBigint`, `bigintToBase64`, `base64ToBigint`, `bufToHex`, `hexToBuf`, `textToBuf`, `bufToText`, `parseHex`, `TypedArray`
+## API Surface (high level)
+- Core: `toBigIntBE/LE`, `toBufferBE/LE`, `validateBigIntBuffer`, `isNative`
+- Conversion: `bigintToBuf`, `bufToBigint`, `bigintToHex`, `hexToBigint`, `bigintToText`, `textToBigint`, `bigintToBase64`, `base64ToBigint`, `bufToHex`, `hexToBuf`, `textToBuf`, `bufToText`, `parseHex`
 
 All helpers are endian-safe and validated across Node and browser builds.
 
 ---
 
-## Support & Project Status
-- Version: 1.4.2
-- Maintainer: GSKNNFT/CoreFlame
-- Node: ≥18 (native), browser bundle included
+## Support
+- Version: 1.4.3
+- Node: 18+ (tested through 24 LTS)
 - Issues: https://github.com/gsknnft/bigint-buffer/issues

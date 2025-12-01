@@ -1,6 +1,6 @@
 {
   "name": "@gsknnft/bigint-buffer",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "bigint to buffer conversion with native support and built-in conversion helpers",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -31,7 +31,7 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "coverage": "vitest cover ./test/index.js",
-    "lint": "gts check",
+    "lint": "eslint . --ext .ts,.js",
     "install": "node-gyp rebuild",
     "prepublishOnly": "rm -rf build/Makefile; rm build/gyp-*; rm build/*.mk; rm build/*.Makefile; rm *.tgz",
     "clean:js": "npm clean && rm -rf build/* dist/*",
@@ -45,9 +45,9 @@
     "compile": "vite build && npm run declare && tsc -p . && cpy \"index.d.ts\" ../dist/types --cwd dist/types && cpy \"conversion/index.d.ts\" ../dist/conversion --cwd dist/types",
     "check": "eslint src/**/*.ts src/conversion/**/*.ts src/index.spec.ts src/conversion/test/**/*.ts",
     "test:vitest": "vitest",
-    "test:all": "pnpm run test && pnpm run benchmark",
-    "clean": "gts clean",
-    "fix": "gts fix",
+    "test:all": "npm run test && npm run benchmark",
+    "clean": "rm -rf build/* dist/* node_modules package-lock.json pnpm-lock.yaml",
+    "fix": "eslint . --ext .ts,.js --fix && prettier --write .",
     "pretest": "npm run compile",
     "posttest": "npm run check"
   },
@@ -81,6 +81,7 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-replace": "6.0.3",
     "@rollup/plugin-typescript": "^12.1.4",
+    "rollup-plugin-polyfill-node": "^0.13.0",
     "@types/benchmark": "^2.1.5",
     "@types/bn.js": "^5.2.0",
     "@types/chai": "^5.2.3",
@@ -95,7 +96,6 @@
     "cross-env": "^10.1.0",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
-    "gts": "^6.0.2",
     "jiti": "^2.6.1",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
@@ -105,6 +105,7 @@
     "karma-webpack": "^5.0.1",
     "microtime": "^3.0.0",
     "mkdirp": "^3.0.1",
+    "prettier": "^3.2.2",
     "rollup": "^4.53.3",
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
@@ -118,7 +119,8 @@
     "webpack-cli": "6.0.1"
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "publishConfig": {
     "access": "public"
