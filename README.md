@@ -83,7 +83,7 @@ npm run rebuild:native  # rebuild the N-API binding
 All helpers are endian-safe and validated across Node and browser builds.
 
 ---
- 
+
 ## Support
 - Version: 1.4.4 (CI-verified; 1.4.3 was pre-green)
 - Node: 20+ (tested through 24 LTS under CI)
