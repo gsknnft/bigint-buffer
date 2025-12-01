@@ -17,6 +17,15 @@
       "require": "./dist/conversion/index.cjs"
     }
   },
+  "files": [
+    "dist/",
+    "helper/",
+    "src/",
+    "binding.gyp",
+    "build/",
+    "README.md",
+    "LICENSE"
+  ],
   "workspaces": [],
   "scripts": {
     "test": "vitest run",
@@ -66,7 +75,6 @@
     "bindings": "^1.5.0"
   },
   "devDependencies": {
-    "jiti": "^2.6.1",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-esm-shim": "0.1.8",
     "@rollup/plugin-json": "^6.1.0",
@@ -88,6 +96,7 @@
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
     "gts": "^6.0.2",
+    "jiti": "^2.6.1",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
     "karma-env-preprocessor": "^0.1.1",
@@ -117,5 +126,8 @@
   "contributors": [
     "Gordon Skinner <gsknnft@gmail.com> (https://github.com/gsknnft)",
     "Michael Wei <mwei@vmware.com> (https://github.com/no2chem)"
-  ]
+  ],
+  "dependencies": {
+    "@gsknnft/bigint-buffer": "file:gsknnft-bigint-buffer-1.4.1.tgz"
+  }
 }
