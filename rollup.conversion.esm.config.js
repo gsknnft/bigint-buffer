@@ -1,5 +1,6 @@
 import replace from '@rollup/plugin-replace';
 import commonjs from '@rollup/plugin-commonjs';
+import polyfillNode from 'rollup-plugin-polyfill-node';
 
 export default {
   input: 'build/conversion/index.js',
@@ -8,11 +9,14 @@ export default {
     format: 'esm'
   },
   context: 'globalThis',
-  external: ['bindings'],
   plugins: [
+    polyfillNode(),
     commonjs({
       include: /node_modules/,
       namedExports: {
+        'fs': ['fs'],
+        'path': ['path'],
+        'Buffer': ['Buffer']
       }
     }),
     replace({

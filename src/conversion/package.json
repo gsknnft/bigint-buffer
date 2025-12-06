@@ -15,11 +15,10 @@
   ],
   "license": "MIT",
   "author": {
-    "name": "Juan Hernández Serrano",
-    "email": "j.hernandez@upc.edu",
-    "url": "https://github.com/juanelas"
+    "name": "Gordon Skinner",
+    "email": "gsknnft@gmail.com",
+    "url": "https://github.com/gsknnft"
   },
-  "repository": "github:juanelas/bigint-conversion",
   "main": "./dist/cjs/index.node.js",
   "browser": "./dist/esm/index.browser.js",
   "types": "./dist/index.d.ts",
@@ -93,7 +92,6 @@
     "build:js": "rollup -c build/rollup.config.ts",
     "typecheck": "tsc --noEmit",
     "postbuild:js": "run-s _build:cleantypes _build:cjsAndesmPkgJsons",
-    "test:node": "vitest run",
     "clean": "rimraf coverage dist .types docs",
     "coverage": "vitest run --coverage",
     "docs": "typedoc --plugin typedoc-plugin-markdown --entryModule API.md --readme none --excludePrivate --out docs src/ts/index.ts",
@@ -130,14 +128,7 @@
     }
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-inject": "^5.0.5",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-multi-entry": "^7.0.1",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-replace": "^6.0.2",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.3.0",
+    "vite-plugin-node-polyfills": "0.24.0",
     "@types/node": "^24.10.1",
     "c8": "^10.1.3",
     "chai": "^6.2.0",

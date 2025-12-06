@@ -1,6 +1,8 @@
-import { Buffer } from 'buffer';
-import path from 'path';
-import fs from 'fs';
+import {
+  ConverterInterface,
+  findModuleRoot,
+  IS_BROWSER,
+} from "../../converter";
 
 export {
   toFixedPoint,
@@ -14,38 +16,10 @@ export {
   ZERO_FIXED_POINT,
   fixedPointToBigInt,
   toBigIntValue,
-} from './fixedPoint'
+} from "./fixedPoint";
 
-
-interface ConverterInterface {
-  toBigInt: (buf: Buffer, bigEndian?: boolean) => bigint;
-  fromBigInt: (num: bigint, buf: Buffer, bigEndian?: boolean) => Buffer;
-}
-
-export let isNative = false;
 let converter: ConverterInterface | undefined;
 let nativeLoadError: unknown;
-
-const IS_BROWSER =
-  typeof globalThis !== "undefined" &&
-  typeof (globalThis as { document?: unknown }).document !== "undefined";
-
-const candidateRoots = [
-  // when running from dist/
-  path.resolve(__dirname, ".."),
-  // when running from build/conversion/src/ts
-  path.resolve(__dirname, "../../.."),
-  // when running from src/conversion/src/ts
-  path.resolve(__dirname, "../../../../"),
-];
-
-const findModuleRoot = (): string => {
-  for (const root of candidateRoots) {
-    const candidate = path.join(root, "build", "Release", "bigint_buffer.node");
-    if (fs.existsSync(candidate)) return root;
-  }
-  return candidateRoots[0];
-};
 
 function loadNative(): ConverterInterface | undefined {
   try {
@@ -62,11 +36,12 @@ function loadNative(): ConverterInterface | undefined {
   }
 }
 
+let localIsNative = false;
 if (!IS_BROWSER) {
   converter = loadNative();
-  isNative = converter !== undefined;
+  localIsNative = converter !== undefined;
   if (
-    !isNative &&
+    !localIsNative &&
     nativeLoadError !== undefined &&
     process.env?.BIGINT_BUFFER_SILENT_NATIVE_FAIL !== "1"
   ) {

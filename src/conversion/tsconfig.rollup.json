@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "declaration": false,
-    "outDir": "./.rollup-tmp",
-    "composite": false
-  },
-  "include": ["src/ts/**/*"]
-}

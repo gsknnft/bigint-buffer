@@ -1,4 +1,5 @@
 import commonjs from '@rollup/plugin-commonjs';
+import polyfillNode from 'rollup-plugin-polyfill-node';
 
 export default {
   input: 'build/conversion/index.js',
@@ -8,6 +9,5 @@ export default {
     exports: 'named'
   },
   context: 'globalThis',
-  external: ['bindings'],
-  plugins: [commonjs()]
+  plugins: [polyfillNode(), commonjs()]
 };

@@ -1,5 +1,6 @@
 import replace from '@rollup/plugin-replace';
 import commonjs from '@rollup/plugin-commonjs';
+import polyfillNode from 'rollup-plugin-polyfill-node';
 
 export default {
     input: 'build/index.js',
@@ -10,6 +11,7 @@ export default {
     context: 'globalThis',
     external: ['bindings'],
     plugins: [
+        polyfillNode(),
         commonjs({
             include: /node_modules/,
             namedExports: {

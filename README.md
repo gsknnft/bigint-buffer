@@ -5,7 +5,7 @@
 
 Secure BigInt ⇆ Buffer conversion with native bindings, browser fallbacks, and the `bigint-conversion` helper APIs built in. This is the actively maintained fork of the original `bigint-buffer`.
 
-**Upgrade notice:** `1.4.5` adds FixedPoint utilities, native bindings in `build/Release/` out of the box, and improved JS fallback for environments without native support. CI-verified for Node 20–24. All users should upgrade for best compatibility and new features.
+**Upgrade notice:** The current 1.4.x line ships chunked, allocation-free BE/LE converters (Buffer.read/writeBigUInt64* when available) that are fuzzed across empty, tiny, and huge buffers, alongside FixedPoint utilities and packaged native bindings. CI-verified for Node 20–24. Upgrade for the fastest conversions and consistent behaviour across environments.
 
 [![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
 [![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
@@ -51,6 +51,15 @@ const fp = toFixedPoint(123456789n, 18);    // Convert bigint to FixedPoint
 const sum = addFixedPoint(fp, fp);          // Add two FixedPoints
 const avg = averageFixedPoint([fp, fp]);    // Average FixedPoints
 ```
+
+### Performance
+- BE/LE conversions now stream bytes directly from buffers (64-bit chunks via Buffer.read/writeBigUInt64* when available) with no intermediate hex copies.
+- JS fallback matches the native binding semantics and is exercised against empty, tiny, and very large inputs in CI.
+- Native bindings still load automatically when present; the optimized fallback keeps browser and non-native runtimes fast.
+- Browser bundlers must polyfill Node built-ins: add a node polyfill plugin (e.g. `rollup-plugin-polyfill-node`) or explicit aliases for `buffer`, `path`, and `fs` so the fallback loader can resolve.
+
+### Pushing Performance Further
+- For very large buffers, consider enabling the native binding (included in npm tarball) or adding SIMD/native glue in your host app if you need throughput beyond JS.
 
 ### Conversion Utilities
 ```ts

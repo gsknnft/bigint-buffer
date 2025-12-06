@@ -7,14 +7,169 @@ interface ConverterInterface {
   fromBigInt(num: bigint, buf: Buffer, bigEndian?: boolean): Buffer;
 }
 
-let converter: ConverterInterface;
+type ReadUint64 = (buf: Buffer, offset: number) => bigint;
+type WriteUint64 = (buf: Buffer, offset: number, value: bigint) => void;
+
+const hasRead64LE = typeof Buffer.prototype.readBigUInt64LE === "function";
+const hasRead64BE = typeof Buffer.prototype.readBigUInt64BE === "function";
+const hasWrite64LE = typeof Buffer.prototype.writeBigUInt64LE === "function";
+const hasWrite64BE = typeof Buffer.prototype.writeBigUInt64BE === "function";
+
+const read64LE: ReadUint64 = hasRead64LE
+  ? (buf, offset) => buf.readBigUInt64LE(offset)
+  : (buf, offset) => {
+      let out = 0n;
+      for (let i = 7; i >= 0; i--) {
+        out = (out << 8n) + BigInt(buf[offset + i]);
+      }
+      return out;
+    };
+
+const read64BE: ReadUint64 = hasRead64BE
+  ? (buf, offset) => buf.readBigUInt64BE(offset)
+  : (buf, offset) => {
+      let out = 0n;
+      for (let i = 0; i < 8; i++) {
+        out = (out << 8n) + BigInt(buf[offset + i]);
+      }
+      return out;
+    };
+
+const write64LE: WriteUint64 = hasWrite64LE
+  ? (buf, offset, value) => {
+      buf.writeBigUInt64LE(value, offset);
+    }
+  : (buf, offset, value) => {
+      let temp = value;
+      for (let i = 0; i < 8; i++) {
+        buf[offset + i] = Number(temp & 0xffn);
+        temp >>= 8n;
+      }
+    };
+
+const write64BE: WriteUint64 = hasWrite64BE
+  ? (buf, offset, value) => {
+      buf.writeBigUInt64BE(value, offset);
+    }
+  : (buf, offset, value) => {
+      let temp = value;
+      for (let i = 7; i >= 0; i--) {
+        buf[offset + i] = Number(temp & 0xffn);
+        temp >>= 8n;
+      }
+    };
+
+const bufferToBigIntLE = (buf: Buffer): bigint => {
+  let result = 0n;
+  let multiplier = 1n;
+  const len = buf.length;
+  const remainder = len & 7;
+
+  for (let i = 0; i < remainder; i++) {
+    result += BigInt(buf[i]) * multiplier;
+    multiplier <<= 8n;
+  }
+
+  for (let offset = remainder; offset < len; offset += 8) {
+    const chunk = read64LE(buf, offset);
+    result += chunk * multiplier;
+    multiplier <<= 64n;
+  }
+
+  return result;
+};
+
+const bufferToBigIntBE = (buf: Buffer): bigint => {
+  const len = buf.length;
+  if (len === 0) return 0n;
+
+  let result = 0n;
+  const remainder = len & 7;
+  let offset = 0;
+
+  if (remainder !== 0) {
+    for (; offset < remainder; offset++) {
+      result = (result << 8n) + BigInt(buf[offset]);
+    }
+  }
+
+  for (; offset < len; offset += 8) {
+    const chunk = read64BE(buf, offset);
+    result = (result << 64n) + chunk;
+  }
+
+  return result;
+};
+
+const writeBigIntToBufferLE = (num: bigint, target: Buffer): Buffer => {
+  const width = target.length;
+  let remaining = num;
+  let offset = 0;
+
+  const limit = width - (width % 8);
+  for (; offset < limit; offset += 8) {
+    write64LE(target, offset, remaining & 0xffffffffffffffffn);
+    remaining >>= 64n;
+  }
+
+  for (; offset < width; offset++) {
+    target[offset] = Number(remaining & 0xffn);
+    remaining >>= 8n;
+  }
+
+  return target;
+};
+
+const writeBigIntToBufferBE = (num: bigint, target: Buffer): Buffer => {
+  const width = target.length;
+  let remaining = num;
+  let offset = width;
+
+  const limit = width & ~7;
+  while (offset > limit) {
+    offset--;
+    target[offset] = Number(remaining & 0xffn);
+    remaining >>= 8n;
+  }
+
+  for (; offset > 0; offset -= 8) {
+    const chunk = remaining & 0xffffffffffffffffn;
+    write64BE(target, offset - 8, chunk);
+    remaining >>= 64n;
+  }
+
+  return target;
+};
+
+const byteLengthFromBigint = (value: bigint): number => {
+  if (value === 0n) return 1;
+  let tmp = value;
+  let bytes = 0;
+  while (tmp > 0n) {
+    bytes++;
+    tmp >>= 8n;
+  }
+  return bytes;
+};
+
+const jsConverter: ConverterInterface = {
+  toBigInt: (buf: Buffer, bigEndian = true) =>
+    bigEndian ? bufferToBigIntBE(buf) : bufferToBigIntLE(buf),
+  fromBigInt: (num: bigint, buf: Buffer, bigEndian = true) =>
+    bigEndian ? writeBigIntToBufferBE(num, buf) : writeBigIntToBufferLE(num, buf),
+};
+
+let converter: ConverterInterface = jsConverter;
 export let isNative = false;
 
 if (typeof window === "undefined") {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    converter = require("bindings")("bigint_buffer");
-    isNative = converter !== undefined;
+    const nativeConverter = require("bindings")("bigint_buffer") as ConverterInterface;
+    if (nativeConverter !== undefined) {
+      converter = nativeConverter;
+      isNative = true;
+    }
   } catch (e) {
     console.warn(
       "bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)", e
@@ -28,15 +183,6 @@ if (typeof window === "undefined") {
  * @returns A BigInt with the little-endian representation of buf.
  */
 export function toBigIntLE(buf: Buffer): bigint {
-  if (typeof window !== "undefined" || converter === undefined) {
-    const reversed = Buffer.from(buf);
-    reversed.reverse();
-    const hex = reversed.toString("hex");
-    if (hex.length === 0) {
-      return BigInt(0);
-    }
-    return BigInt(`0x${hex}`);
-  }
   return converter.toBigInt(buf, false);
 }
 
@@ -55,13 +201,6 @@ export function validateBigIntBuffer(): boolean {
  * @returns A BigInt with the big-endian representation of buf.
  */
 export function toBigIntBE(buf: Buffer): bigint {
-  if (typeof window !== "undefined" || converter === undefined) {
-    const hex = buf.toString("hex");
-    if (hex.length === 0) {
-      return BigInt(0);
-    }
-    return BigInt(`0x${hex}`);
-  }
   return converter.toBigInt(buf, true);
 }
 
@@ -72,17 +211,11 @@ export function toBigIntBE(buf: Buffer): bigint {
  * @returns A little-endian buffer representation of num.
  */
 export function toBufferLE(num: bigint, width: number): Buffer {
-  if (typeof window !== "undefined" || converter === undefined) {
-    const hex = num.toString(16);
-    const buffer = Buffer.from(
-      hex.padStart(width * 2, "0").slice(0, width * 2),
-      "hex"
-    );
-    buffer.reverse();
-    return buffer;
+  if (width < 0) {
+    throw new RangeError("toBufferLE width must be non-negative");
   }
-  // Allocation is done here, since it is slower using napi in C
-  return converter.fromBigInt(num, Buffer.allocUnsafe(width), false);
+  const target = width === 0 ? Buffer.alloc(0) : Buffer.allocUnsafe(width);
+  return converter.fromBigInt(num, target, false);
 }
 
 /**
@@ -92,11 +225,11 @@ export function toBufferLE(num: bigint, width: number): Buffer {
  * @returns A big-endian buffer representation of num.
  */
 export function toBufferBE(num: bigint, width: number): Buffer {
-  if (typeof window !== "undefined" || converter === undefined) {
-    const hex = num.toString(16);
-    return Buffer.from(hex.padStart(width * 2, "0").slice(0, width * 2), "hex");
+  if (width < 0) {
+    throw new RangeError("toBufferBE width must be non-negative");
   }
-  return converter.fromBigInt(num, Buffer.allocUnsafe(width), true);
+  const target = width === 0 ? Buffer.alloc(0) : Buffer.allocUnsafe(width);
+  return converter.fromBigInt(num, target, true);
 }
 
 // ========== Conversion Utilities ==========
@@ -111,12 +244,7 @@ export function bigintToBuf(num: bigint): Buffer {
   if (num < BigInt(0)) {
     throw new Error("bigintToBuf: negative bigint values are not supported");
   }
-  if (num === BigInt(0)) {
-    return Buffer.from([0]);
-  }
-  // Calculate the number of bytes needed
-  const hex = num.toString(16);
-  const width = Math.ceil(hex.length / 2);
+  const width = byteLengthFromBigint(num);
   return toBufferBE(num, width);
 }
 
