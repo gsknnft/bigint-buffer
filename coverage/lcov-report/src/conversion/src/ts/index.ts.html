@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">56.2% </span>
+                <span class="strong">58.82% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>77/137</span>
+                <span class='fraction'>80/136</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">54.63% </span>
+                <span class="strong">56.7% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>53/97</span>
+                <span class='fraction'>55/97</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.03% </span>
+                <span class="strong">59.7% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>77/135</span>
+                <span class='fraction'>80/134</span>
             </div>
         
             
@@ -560,18 +560,7 @@
 <a name='L495'></a><a href='#L495'>495</a>
 <a name='L496'></a><a href='#L496'>496</a>
 <a name='L497'></a><a href='#L497'>497</a>
-<a name='L498'></a><a href='#L498'>498</a>
-<a name='L499'></a><a href='#L499'>499</a>
-<a name='L500'></a><a href='#L500'>500</a>
-<a name='L501'></a><a href='#L501'>501</a>
-<a name='L502'></a><a href='#L502'>502</a>
-<a name='L503'></a><a href='#L503'>503</a>
-<a name='L504'></a><a href='#L504'>504</a>
-<a name='L505'></a><a href='#L505'>505</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L498'></a><a href='#L498'>498</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -594,14 +583,11 @@
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -614,7 +600,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -623,7 +609,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1071,11 +1057,7 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
-  ConverterInterface,
-  findModuleRoot,
-  IS_BROWSER,
-} from "../../converter";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { ConverterInterface, IS_BROWSER } from "./converter";
 &nbsp;
 export {
   toFixedPoint,
@@ -1098,14 +1080,11 @@ function loadNative(): ConverterInterface | undefined {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const bindings = require("bindings");
-    const moduleRoot = findModuleRoot();
-    return bindings({
-      bindings: "bigint_buffer",
-      module_root: moduleRoot,
-    }) as ConverterInterface;
+    // Let bindings module handle path resolution automatically
+    return bindings("bigint_buffer") as ConverterInterface;
   } catch (err) {
-<span class="cstat-no" title="statement not covered" >    nativeLoadError = err;</span>
-<span class="cstat-no" title="statement not covered" >    return undefined;</span>
+    nativeLoadError = err;
+    return undefined;
   }
 }
 &nbsp;
@@ -1113,21 +1092,21 @@ let localIsNative = false;
 <span class="missing-if-branch" title="else path not taken" >E</span>if (!IS_BROWSER) {
   converter = loadNative();
   localIsNative = converter !== undefined;
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (
     !localIsNative &amp;&amp;
-<span class="branch-1 cbranch-no" title="branch not covered" >    nativeLoadError !== undefined &amp;&amp;</span>
-<span class="branch-2 cbranch-no" title="branch not covered" >    process.env?.BIGINT_BUFFER_SILENT_NATIVE_FAIL !== "1"</span>
+    nativeLoadError !== undefined &amp;&amp;
+    process.env?.BIGINT_BUFFER_SILENT_NATIVE_FAIL !== "1"
   ) {
-<span class="cstat-no" title="statement not covered" >    console.warn(</span>
+    console.warn(
       "bigint-buffer: Failed to load native bindings; using pure JS fallback. Run npm run rebuild to restore native.",
       nativeLoadError
     );
   }
 }
 &nbsp;
-<span class="missing-if-branch" title="if path not taken" >I</span>if (converter === undefined) {
+<span class="missing-if-branch" title="else path not taken" >E</span>if (converter === undefined) {
   // fallback to pure JS if needed (browser or when native load fails)
-<span class="cstat-no" title="statement not covered" >  converter = {</span>
+  converter = {
     toBigInt: <span class="fstat-no" title="function not covered" >(b</span>uf: Buffer, bigEndian = <span class="branch-0 cbranch-no" title="branch not covered" >true) =&gt; {</span>
       const copy = <span class="cstat-no" title="statement not covered" >Buffer.from(buf);</span>
 <span class="cstat-no" title="statement not covered" >      if (!bigEndian) <span class="cstat-no" title="statement not covered" >copy.reverse();</span></span>
@@ -1582,7 +1561,7 @@ export function base64ToBigint(a: string): bigint {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-06T20:25:13.229Z
+                at 2025-12-06T21:16:19.055Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
