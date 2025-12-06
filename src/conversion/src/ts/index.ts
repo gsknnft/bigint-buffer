@@ -21,9 +21,8 @@ function loadNative(): ConverterInterface | undefined {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const bindings = require("bindings");
-    return bindings({
-      bindings: "bigint_buffer",
-    }) as ConverterInterface;
+    // Let bindings module handle path resolution automatically
+    return bindings("bigint_buffer") as ConverterInterface;
   } catch (err) {
     nativeLoadError = err;
     return undefined;

@@ -2,6 +2,11 @@ node_modules
 dist
 build/*
 !build/Release/
+build/Release/*.Makefile
+build/Release/*.mk
+build/Release/.deps/
+build/Release/obj.target/
+build/Release/obj/
 
 .vscode
 # Logs
