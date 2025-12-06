@@ -18,11 +18,11 @@
     }
   },
   "files": [
+    "build/Release/bigint_buffer.node",
     "dist/",
     "helper/",
     "src/",
     "binding.gyp",
-    "build/",
     "README.md",
     "LICENSE"
   ],
