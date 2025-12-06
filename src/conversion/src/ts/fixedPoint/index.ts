@@ -1,4 +1,4 @@
-import { bigintToHex, hexToBigint } from "#pkg";
+import { bigintToHex, hexToBigint } from "../index";
 
 export type FixedPoint = string;
 
