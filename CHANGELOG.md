@@ -1,4 +1,12 @@
+
 # Changelog
+
+## 1.4.5 — FixedPoint, Native Bindings, JS Fallback
+
+- Added FixedPoint utilities: `toFixedPoint`, `fromFixedPoint`, `addFixedPoint`, `subtractFixedPoint`, `averageFixedPoint`, `compareFixedPoint`, and `FixedPoint` type.
+- Native bindings (`build/Release/bigint_buffer.node`) now included out-of-the-box in npm package.
+- Improved JS fallback for environments without native bindings.
+- CI-verified for Node 20–24 on all platforms.
 
 ## 1.4.4 — CI-Verified
 

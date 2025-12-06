@@ -3,7 +3,7 @@
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 {{GITHUB_ACTIONS_BADGES}}
 
-# {{PKG_NAME}}
+# {{PKG_NAME}} v1.4.5
 
 Convert to/from non-negative integers represented with [ES-2020 native JS implementation of BigInt](https://tc39.es/ecma262/#sec-bigint-objects) from/to:
 
@@ -13,6 +13,11 @@ Convert to/from non-negative integers represented with [ES-2020 native JS implem
 - standard and url-safe base64 with and without padding.
 
 It provides a common interface for the conversions that works for both **node.js** and **native javascript**.
+
+**New in 1.4.5:**
+- FixedPoint utilities for high-precision math and conversions
+- Native bindings included in `build/Release/` out of the box
+- Improved JS fallback for environments without native support
 
 > Note that there is not a directly visible `TypedArray()` constructor, but a set of typed array ones: `Int8Array()`, `Uint8Array()`, `Uint8ClampedArray()`, `Int16Array()`, `Uint16Array()`, `Int32Array()`, `Uint32Array()`, `Float32Array()`, `Float64Array()`, `BigInt64Array()`, `BigUint64Array()`.
 

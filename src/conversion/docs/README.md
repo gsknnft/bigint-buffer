@@ -2,7 +2,7 @@
 
 ***
 
-# bigint-conversion
+# bigint-conversion (v1.4.5)
 
 ## Type Aliases
 
@@ -32,3 +32,11 @@
 - [toBufferBE](functions/toBufferBE.md)
 - [toBufferLE](functions/toBufferLE.md)
 - [validateBigIntBuffer](functions/validateBigIntBuffer.md)
+- **New in 1.4.5:**
+	- [toFixedPoint](../src/ts/fixedPoint/index.ts)
+	- [fromFixedPoint](../src/ts/fixedPoint/index.ts)
+	- [addFixedPoint](../src/ts/fixedPoint/index.ts)
+	- [subtractFixedPoint](../src/ts/fixedPoint/index.ts)
+	- [averageFixedPoint](../src/ts/fixedPoint/index.ts)
+	- [compareFixedPoint](../src/ts/fixedPoint/index.ts)
+	- [FixedPoint type](../src/ts/fixedPoint/index.ts)

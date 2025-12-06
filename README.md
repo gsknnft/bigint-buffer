@@ -5,7 +5,7 @@
 
 Secure BigInt ⇆ Buffer conversion with native bindings, browser fallbacks, and the `bigint-conversion` helper APIs built in. This is the actively maintained fork of the original `bigint-buffer`.
 
-> **Upgrade notice:** `1.4.4` is the CI-verified release (Node 20–24) and matches the 1.4.3 code. `1.4.3` was pre-green; move to 1.4.4 for a fully verified pipeline.
+**Upgrade notice:** `1.4.5` adds FixedPoint utilities, native bindings in `build/Release/` out of the box, and improved JS fallback for environments without native support. CI-verified for Node 20–24. All users should upgrade for best compatibility and new features.
 
 [![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
 [![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
@@ -35,6 +35,9 @@ import {
   toBigIntBE, toBigIntLE, toBufferBE, toBufferLE,
   bigintToBuf, bufToBigint, bigintToHex, hexToBigint,
   bigintToText, textToBigint, bigintToBase64, base64ToBigint,
+  // New in 1.4.5
+  toFixedPoint, fromFixedPoint, addFixedPoint, subtractFixedPoint,
+  averageFixedPoint, compareFixedPoint, type FixedPoint,
 } from "@gsknnft/bigint-buffer";
 
 toBigIntBE(Buffer.from("deadbeef", "hex")); // 3735928559n
@@ -42,6 +45,11 @@ toBufferLE(0xdeadbeefn, 6);                 // <Buffer ef be ad de 00 00>
 bigintToHex(123456789n);                    // "075bcd15"
 textToBigint("Hello");                      // 0x48656c6c6f
 bigintToBase64(123456789n);                 // "B1vNFQ=="
+
+// FixedPoint usage
+const fp = toFixedPoint(123456789n, 18);    // Convert bigint to FixedPoint
+const sum = addFixedPoint(fp, fp);          // Add two FixedPoints
+const avg = averageFixedPoint([fp, fp]);    // Average FixedPoints
 ```
 
 ### Conversion Utilities
@@ -56,8 +64,8 @@ const text = conversionUtils.bigintToText(123456789n);
 ---
 
 ## Runtime
-- Native binary: `build/Release/bigint_buffer.node` (loads automatically when available).
-- Fallback: pure JS bundle for browser and non-native installs.
+- Native binary: `build/Release/bigint_buffer.node` (included in npm package; loads automatically when available).
+- Fallback: pure JS bundle for browser and non-native installs (now improved in 1.4.5).
 - Check which path loaded:
   ```ts
   import { isNative } from "@gsknnft/bigint-buffer";
@@ -85,6 +93,6 @@ All helpers are endian-safe and validated across Node and browser builds.
 ---
  
 ## Support
-- Version: 1.4.4 (CI-verified; 1.4.3 was pre-green)
+- Version: 1.4.5 (FixedPoint, native bindings out-of-the-box, improved JS fallback)
 - Node: 20+ (tested through 24 LTS under CI)
 - Issues: https://github.com/gsknnft/bigint-buffer/issues
