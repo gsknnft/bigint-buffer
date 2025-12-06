@@ -1,4 +1,4 @@
-import { ConverterInterface, findModuleRoot, IS_BROWSER } from "./converter";
+import { ConverterInterface, IS_BROWSER } from "./converter";
 
 export {
   toFixedPoint,
@@ -21,11 +21,8 @@ function loadNative(): ConverterInterface | undefined {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const bindings = require("bindings");
-    const moduleRoot = findModuleRoot();
-    return bindings({
-      bindings: "bigint_buffer",
-      module_root: moduleRoot,
-    }) as ConverterInterface;
+    // Let bindings module handle path resolution automatically
+    return bindings("bigint_buffer") as ConverterInterface;
   } catch (err) {
     nativeLoadError = err;
     return undefined;

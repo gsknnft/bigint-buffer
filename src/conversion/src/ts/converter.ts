@@ -1,6 +1,4 @@
 import { Buffer } from 'buffer';
-import path from 'path';
-import fs from 'fs';
 
 export interface ConverterInterface {
   toBigInt: (buf: Buffer, bigEndian?: boolean) => bigint;
@@ -16,32 +14,12 @@ export const IS_BROWSER =
   typeof globalThis !== "undefined" &&
   typeof (globalThis as { document?: unknown }).document !== "undefined";
 
-export const candidateRoots = [
-  // when running from dist/
-  path.resolve(__dirname, "../.."),
-  // when running from build/conversion/src/ts
-  path.resolve(__dirname, "../../.."),
-  // when running from src/conversion/src/ts
-  path.resolve(__dirname, "../../../.."),
-];
-
-export const findModuleRoot = (): string => {
-  for (const root of candidateRoots) {
-    const candidate = path.join(root, "build", "Release", "bigint_buffer.node");
-    if (fs.existsSync(candidate)) return root;
-  }
-  return candidateRoots[0];
-};
-
 export function loadNative(): ConverterInterface | undefined {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const bindings = require("bindings");
-    const moduleRoot = findModuleRoot();
-    return bindings({
-      bindings: "bigint_buffer",
-      module_root: moduleRoot,
-    }) as ConverterInterface;
+    // Let bindings module handle path resolution automatically
+    return bindings("bigint_buffer") as ConverterInterface;
   } catch (err) {
     nativeLoadError = err;
     return undefined;
