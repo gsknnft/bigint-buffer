@@ -18,11 +18,11 @@ export const IS_BROWSER =
 
 export const candidateRoots = [
   // when running from dist/
-  path.resolve(__dirname, "../"),
+  path.resolve(__dirname, "../../"),
   // when running from build/conversion/src/ts
-  path.resolve(__dirname, "../.."),
+  path.resolve(__dirname, "../../.."),
   // when running from src/conversion/src/ts
-  path.resolve(__dirname, "../../../"),
+  path.resolve(__dirname, "../../../../"),
 ];
 
 export const findModuleRoot = (): string => {
