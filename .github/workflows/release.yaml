@@ -45,13 +45,17 @@ jobs:
         run: npm run test
 
       - name: Run posttests
-        run: npm run posttest
+        run: npm run test
 
       - name: prepublish
         run: npm run prepublishOnly
 
       - name: check native bindings
-        run: npm run postCheck
+        run: |
+          if [ ! -f ./build/Release/bigint_buffer.node ]; then
+            echo "Native bindings not found!"
+            exit 1
+          fi
 
       - name: Release
         env:
