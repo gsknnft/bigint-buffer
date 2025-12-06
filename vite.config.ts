@@ -5,7 +5,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import ts from "./tsconfig.json";
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
-import polyfillNode from 'rollup-plugin-polyfill-node';
+
 const nodeBuiltins = [
   ...builtinModules,
   ...builtinModules.map((m) => `node:${m}`),
