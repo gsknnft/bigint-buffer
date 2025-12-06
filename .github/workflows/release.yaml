@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+      tags:
+        - v*.*.*
   workflow_dispatch:
 
 permissions:
@@ -40,7 +42,16 @@ jobs:
         run: npm run build
 
       - name: Run unit tests
-        run: npm test
+        run: npm run test
+
+      - name: Run posttests
+        run: npm run posttest
+
+      - name: prepublish
+        run: npm run prepublishOnly
+
+      - name: check native bindings
+        run: npm run postCheck
 
       - name: Release
         env:
