@@ -2,6 +2,21 @@ import { Buffer } from 'buffer';
 import path from 'path';
 import fs from 'fs';
 
+export {
+  toFixedPoint,
+  fromFixedPoint,
+  addFixedPoint,
+  subtractFixedPoint,
+  averageFixedPoint,
+  compareFixedPoint,
+  type FixedPoint,
+  FIXED_POINT_DECIMALS,
+  ZERO_FIXED_POINT,
+  fixedPointToBigInt,
+  toBigIntValue,
+} from './fixedPoint'
+
+
 interface ConverterInterface {
   toBigInt: (buf: Buffer, bigEndian?: boolean) => bigint;
   fromBigInt: (num: bigint, buf: Buffer, bigEndian?: boolean) => Buffer;
