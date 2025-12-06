@@ -53,5 +53,5 @@
 "include": [
   "src/**/*.ts",
   "test/**/*.ts"
-, "converter.ts"]
+, "src/ts/converter.ts"]
 }

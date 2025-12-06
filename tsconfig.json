@@ -2,7 +2,7 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "./src",
-    "outDir": "build",
+    "outDir": "dist",
     "declaration": true,
     "target" : "esnext",
     "module": "nodenext",
@@ -22,7 +22,7 @@
     "src/**/*.ts",
     "src/conversion/src/ts/**/*.ts",
     "src/conversion/test/**/*.ts"
-, "src/conversion/converter.ts"  ],
+, "src/conversion/src/ts/converter.ts"  ],
   "exclude": [
     "node_modules"
   ]

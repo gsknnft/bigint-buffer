@@ -1,8 +1,4 @@
-import {
-  ConverterInterface,
-  findModuleRoot,
-  IS_BROWSER,
-} from "../../converter";
+import { ConverterInterface, findModuleRoot, IS_BROWSER } from "./converter";
 
 export {
   toFixedPoint,
