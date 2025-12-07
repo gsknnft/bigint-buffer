@@ -8,7 +8,7 @@
 
 > **validateBigIntBuffer**(): `boolean`
 
-Defined in: index.ts:49
+Defined in: index.ts:100
 
 ## Returns
 

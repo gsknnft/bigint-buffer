@@ -8,7 +8,7 @@
 
 > **toBufferLE**(`num`, `width`): `Buffer`
 
-Defined in: index.ts:80
+Defined in: index.ts:131
 
 Convert a BigInt to a little-endian buffer.
 

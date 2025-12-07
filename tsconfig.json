@@ -4,11 +4,11 @@
     "rootDir": "./src",
     "outDir": "dist",
     "declaration": true,
-    "target" : "esnext",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "target" : "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "lib" : [ "esnext", "dom" ],
+    "lib" : [ "ESNext", "dom" ],
     "sourceMap": true,
     "types": ["node"],
     "typeRoots": ["./src/types", "node_modules/@types"],
@@ -21,8 +21,9 @@
     "src/*.ts",
     "src/**/*.ts",
     "src/conversion/src/ts/**/*.ts",
-    "src/conversion/test/**/*.ts"
-, "src/conversion/src/ts/converter.ts"  ],
+    "src/conversion/test/**/*.ts",
+    "src/conversion/src/ts/converter.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

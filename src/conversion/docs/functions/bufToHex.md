@@ -8,7 +8,7 @@
 
 > **bufToHex**(`buf`, `prefix0x`, `byteLength?`): `string`
 
-Defined in: index.ts:269
+Defined in: index.ts:385
 
 Returns the hexadecimal representation of a buffer.
 
@@ -28,7 +28,8 @@ set to true to prefix the output with '0x'
 
 `number`
 
-pad the output to have the desired byte length. Notice that the hex length is double the byte length.
+pad the output to have the desired byte length. Notice
+that the hex length is double the byte length.
 
 ## Returns
 

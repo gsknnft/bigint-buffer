@@ -61,6 +61,10 @@ const avg = averageFixedPoint([fp, fp]);    // Average FixedPoints
 ### Pushing Performance Further
 - For very large buffers, consider enabling the native binding (included in npm tarball) or adding SIMD/native glue in your host app if you need throughput beyond JS.
 
+### Electron Packaging
+- Ensure the native binding ships with your app: add `node_modules/@gsknnft/bigint-buffer/build/Release/bigint_buffer.node` to `extraResources`/`asarUnpack` so it ends up under `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/build/Release/`.
+- If your packager relocates files, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node` before launching the app.
+
 ### Conversion Utilities
 ```ts
 import { conversionUtils } from "@gsknnft/bigint-buffer";

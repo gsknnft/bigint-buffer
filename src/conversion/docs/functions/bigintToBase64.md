@@ -8,7 +8,7 @@
 
 > **bigintToBase64**(`a`, `urlsafe`, `padding`): `string`
 
-Defined in: index.ts:321
+Defined in: index.ts:467
 
 Converts an arbitrary-size non-negative bigint to a base64 string
 
@@ -24,7 +24,8 @@ a non negative bigint
 
 `boolean` = `false`
 
-if true Base64 URL encoding is used ('+' and '/' are replaced by '-', '_')
+if true Base64 URL encoding is used ('+' and '/' are
+replaced by '-', '_')
 
 ### padding
 

@@ -8,9 +8,10 @@
 
 > **textToBuf**(`str`, `returnArrayBuffer`): `ArrayBuffer` \| `Buffer`\<`ArrayBufferLike`\>
 
-Defined in: index.ts:253
+Defined in: index.ts:365
 
-Converts a string of utf-8 encoded text to an ArrayBuffer or a Buffer (default in Node.js)
+Converts a string of utf-8 encoded text to an ArrayBuffer or a Buffer
+(default in Node.js)
 
 ## Parameters
 
@@ -24,7 +25,8 @@ A string of text (with utf-8 encoding)
 
 `boolean` = `false`
 
-When invoked in Node.js, it can force the output to be an ArrayBuffer instead of a Buffer.
+When invoked in Node.js, it can force the output
+to be an ArrayBuffer instead of a Buffer.
 
 ## Returns
 

@@ -8,6 +8,7 @@
 - `toBuffer*`/`toBigInt*` share the same zero-allocation paths as the native binding, preserving low-order bytes and handling empty through very large buffers consistently.
 - README now documents the optimized, size-agnostic conversions and the expanded test coverage across buffer sizes and environments.
 - Documented browser polyfill requirements for `buffer`, `path`, and `fs` plus guidance on using native/SIMD paths when extreme throughput is needed.
+- Native loader now searches installed package roots, Electron `resources/app.asar.unpacked`, and env override; README clarifies packaging the `.node` file via `extraResources`/`asarUnpack`.
 
 ## 1.4.6 — Import/Build Fixes
 - Fixed import path issues in FixedPoint utilities (no more unresolved #pkg errors)

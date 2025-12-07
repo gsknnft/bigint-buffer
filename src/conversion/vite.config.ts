@@ -17,13 +17,14 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
+      entry: path.resolve(__dirname, "src/ts/index.ts"),
       name: "bigint-buffer",
       formats: ["es", "cjs", "umd"],
       fileName: (format) => {
         if (format === "es") return "index.js";
         if (format === "cjs") return "index.cjs";
         if (format === "umd") return "index.umd.js";
+        if (format === "iife") return "bundle.iife.js";
         return `index.${format}.js`;
       },
     },

@@ -8,9 +8,10 @@
 
 > **bigintToBuf**(`a`, `returnArrayBuffer`): `ArrayBuffer` \| `Buffer`\<`ArrayBufferLike`\>
 
-Defined in: index.ts:144
+Defined in: index.ts:223
 
-Converts an arbitrary-size non-negative bigint to an ArrayBuffer or a Buffer (default for Node.js)
+Converts an arbitrary-size non-negative bigint to an ArrayBuffer or a Buffer
+(default for Node.js)
 
 ## Parameters
 
@@ -22,13 +23,15 @@ Converts an arbitrary-size non-negative bigint to an ArrayBuffer or a Buffer (de
 
 `boolean` = `false`
 
-In Node.js, it forces the output to be an ArrayBuffer instead of a Buffer.
+In Node.js, it forces the output to be an
+ArrayBuffer instead of a Buffer.
 
 ## Returns
 
 `ArrayBuffer` \| `Buffer`\<`ArrayBufferLike`\>
 
-an ArrayBuffer or a Buffer with a binary representation of the input bigint
+an ArrayBuffer or a Buffer with a binary representation of the input
+bigint
 
 ## Throws
 

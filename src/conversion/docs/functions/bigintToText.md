@@ -8,9 +8,10 @@
 
 > **bigintToText**(`a`): `string`
 
-Defined in: index.ts:204
+Defined in: index.ts:304
 
-Converts a non-negative bigint representing a binary array of utf-8 encoded text to a string of utf-8 text
+Converts a non-negative bigint representing a binary array of utf-8 encoded
+text to a string of utf-8 text
 
 ## Parameters
 
@@ -18,7 +19,8 @@ Converts a non-negative bigint representing a binary array of utf-8 encoded text
 
 `bigint`
 
-A non-negative bigint representing a binary array of utf-8 encoded text.
+A non-negative bigint representing a binary array of utf-8 encoded
+text.
 
 ## Returns
 

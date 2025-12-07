@@ -1,6 +1,22 @@
 // Export robust Buffer/BigInt methods at top level
-import * as conversionUtils from "./conversion/src/ts/index";
-export { conversionUtils };
+export {
+  FIXED_POINT_DECIMALS,
+  FIXED_POINT_PATTERN,
+  ZERO_FIXED_POINT,
+  toFixedPoint,
+  fromFixedPoint,
+  addFixedPoint,
+  subtractFixedPoint,
+  averageFixedPoint,
+  compareFixedPoint,
+  fixedPointToBigInt,
+  toBigIntValue,
+} from "./conversion/src/ts/index";
+
+type PathModule = typeof import("path");
+type FsModule = typeof import("fs");
+type BindingsLoader = ((name: string) => unknown) &
+  ((options: { bindings: string; module_root?: string }) => unknown);
 
 interface ConverterInterface {
   toBigInt(buf: Buffer, bigEndian?: boolean): bigint;
@@ -156,23 +172,135 @@ const jsConverter: ConverterInterface = {
   toBigInt: (buf: Buffer, bigEndian = true) =>
     bigEndian ? bufferToBigIntBE(buf) : bufferToBigIntLE(buf),
   fromBigInt: (num: bigint, buf: Buffer, bigEndian = true) =>
-    bigEndian ? writeBigIntToBufferBE(num, buf) : writeBigIntToBufferLE(num, buf),
+    bigEndian
+      ? writeBigIntToBufferBE(num, buf)
+      : writeBigIntToBufferLE(num, buf),
+};
+
+const IS_BROWSER =
+  typeof globalThis !== "undefined" &&
+  typeof (globalThis as { document?: unknown }).document !== "undefined";
+
+let path: PathModule | undefined;
+let fs: FsModule | undefined;
+
+if (!IS_BROWSER) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  path = require("path") as PathModule;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  fs = require("fs") as FsModule;
+}
+
+const candidateRoots = (): string[] => {
+  if (!path) return [];
+  const pkgRoot = resolvePackageRoot();
+  const resourcesPath =
+    typeof process !== "undefined" &&
+    (process as { resourcesPath?: string }).resourcesPath;
+
+  return [
+    process.env?.BIGINT_BUFFER_NATIVE_PATH,
+    pkgRoot,
+    pkgRoot ? path.join(pkgRoot, "dist") : undefined,
+    resourcesPath
+      ? path.join(
+          resourcesPath,
+          "app.asar.unpacked",
+          "node_modules",
+          "@gsknnft",
+          "bigint-buffer"
+        )
+      : undefined,
+    path.resolve(__dirname, ".."),
+    path.resolve(__dirname, "."),
+    path.resolve(__dirname, "../.."),
+    path.resolve(__dirname, "../../.."),
+    path.resolve(__dirname, "../../../.."),
+  ].filter((p): p is string => Boolean(p));
+};
+
+const findModuleRoot = (): string | undefined => {
+  if (!path || !fs) return undefined;
+  for (const root of candidateRoots()) {
+    const directCandidate = path.join(
+      root,
+      "build",
+      "Release",
+      "bigint_buffer.node"
+    );
+    if (fs.existsSync(directCandidate)) {
+      return root;
+    }
+    const distCandidate = path.join(
+      root,
+      "dist",
+      "build",
+      "Release",
+      "bigint_buffer.node"
+    );
+    if (fs.existsSync(distCandidate)) {
+      return path.join(root, "dist");
+    }
+  }
+  return undefined;
+};
+
+const resolveBindings = (candidate: unknown): BindingsLoader => {
+  if (typeof candidate === "function") {
+    return candidate as BindingsLoader;
+  }
+  if (candidate && typeof candidate === "object") {
+    const maybeDefault = (candidate as { default?: unknown }).default;
+    if (typeof maybeDefault === "function") {
+      return maybeDefault as BindingsLoader;
+    }
+    if (
+      maybeDefault &&
+      typeof maybeDefault === "object" &&
+      typeof (maybeDefault as { default?: unknown }).default === "function"
+    ) {
+      return (maybeDefault as { default: unknown }).default as BindingsLoader;
+    }
+  }
+  throw new TypeError("bindings is not a function");
 };
 
 let converter: ConverterInterface = jsConverter;
+let nativeLoadError: unknown;
 export let isNative = false;
 
-if (typeof window === "undefined") {
+const loadNative = (): ConverterInterface | undefined => {
+  nativeLoadError = undefined;
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const nativeConverter = require("bindings")("bigint_buffer") as ConverterInterface;
-    if (nativeConverter !== undefined) {
-      converter = nativeConverter;
-      isNative = true;
+    const rawBindings = require("bindings");
+    const bindings = resolveBindings(rawBindings);
+    const moduleRoot = findModuleRoot();
+    if (moduleRoot) {
+      return bindings({
+        bindings: "bigint_buffer",
+        module_root: moduleRoot,
+      }) as ConverterInterface;
     }
-  } catch (e) {
+    return bindings("bigint_buffer") as ConverterInterface;
+  } catch (err) {
+    nativeLoadError = err;
+    return undefined;
+  }
+};
+
+if (!IS_BROWSER) {
+  const nativeConverter = loadNative();
+  if (nativeConverter !== undefined) {
+    converter = nativeConverter;
+    isNative = true;
+  } else if (
+    nativeLoadError !== undefined &&
+    process.env?.BIGINT_BUFFER_SILENT_NATIVE_FAIL !== "1"
+  ) {
     console.warn(
-      "bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)", e
+      "bigint-buffer: Failed to load native bindings; using pure JS fallback. Run npm run rebuild to restore native.",
+      nativeLoadError
     );
   }
 }
@@ -307,7 +435,9 @@ export function textToBigint(text: string): bigint {
   try {
     return BigInt(text);
   } catch (e) {
-    throw new Error(`textToBigint: invalid decimal string "${text}" ${e instanceof Error ? e.message : String(e)}`);
+    throw new Error(
+      `textToBigint: invalid decimal string "${text}" ${e instanceof Error ? e.message : String(e)}`
+    );
   }
 }
 
@@ -340,4 +470,24 @@ export function base64ToBigint(base64: string): bigint {
   }
   const buf = Buffer.from(cleaned, "base64");
   return bufToBigint(buf);
+}
+
+/**
+ * Attempt to resolve the root directory of the current package.
+ * Looks for the nearest directory containing a package.json, starting from __dirname.
+ * Returns the absolute path to the package root, or undefined if not found.
+ */
+function resolvePackageRoot(): string | undefined {
+  if (!path || !fs) return undefined;
+  let dir = __dirname;
+  while (true) {
+    const pkgPath = path.join(dir, "package.json");
+    if (fs.existsSync(pkgPath)) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return undefined;
 }

@@ -8,7 +8,7 @@
 
 > **base64ToBigint**(`a`): `bigint`
 
-Defined in: index.ts:330
+Defined in: index.ts:494
 
 Converts a base64 string to bigint.
 
@@ -18,7 +18,8 @@ Converts a base64 string to bigint.
 
 `string`
 
-base64 string. It accepts standard and URL-safe base64 with and without padding
+base64 string. It accepts standard and URL-safe base64 with and
+without padding
 
 ## Returns
 

@@ -8,7 +8,7 @@
 
 > **hexToBuf**(`hexStr`, `returnArrayBuffer`): `ArrayBuffer` \| `Buffer`\<`ArrayBufferLike`\>
 
-Defined in: index.ts:298
+Defined in: index.ts:435
 
 Converts a hexadecimal string to a buffer
 
@@ -24,7 +24,8 @@ A string representing a number with hexadecimal notation
 
 `boolean` = `false`
 
-In Node.js, it forces the output to be an ArrayBuffer instead of a Buffer.
+In Node.js, it forces the output to be an
+ArrayBuffer instead of a Buffer.
 
 ## Returns
 
