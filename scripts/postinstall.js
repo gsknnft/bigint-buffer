@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-const path = require("node:path");
-const fs = require("node:fs");
+import { join } from "node:path";
+import { existsSync } from "node:fs";
 
 const shouldSkip =
   process.env.BIGINT_BUFFER_SKIP_NATIVE === "1" ||
@@ -22,8 +22,8 @@ if (process.platform === "win32") {
   }
 }
 
-const bindingPath = path.join(__dirname, "..", "dist", "build", "Release", "bigint_buffer.node");
-if (fs.existsSync(bindingPath) && process.env.BIGINT_BUFFER_FORCE_REBUILD !== "1") {
+const bindingPath = join(__dirname, "..", "dist", "build", "Release", "bigint_buffer.node");
+if (existsSync(bindingPath) && process.env.BIGINT_BUFFER_FORCE_REBUILD !== "1") {
   console.log("bigint-buffer: native addon already present in dist; skipping rebuild");
   process.exit(0);
 }
