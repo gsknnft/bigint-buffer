@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { join } from "node:path";
+import path, { join } from "node:path";
 import { existsSync } from "node:fs";
 
 const shouldSkip =
@@ -22,7 +22,7 @@ if (process.platform === "win32") {
   }
 }
 
-const bindingPath = join(__dirname, "..", "dist", "build", "Release", "bigint_buffer.node");
+const bindingPath = join(path.dirname(), "..", "dist", "build", "Release", "bigint_buffer.node");
 if (existsSync(bindingPath) && process.env.BIGINT_BUFFER_FORCE_REBUILD !== "1") {
   console.log("bigint-buffer: native addon already present in dist; skipping rebuild");
   process.exit(0);
