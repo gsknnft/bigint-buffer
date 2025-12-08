@@ -136,7 +136,6 @@ const resolveBindings = (candidate: unknown): BindingsLoader => {
 const loadWithNodeGypBuild = (): ConverterInterface | undefined => {
   if (!path) return undefined;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const load = require("node-gyp-build") as (dir: string) => ConverterInterface;
     const pkgRoot = resolvePackageRoot();
     if (!pkgRoot) return undefined;
@@ -153,7 +152,6 @@ export function loadNative(): ConverterInterface | undefined {
   if (fromNodeGypBuild) return fromNodeGypBuild;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const rawBindings = require("bindings");
     const bindings = resolveBindings(rawBindings);
     const moduleRoot = findModuleRoot();
