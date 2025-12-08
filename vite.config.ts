@@ -17,6 +17,11 @@ const tsPaths = ts.compilerOptions?.paths
   : [];
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "./converter": path.resolve(__dirname, "src/conversion/src/ts/converter.ts"),
+    },
+  },
   build: {
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
@@ -40,9 +45,25 @@ export default defineConfig({
           fs: "fs",
         },
       },
-      plugins: [    
-      nodePolyfills(),
-      commonjs({ defaultIsModuleExports: true }), nodeResolve()],
+      plugins: [
+        nodePolyfills(),
+        commonjs({ defaultIsModuleExports: true }),
+        nodeResolve({ extensions: [".mjs", ".js", ".ts", ".json", ".node"] }),
+        {
+          name: "resolve-conversion-converter",
+          resolveId(source, importer) {
+            if (
+              source === "./converter" &&
+              importer &&
+              (importer.includes(path.join("src", "conversion", "src", "ts")) ||
+                importer.includes("converter?commonjs-external"))
+            ) {
+              return path.resolve(__dirname, "src/conversion/src/ts/converter.ts");
+            }
+            return null;
+          },
+        },
+      ],
     },
   },
 });

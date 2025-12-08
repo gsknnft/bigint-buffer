@@ -8,7 +8,7 @@
 
 > **toBigIntValue**(`value?`): `bigint`
 
-Defined in: index.ts:528
+Defined in: index.ts:488
 
 ## Parameters
 

@@ -1,47 +1,7 @@
-import path from "path";
-
-import { ConverterInterface, IS_BROWSER } from "./converter";
-
-const packageRoot = IS_BROWSER
-  ? undefined
-  : __dirname;
+import { ConverterInterface, IS_BROWSER, loadNative } from "./converter";
 
 let converter: ConverterInterface | undefined;
 let nativeLoadError: unknown;
-
-function loadNative(): ConverterInterface | undefined {
-  if (packageRoot === undefined) {
-    return undefined;
-  }
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const bindings = require("bindings");
-    if (typeof bindings === "function") {
-      return bindings({
-        bindings: "bigint_buffer",
-        module_root: packageRoot,
-      }) as ConverterInterface;
-    }
-  } catch (err) {
-    nativeLoadError = err;
-  }
-
-  try {
-    return require(
-      path.resolve(
-        packageRoot,
-        "dist",
-        "build",
-        "Release",
-        "bigint_buffer.node"
-      )
-    ) as ConverterInterface;
-  } catch (err) {
-    nativeLoadError = err;
-    return undefined;
-  }
-}
-
 let localIsNative = false;
 if (!IS_BROWSER) {
   converter = loadNative();
@@ -552,17 +512,17 @@ export function toFixedPoint(
   return toHexString(scaled);
 }
 
-export function fromFixedPoint(
-  value?: string,
-  decimals: number = FIXED_POINT_DECIMALS
-): number {
-  const bigValue = toBigIntValue(value);
-  if (bigValue === 0n) {
-    return 0;
-  }
-  const scale = Math.pow(10, decimals);
+export function fromFixedPoint(value?: string, decimals: number = 9): number {
+  if (!value) return 0;
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return 0;
+  const isNegative = trimmed.startsWith('-');
+  const body = isNegative ? trimmed.slice(1) : trimmed;
+  const bigValue = isNegative ? -BigInt(body) : BigInt(body);
+  const scale = 10 ** decimals;
   return Number(bigValue) / scale;
 }
+
 
 export function addFixedPoint(a: string, b: string): string {
   return toHexString(toBigIntValue(a) + toBigIntValue(b));
@@ -591,9 +551,3 @@ export function compareFixedPoint(a: string, b: string): number {
 export function fixedPointToBigInt(value?: string): bigint {
   return toBigIntValue(value);
 }
-
-export type { ConverterInterface } from "./converter";
-
-export type BindingsLoader = (
-  opts: { bindings: string; module_root: string } | string
-) => unknown;

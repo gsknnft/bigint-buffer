@@ -8,7 +8,7 @@
 
 > **bigintToBase64**(`a`, `urlsafe`, `padding`): `string`
 
-Defined in: index.ts:467
+Defined in: index.ts:427
 
 Converts an arbitrary-size non-negative bigint to a base64 string
 

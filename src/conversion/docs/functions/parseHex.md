@@ -8,7 +8,7 @@
 
 > **parseHex**(`a`, `prefix0x`, `byteLength?`): `string`
 
-Defined in: index.ts:185
+Defined in: index.ts:145
 
 Parses a hexadecimal string for correctness and returns it with or without
 '0x' prefix, and/or with the specified byte length

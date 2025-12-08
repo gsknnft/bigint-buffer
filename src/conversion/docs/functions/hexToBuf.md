@@ -8,7 +8,7 @@
 
 > **hexToBuf**(`hexStr`, `returnArrayBuffer`): `ArrayBuffer` \| `Buffer`\<`ArrayBufferLike`\>
 
-Defined in: index.ts:435
+Defined in: index.ts:395
 
 Converts a hexadecimal string to a buffer
 

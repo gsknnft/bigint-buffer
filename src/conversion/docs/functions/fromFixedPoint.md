@@ -8,7 +8,7 @@
 
 > **fromFixedPoint**(`value?`, `decimals?`): `number`
 
-Defined in: index.ts:555
+Defined in: index.ts:515
 
 ## Parameters
 
@@ -18,7 +18,7 @@ Defined in: index.ts:555
 
 ### decimals?
 
-`number` = `FIXED_POINT_DECIMALS`
+`number` = `9`
 
 ## Returns
 

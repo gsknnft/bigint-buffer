@@ -8,4 +8,4 @@
 
 > `const` **ZERO\_FIXED\_POINT**: `string` = `"0x0"`
 
-Defined in: index.ts:513
+Defined in: index.ts:473

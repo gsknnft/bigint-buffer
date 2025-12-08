@@ -8,7 +8,7 @@
 
 > **bigintToHex**(`a`, `prefix0x`, `byteLength?`): `string`
 
-Defined in: index.ts:267
+Defined in: index.ts:227
 
 Converts a non-negative bigint to a hexadecimal string
 

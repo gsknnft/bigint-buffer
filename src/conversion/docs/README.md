@@ -4,13 +4,8 @@
 
 # bigint-conversion
 
-## Interfaces
-
-- [ConverterInterface](interfaces/ConverterInterface.md)
-
 ## Type Aliases
 
-- [BindingsLoader](type-aliases/BindingsLoader.md)
 - [TypedArray](type-aliases/TypedArray.md)
 
 ## Variables

@@ -8,4 +8,4 @@
 
 > `const` **FIXED\_POINT\_DECIMALS**: `9` = `9`
 
-Defined in: index.ts:511
+Defined in: index.ts:471

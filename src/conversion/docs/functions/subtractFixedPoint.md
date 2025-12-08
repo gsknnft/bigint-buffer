@@ -8,7 +8,7 @@
 
 > **subtractFixedPoint**(`a`, `b`): `string`
 
-Defined in: index.ts:571
+Defined in: index.ts:531
 
 ## Parameters
 

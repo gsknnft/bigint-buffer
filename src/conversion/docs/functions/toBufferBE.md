@@ -8,7 +8,7 @@
 
 > **toBufferBE**(`num`, `width`): `Buffer`
 
-Defined in: index.ts:151
+Defined in: index.ts:111
 
 Convert a BigInt to a big-endian buffer.
 

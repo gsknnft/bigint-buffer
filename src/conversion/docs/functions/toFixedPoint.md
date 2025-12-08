@@ -8,7 +8,7 @@
 
 > **toFixedPoint**(`value`, `decimals`): `string`
 
-Defined in: index.ts:543
+Defined in: index.ts:503
 
 ## Parameters
 

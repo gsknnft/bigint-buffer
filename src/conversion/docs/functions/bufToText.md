@@ -8,7 +8,7 @@
 
 > **bufToText**(`buf`): `string`
 
-Defined in: index.ts:346
+Defined in: index.ts:306
 
 Converts an ArrayBuffer, TypedArray or Buffer (in Node.js) containing utf-8
 encoded text to a string of utf-8 text

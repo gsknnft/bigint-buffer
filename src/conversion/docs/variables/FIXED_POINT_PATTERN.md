@@ -8,4 +8,4 @@
 
 > `const` **FIXED\_POINT\_PATTERN**: `RegExp`
 
-Defined in: index.ts:512
+Defined in: index.ts:472

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 
-type PathModule = typeof import("path");
-type FsModule = typeof import("fs");
-type BindingsLoader = ((name: string) => unknown) &
+export type PathModule = typeof import("path");
+export type FsModule = typeof import("fs");
+export type BindingsLoader = ((name: string) => unknown) &
   ((options: { bindings: string; module_root?: string }) => unknown);
 
 export interface ConverterInterface {
@@ -17,10 +17,9 @@ let nativeLoadError: unknown;
 
 export const IS_BROWSER =
   typeof globalThis !== "undefined" &&
-  typeof (globalThis as { document?: unknown }).document !== "undefined";
-
-let path: PathModule | undefined = undefined;
-let fs: FsModule | undefined = undefined;
+  typeof (globalThis as { document?: unknown }).document
+  let path: PathModule | undefined;
+let fs: FsModule | undefined;
 
 // Only import Node.js modules in Node, never in browser/renderer
 if (typeof process !== "undefined" && process.versions?.node && !IS_BROWSER) {
@@ -38,20 +37,50 @@ const resolvePackageRoot = (): string | undefined => {
   }
 };
 
+
+// const resolvePackageRoot = (): string | undefined => {
+//   if (!path || !fs) return undefined;
+
+//   let dir = __dirname;
+//   while (true) {
+//     const pkgPath = path.join(dir, "package.json");
+//     if (fs.existsSync(pkgPath)) {
+//       return dir;
+//     }
+//     const parent = path.dirname(dir);
+//     if (parent === dir) break;
+//     dir = parent;
+//   }
+
+//   return undefined;
+// };
+
 const candidateRoots = (): string[] => {
   if (!path) return [];
+
+  const seen = new Set<string>();
+  const add = (candidate: string | undefined | null) => {
+    if (!candidate) return;
+    const normalized = path.resolve(candidate);
+    if (!seen.has(normalized)) {
+      seen.add(normalized);
+    }
+  };
+
   const pkgRoot = resolvePackageRoot();
   const resourcesPath =
     typeof process !== "undefined" &&
     (process as { resourcesPath?: string }).resourcesPath;
 
-  return [
-    // explicit override
-    process.env?.BIGINT_BUFFER_NATIVE_PATH,
-    // installed package root
-    pkgRoot,
-    pkgRoot ? path.join(pkgRoot, "dist") : undefined,
-    // electron packaged path (asar unpacked)
+  // explicit override
+  add(process.env?.BIGINT_BUFFER_NATIVE_PATH);
+
+  // installed package root and its dist output
+  add(pkgRoot);
+  add(pkgRoot ? path.join(pkgRoot, "dist") : undefined);
+
+  // electron packaged path (asar unpacked)
+  add(
     resourcesPath
       ? path.join(
           resourcesPath,
@@ -60,17 +89,17 @@ const candidateRoots = (): string[] => {
           "@gsknnft",
           "bigint-buffer"
         )
-      : undefined,
-    // when running from dist/
-    path.resolve(__dirname, ".."),
-    path.resolve(__dirname, "../.."),
-    // when running from build/conversion/src/ts
-    path.resolve(__dirname, "../../.."),
-    // when running from src/conversion/src/ts
-    path.resolve(__dirname, "../../../.."),
-    // fallback to package root
-    path.resolve(__dirname, "../../../../.."),
-  ].filter((p): p is string => Boolean(p));
+      : undefined
+  );
+
+  // relative to compiled artifacts or source
+  add(path.resolve(__dirname, ".."));
+  add(path.resolve(__dirname, "../.."));
+  add(path.resolve(__dirname, "../../.."));
+  add(path.resolve(__dirname, "../../../.."));
+  add(path.resolve(__dirname, "../../../../.."));
+
+  return Array.from(seen);
 };
 
 export const findModuleRoot = (): string | undefined => {
@@ -104,8 +133,27 @@ const resolveBindings = (candidate: unknown): BindingsLoader => {
   throw new TypeError("bindings is not a function");
 };
 
-export function loadNative(): ConverterInterface | undefined {
+const loadWithNodeGypBuild = (): ConverterInterface | undefined => {
+  if (!path) return undefined;
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const load = require("node-gyp-build") as (dir: string) => ConverterInterface;
+    const pkgRoot = resolvePackageRoot();
+    if (!pkgRoot) return undefined;
+    return load(pkgRoot);
+  } catch (err) {
+    nativeLoadError = err;
+    return undefined;
+  }
+};
+
+export function loadNative(): ConverterInterface | undefined {
+  // Prefer node-gyp-build (supports prebuilds) and fall back to bindings.
+  const fromNodeGypBuild = loadWithNodeGypBuild();
+  if (fromNodeGypBuild) return fromNodeGypBuild;
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const rawBindings = require("bindings");
     const bindings = resolveBindings(rawBindings);
     const moduleRoot = findModuleRoot();

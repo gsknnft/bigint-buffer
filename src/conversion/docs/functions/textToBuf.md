@@ -8,7 +8,7 @@
 
 > **textToBuf**(`str`, `returnArrayBuffer`): `ArrayBuffer` \| `Buffer`\<`ArrayBufferLike`\>
 
-Defined in: index.ts:365
+Defined in: index.ts:325
 
 Converts a string of utf-8 encoded text to an ArrayBuffer or a Buffer
 (default in Node.js)

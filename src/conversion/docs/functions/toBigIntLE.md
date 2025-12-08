@@ -8,7 +8,7 @@
 
 > **toBigIntLE**(`buf`): `bigint`
 
-Defined in: index.ts:87
+Defined in: index.ts:47
 
 Convert a little-endian buffer into a BigInt.
 

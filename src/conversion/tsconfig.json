@@ -52,7 +52,6 @@
 ],
 "include": [
   "src/**/*.ts",
-  "test/**/*.ts",
-  "src/ts/converter.ts"
+  "test/**/*.ts"
 ]
 }

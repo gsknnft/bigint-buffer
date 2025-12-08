@@ -8,7 +8,7 @@
 
 > **toHexString**(`value`): `string`
 
-Defined in: index.ts:518
+Defined in: index.ts:478
 
 ## Parameters
 

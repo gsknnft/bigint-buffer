@@ -8,7 +8,7 @@
 
 > **fixedPointToBigInt**(`value?`): `bigint`
 
-Defined in: index.ts:591
+Defined in: index.ts:551
 
 ## Parameters
 

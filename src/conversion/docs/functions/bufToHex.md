@@ -8,7 +8,7 @@
 
 > **bufToHex**(`buf`, `prefix0x`, `byteLength?`): `string`
 
-Defined in: index.ts:385
+Defined in: index.ts:345
 
 Returns the hexadecimal representation of a buffer.
 

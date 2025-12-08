@@ -8,7 +8,7 @@
 
 > **averageFixedPoint**(`values`): `string`
 
-Defined in: index.ts:575
+Defined in: index.ts:535
 
 ## Parameters
 

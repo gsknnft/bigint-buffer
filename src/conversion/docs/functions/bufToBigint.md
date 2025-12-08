@@ -8,7 +8,7 @@
 
 > **bufToBigint**(`buf`): `bigint`
 
-Defined in: index.ts:240
+Defined in: index.ts:200
 
 Converts an ArrayBuffer, TypedArray or Buffer (node.js) to a bigint
 

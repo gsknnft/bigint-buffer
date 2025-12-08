@@ -8,7 +8,7 @@
 
 > **base64ToBigint**(`a`): `bigint`
 
-Defined in: index.ts:494
+Defined in: index.ts:454
 
 Converts a base64 string to bigint.
 

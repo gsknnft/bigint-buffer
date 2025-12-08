@@ -8,7 +8,7 @@
 
 > **addFixedPoint**(`a`, `b`): `string`
 
-Defined in: index.ts:567
+Defined in: index.ts:527
 
 ## Parameters
 

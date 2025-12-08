@@ -8,7 +8,7 @@
 
 > **compareFixedPoint**(`a`, `b`): `number`
 
-Defined in: index.ts:583
+Defined in: index.ts:543
 
 ## Parameters
 
