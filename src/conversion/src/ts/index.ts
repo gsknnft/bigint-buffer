@@ -1,34 +1,7 @@
-import { ConverterInterface, IS_BROWSER } from "./converter";
-
-export {
-  toFixedPoint,
-  fromFixedPoint,
-  addFixedPoint,
-  subtractFixedPoint,
-  averageFixedPoint,
-  compareFixedPoint,
-  type FixedPoint,
-  FIXED_POINT_DECIMALS,
-  ZERO_FIXED_POINT,
-  fixedPointToBigInt,
-  toBigIntValue,
-} from "./fixedPoint";
+import { ConverterInterface, IS_BROWSER, loadNative } from "./converter";
 
 let converter: ConverterInterface | undefined;
 let nativeLoadError: unknown;
-
-function loadNative(): ConverterInterface | undefined {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const bindings = require("bindings");
-    // Let bindings module handle path resolution automatically
-    return bindings("bigint_buffer") as ConverterInterface;
-  } catch (err) {
-    nativeLoadError = err;
-    return undefined;
-  }
-}
-
 let localIsNative = false;
 if (!IS_BROWSER) {
   converter = loadNative();
@@ -166,8 +139,8 @@ export type TypedArray =
  *
  * @returns
  *
- * @throws {@link RangeError} if input string does not hold an hexadecimal number
- * @throws {@link RangeError} if requested byte length is less than the input byte length
+ * @throws RangeError if input string does not hold an hexadecimal number
+ * @throws RangeError if requested byte length is less than the input byte length
  */
 export function parseHex(
   a: string,
@@ -205,7 +178,7 @@ export function parseHex(
  * @returns an ArrayBuffer or a Buffer with a binary representation of the input
  * bigint
  *
- * @throws {@link RangeError} if a < 0.
+ * @throws RangeError if a < 0.
  */
 export function bigintToBuf(
   a: bigint,
@@ -249,7 +222,7 @@ export function bufToBigint(buf: ArrayBuffer | TypedArray | Buffer): bigint {
  *
  * @returns hexadecimal representation of the input bigint
  *
- * @throws {@link RangeError} if a < 0
+ * @throws RangeError if a < 0
  */
 export function bigintToHex(
   a: bigint,
@@ -271,7 +244,7 @@ export function bigintToHex(
  *
  * @returns a bigint
  *
- * @throws {@link RangeError} if input string does not hold an hexadecimal number
+ * @throws RangeError if input string does not hold an hexadecimal number
  */
 export function hexToBigint(hexStr: string): bigint {
   return BigInt(parseHex(hexStr, true));
@@ -286,7 +259,7 @@ export function hexToBigint(hexStr: string): bigint {
  *
  * @returns a string text with utf-8 encoding
  *
- * @throws {@link RangeError} if a < 0.
+ * @throws RangeError if a < 0.
  */
 export function bigintToText(a: bigint): string {
   if (a < 0) {
@@ -417,7 +390,7 @@ export function bufToHex(
  *
  * @returns An ArrayBuffer or a Buffer
  *
- * @throws {@link RangeError} if input string does not hold an hexadecimal number
+ * @throws RangeError if input string does not hold an hexadecimal number
  */
 export function hexToBuf(
   hexStr: string,
@@ -494,4 +467,87 @@ export function base64ToBigint(a: string): bigint {
   }
   const buf = Buffer.from(base64, "base64");
   return bufToBigint(buf);
+}
+export const FIXED_POINT_DECIMALS = 9;
+export const FIXED_POINT_PATTERN = /^-?0x[0-9a-f]+$/i;
+export const ZERO_FIXED_POINT: string = "0x0";
+
+const normalizeHex = (value: string): string =>
+  value.startsWith("0x") || value.startsWith("0X") ? value : `0x${value}`;
+
+export const toHexString = (value: bigint): string => {
+  if (value === 0n) {
+    return ZERO_FIXED_POINT;
+  }
+  const isNegative = value < 0n;
+  const absValue = isNegative ? -value : value;
+  const hexValue = bigintToHex(absValue);
+  return `${isNegative ? "-" : ""}0x${hexValue}`;
+};
+
+export const toBigIntValue = (value?: string): bigint => {
+  if (!value) {
+    return 0n;
+  }
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return 0n;
+  }
+  const isNegative = trimmed.startsWith("-");
+  const body = isNegative ? trimmed.slice(1) : trimmed;
+  const normalized = normalizeHex(body);
+  const bigValue = hexToBigint(normalized);
+  return isNegative ? -bigValue : bigValue;
+};
+
+export function toFixedPoint(
+  value: number,
+  decimals: number = FIXED_POINT_DECIMALS
+): string {
+  if (!Number.isFinite(value)) {
+    return ZERO_FIXED_POINT;
+  }
+  const scale = 10n ** BigInt(decimals);
+  const scaled = BigInt(Math.round(value * Number(scale)));
+  return toHexString(scaled);
+}
+
+export function fromFixedPoint(value?: string, decimals: number = 9): number {
+  if (!value) return 0;
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return 0;
+  const isNegative = trimmed.startsWith('-');
+  const body = isNegative ? trimmed.slice(1) : trimmed;
+  const bigValue = isNegative ? -BigInt(body) : BigInt(body);
+  const scale = 10 ** decimals;
+  return Number(bigValue) / scale;
+}
+
+
+export function addFixedPoint(a: string, b: string): string {
+  return toHexString(toBigIntValue(a) + toBigIntValue(b));
+}
+
+export function subtractFixedPoint(a: string, b: string): string {
+  return toHexString(toBigIntValue(a) - toBigIntValue(b));
+}
+
+export function averageFixedPoint(values: string[]): string {
+  if (values.length === 0) {
+    return ZERO_FIXED_POINT;
+  }
+  const sum = values.reduce((acc, value) => acc + toBigIntValue(value), 0n);
+  return toHexString(sum / BigInt(values.length));
+}
+
+export function compareFixedPoint(a: string, b: string): number {
+  const diff = toBigIntValue(a) - toBigIntValue(b);
+  if (diff === 0n) {
+    return 0;
+  }
+  return diff > 0n ? 1 : -1;
+}
+
+export function fixedPointToBigInt(value?: string): bigint {
+  return toBigIntValue(value);
 }

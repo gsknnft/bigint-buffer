@@ -1,33 +1,45 @@
 {
   "name": "@gsknnft/bigint-buffer",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "bigint to buffer conversion with native support and built-in conversion helpers",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.js",
-  "browser": "dist/browser.js",
+  "types": "dist/index.d.ts",
+  "browser": "dist/index.umd.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./build/Release/bigint_buffer.node": {
+      "import": "./dist/build/Release/bigint_buffer.node",
+      "require": "./dist/build/Release/bigint_buffer.node",
+      "default": "./dist/build/Release/bigint_buffer.node"
     },
     "./conversion": {
       "types": "./dist/conversion/index.d.ts",
-      "import": "./dist/conversion/index.js",
-      "require": "./dist/conversion/index.cjs"
+      "browser": "./dist/conversion/esm/index.browser.js",
+      "import": "./dist/conversion/esm/index.js",
+      "require": "./dist/conversion/cjs/index.node.js",
+      "default": "./dist/conversion/esm/index.js"
     }
   },
   "files": [
     "build/Release/bigint_buffer.node",
     "dist/",
     "helper/",
-    "src/",
+    "src/bigint-buffer.c",
+    "build/Release/bigint_buffer.node",
     "binding.gyp",
+    "scripts/postinstall.cjs",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "prebuilds/"
   ],
   "workspaces": [
-    "./src/conversion"
+    "./src/*"
   ],
   "scripts": {
     "test": "vitest run",
@@ -38,20 +50,23 @@
     "clean:js": "npm clean && rm -rf build/* dist/*",
     "test:browser": "vite test --browser",
     "test:node": "vitest run",
-    "postinstall": "node-gyp rebuild",
-    "declare": "tsc -p . --declaration --emitDeclarationOnly --outDir dist/types",
+    "postinstall": "node ./scripts/postinstall.cjs",
+    "declare": "tsc -p . --declaration --emitDeclarationOnly --outDir dist/types && ts-node ./scripts/copy-dts.ts",
     "benchmark": "node -r ts-node/register src/index.bench.ts",
     "typedoc": "typedoc --out docs $(pwd)/src $(pwd)/helper --target es6 --mode file --tsconfig ./tsconfig.json --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*+(spec|bench).ts'",
-    "rebuild": "node-gyp rebuild && npm run build",
-    "build": "vite build && npm run declare && tsc -p . && cpy \"index.d.ts\" ../dist --cwd dist/types && cpy \"conversion/index.d.ts\" ../dist/conversion --cwd dist/types",
-    "compile": "vite build && npm run declare && tsc -p . && cpy \"index.d.ts\" ../dist/types --cwd dist/types && cpy \"conversion/index.d.ts\" ../dist/conversion --cwd dist/types",
+    "build:conversion": "npm run build:js --workspace src/conversion && npm run copy:types --workspace src/conversion && ts-node ./scripts/sync-conversion.ts",
+    "sync:native": "ts-node ./scripts/sync-native.ts",
+    "rebuild": "node-gyp rebuild && npm run build && npm run build:conversion",
+    "build": "vite build && tsc -p tsconfig.json && npm run build:conversion && npm run declare && npm run sync:native",
+    "compile": "vite build && npm run declare && tsc -p . --noEmit && npm run sync:native",
     "check": "eslint src/**/*.ts src/conversion/**/*.ts src/index.spec.ts src/conversion/test/**/*.ts",
     "test:vitest": "vitest",
     "test:all": "npm run test && npm run benchmark",
     "clean": "rm -rf build/* dist/* node_modules package-lock.json pnpm-lock.yaml",
     "fix": "eslint . --ext .ts,.js --fix && prettier --write .",
     "pretest": "npm run compile",
-    "posttest": "npm run check"
+    "posttest": "npm run check",
+    "prebuilds": "prebuildify --napi --strip --target 24.10.0 --platform win32 --arch x64"
   },
   "repository": {
     "type": "git",
@@ -74,23 +89,23 @@
     }
   },
   "dependencies": {
-    "bindings": "^1.5.0"
+    "bindings": "^1.5.0",
+    "node-gyp-build": "^4.8.4"
   },
   "optionalDependencies": {
+    "@rollup/plugin-esm-shim": "0.1.8",
     "@rollup/rollup-linux-arm64-gnu": "4.53.3",
     "@rollup/rollup-linux-arm64-musl": "4.53.3",
     "@rollup/rollup-win32-x64-gnu": "4.53.3",
-    "@rollup/plugin-esm-shim": "0.1.8"
+    "@rollup/rollup-linux-x64-gnu": "4.53.3"
   },
   "devDependencies": {
-    "vite-plugin-node-polyfills": "0.24.0",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-esm-shim": "0.1.8",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-replace": "6.0.3",
     "@rollup/plugin-typescript": "^12.1.4",
-    "rollup-plugin-polyfill-node": "^0.13.0",
     "@types/benchmark": "^2.1.5",
     "@types/bn.js": "^5.2.0",
     "@types/chai": "^5.2.3",
@@ -114,8 +129,10 @@
     "karma-webpack": "^5.0.1",
     "microtime": "^3.0.0",
     "mkdirp": "^3.0.1",
+    "prebuildify": "^6.0.1",
     "prettier": "^3.2.2",
     "rollup": "^4.53.3",
+    "rollup-plugin-polyfill-node": "^0.13.0",
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.14",
@@ -123,6 +140,7 @@
     "typescript-eslint": "^8.48.0",
     "undici-types": "^7.16.0",
     "vite": "7.2.4",
+    "vite-plugin-node-polyfills": "0.24.0",
     "vitest": "^4.0.14",
     "webpack": "5.103.0",
     "webpack-cli": "6.0.1"

@@ -8,7 +8,7 @@
 
 > **bigintToHex**(`a`, `prefix0x`, `byteLength?`): `string`
 
-Defined in: index.ts:177
+Defined in: index.ts:227
 
 Converts a non-negative bigint to a hexadecimal string
 
@@ -30,7 +30,8 @@ set to true to prefix the output with '0x'
 
 `number`
 
-pad the output to have the desired byte length. Notice that the hex length is double the byte length.
+pad the output to have the desired byte length. Notice
+that the hex length is double the byte length.
 
 ## Returns
 

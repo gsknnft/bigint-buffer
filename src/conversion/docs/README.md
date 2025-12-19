@@ -2,7 +2,7 @@
 
 ***
 
-# bigint-conversion (v1.4.5)
+# bigint-conversion
 
 ## Type Aliases
 
@@ -10,10 +10,14 @@
 
 ## Variables
 
-- [isNative](variables/isNative.md)
+- [FIXED\_POINT\_DECIMALS](variables/FIXED_POINT_DECIMALS.md)
+- [FIXED\_POINT\_PATTERN](variables/FIXED_POINT_PATTERN.md)
+- [ZERO\_FIXED\_POINT](variables/ZERO_FIXED_POINT.md)
 
 ## Functions
 
+- [addFixedPoint](functions/addFixedPoint.md)
+- [averageFixedPoint](functions/averageFixedPoint.md)
 - [base64ToBigint](functions/base64ToBigint.md)
 - [bigintToBase64](functions/bigintToBase64.md)
 - [bigintToBuf](functions/bigintToBuf.md)
@@ -22,21 +26,20 @@
 - [bufToBigint](functions/bufToBigint.md)
 - [bufToHex](functions/bufToHex.md)
 - [bufToText](functions/bufToText.md)
+- [compareFixedPoint](functions/compareFixedPoint.md)
+- [fixedPointToBigInt](functions/fixedPointToBigInt.md)
+- [fromFixedPoint](functions/fromFixedPoint.md)
 - [hexToBigint](functions/hexToBigint.md)
 - [hexToBuf](functions/hexToBuf.md)
 - [parseHex](functions/parseHex.md)
+- [subtractFixedPoint](functions/subtractFixedPoint.md)
 - [textToBigint](functions/textToBigint.md)
 - [textToBuf](functions/textToBuf.md)
 - [toBigIntBE](functions/toBigIntBE.md)
 - [toBigIntLE](functions/toBigIntLE.md)
+- [toBigIntValue](functions/toBigIntValue.md)
 - [toBufferBE](functions/toBufferBE.md)
 - [toBufferLE](functions/toBufferLE.md)
+- [toFixedPoint](functions/toFixedPoint.md)
+- [toHexString](functions/toHexString.md)
 - [validateBigIntBuffer](functions/validateBigIntBuffer.md)
-- **New in 1.4.5:**
-	- [toFixedPoint](../src/ts/fixedPoint/index.ts)
-	- [fromFixedPoint](../src/ts/fixedPoint/index.ts)
-	- [addFixedPoint](../src/ts/fixedPoint/index.ts)
-	- [subtractFixedPoint](../src/ts/fixedPoint/index.ts)
-	- [averageFixedPoint](../src/ts/fixedPoint/index.ts)
-	- [compareFixedPoint](../src/ts/fixedPoint/index.ts)
-	- [FixedPoint type](../src/ts/fixedPoint/index.ts)

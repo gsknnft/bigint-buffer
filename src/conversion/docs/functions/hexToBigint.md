@@ -8,7 +8,7 @@
 
 > **hexToBigint**(`hexStr`): `bigint`
 
-Defined in: index.ts:191
+Defined in: index.ts:249
 
 Converts a hexadecimal string to a bigint
 

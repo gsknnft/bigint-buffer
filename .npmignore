@@ -1,7 +1,5 @@
 # Build scripts
 build
-!build/Release/
-
 # Test files
 test
 __tests__

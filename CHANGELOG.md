@@ -8,6 +8,32 @@
 - `toBuffer*`/`toBigInt*` share the same zero-allocation paths as the native binding, preserving low-order bytes and handling empty through very large buffers consistently.
 - README now documents the optimized, size-agnostic conversions and the expanded test coverage across buffer sizes and environments.
 - Documented browser polyfill requirements for `buffer`, `path`, and `fs` plus guidance on using native/SIMD paths when extreme throughput is needed.
+- Native loader now searches installed package roots, Electron `resources/app.asar.unpacked`, and env override; README clarifies packaging the `.node` file via `extraResources`/`asarUnpack`.
+
+## Migration Guide
+
+- If upgrading from legacy `bigint-buffer`, switch all imports to `@gsknnft/bigint-buffer`.
+- All helpers are now available as named exports (no default export).
+- For Electron, ensure the native binary is included in `extraResources` or `asarUnpack` so it ends up under `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/build/Release/`.
+- If your packager relocates files, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node` before launching the app.
+- For browser, add polyfills for `Buffer`, `path`, and `fs` as needed.
+- ESM, CJS, and TypeScript types are all supported out of the box.
+
+---
+
+
+## Release Summary (v1.4.7)
+- Native N-API binding with prebuilt binaries for Node/Electron.
+- Pure JS fallback for browser and non-native environments.
+- All conversion helpers (hex, base64, text, buffer, FixedPoint) are available as named exports.
+- ESM, CJS, and TypeScript types supported out of the box.
+- Loader logic covers Node, Electron, browser, and asar-unpacked scenarios.
+- Electron packaging guidance and browser polyfill requirements are documented.
+- CI-verified for Node 20–24 and Electron.
+
+## 1.4.7 — Update Release
+- Version bump for release and documentation updates.
+- All references and docs now reflect 1.4.7.
 
 ## 1.4.6 — Import/Build Fixes
 - Fixed import path issues in FixedPoint utilities (no more unresolved #pkg errors)

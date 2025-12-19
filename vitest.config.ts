@@ -6,10 +6,17 @@ export default defineConfig({
     mockReset: true,
     exclude: ["node_modules/**", "build/**", "dist/**"],
     coverage: {
+
       enabled: true,
       include: ["src/**/*.ts"],
       provider: "v8",
       reporter: ["text", "lcov"],
+      exclude: [
+        "dist/**",
+        "src/conversion/.types/**",
+        "**/*.d.ts",
+        "src/index.bench.ts"
+      ]
     },
     alias: {
       '#pkg': '/src/conversion/src/ts/index.ts',

@@ -8,9 +8,10 @@
 
 > **parseHex**(`a`, `prefix0x`, `byteLength?`): `string`
 
-Defined in: index.ts:119
+Defined in: index.ts:145
 
-Parses a hexadecimal string for correctness and returns it with or without '0x' prefix, and/or with the specified byte length
+Parses a hexadecimal string for correctness and returns it with or without
+'0x' prefix, and/or with the specified byte length
 
 ## Parameters
 
@@ -30,7 +31,8 @@ set to true to prefix the output with '0x'
 
 `number`
 
-pad the output to have the desired byte length. Notice that the hex length is double the byte length.
+pad the output to have the desired byte length. Notice
+that the hex length is double the byte length.
 
 ## Returns
 
