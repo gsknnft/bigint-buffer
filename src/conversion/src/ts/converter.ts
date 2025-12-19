@@ -30,10 +30,6 @@ if (typeof process !== "undefined" && process.versions?.node && !IS_BROWSER) {
 const resolvePackageRoot = (): string | undefined => {
   if (!path) return undefined;
   try {
-<<<<<<< HEAD
-    const bindings = require("bindings");
-    // Let bindings module handle path resolution automatically
-=======
     const pkgPath = require.resolve("@gsknnft/bigint-buffer/package.json");
     return path.dirname(pkgPath);
   } catch {
