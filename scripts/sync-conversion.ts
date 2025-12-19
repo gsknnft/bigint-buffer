@@ -12,8 +12,10 @@ async function ensureSource() {
     if (!info.isDirectory()) {
       throw new Error("source is not a directory");
     }
-  } catch (error) {
-    throw new Error(`Expected built conversion output at ${sourceDir}, run the conversion build first.`);
+  } catch {
+    throw new Error(
+      `Expected built conversion output at ${sourceDir}, run the conversion build first.`
+    );
   }
 }
 

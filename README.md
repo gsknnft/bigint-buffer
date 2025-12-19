@@ -7,6 +7,19 @@ Secure BigInt ⇆ Buffer conversion with native bindings, browser fallbacks, and
 
 **Upgrade notice:** The current 1.4.x line ships chunked, allocation-free BE/LE converters (Buffer.read/writeBigUInt64* when available) that are fuzzed across empty, tiny, and huge buffers, alongside FixedPoint utilities and packaged native bindings. CI-verified for Node 20–24. Upgrade for the fastest conversions and consistent behaviour across environments.
 
+---
+
+## Migration Guide
+
+- If upgrading from legacy `bigint-buffer`, switch all imports to `@gsknnft/bigint-buffer`.
+- All helpers are now available as named exports (no default export).
+- For Electron, ensure the native binary is included in `extraResources` or `asarUnpack` so it ends up under `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/build/Release/`.
+- If your packager relocates files, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node` before launching the app.
+- For browser, add polyfills for `Buffer`, `path`, and `fs` as needed (see below).
+- ESM, CJS, and TypeScript types are all supported out of the box.
+
+---
+
 [![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
 [![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
 
@@ -52,6 +65,15 @@ const sum = addFixedPoint(fp, fp);          // Add two FixedPoints
 const avg = averageFixedPoint([fp, fp]);    // Average FixedPoints
 ```
 
+// Browser usage (with polyfills)
+import { toBigIntBE } from "@gsknnft/bigint-buffer";
+// Polyfill Buffer if needed:
+// import { Buffer } from "buffer";
+
+// CJS usage
+const { toBigIntBE } = require("@gsknnft/bigint-buffer");
+```
+
 ### Performance
 - BE/LE conversions now stream bytes directly from buffers (64-bit chunks via Buffer.read/writeBigUInt64* when available) with no intermediate hex copies.
 - JS fallback matches the native binding semantics and is exercised against empty, tiny, and very large inputs in CI.
@@ -65,6 +87,12 @@ const avg = averageFixedPoint([fp, fp]);    // Average FixedPoints
 - Ensure the native binding ships with your app: add `node_modules/@gsknnft/bigint-buffer/build/Release/bigint_buffer.node` to `extraResources`/`asarUnpack` so it ends up under `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/build/Release/`.
 - If your packager relocates files, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node` before launching the app.
 
+The loader will check, in order:
+- `dist/build/Release/bigint_buffer.node`
+- `build/Release/bigint_buffer.node`
+- Electron asar-unpacked path
+- `BIGINT_BUFFER_NATIVE_PATH` (if set)
+
 ### Conversion Utilities
 ```ts
 import { conversionUtils } from "@gsknnft/bigint-buffer";
@@ -72,6 +100,10 @@ import { conversionUtils } from "@gsknnft/bigint-buffer";
 const arrBuf = conversionUtils.bigintToBuf(123456789n, true); // ArrayBuffer
 const hex = conversionUtils.bigintToHex(123456789n, true);    // '0x...' format
 const text = conversionUtils.bigintToText(123456789n);
+```
+
+// All helpers are available as named exports:
+import { bigintToBuf, bufToBigint, bigintToHex, hexToBigint } from "@gsknnft/bigint-buffer";
 ```
 
 ---
@@ -101,11 +133,13 @@ npm run rebuild:native  # rebuild the N-API binding
 - Core: `toBigIntBE/LE`, `toBufferBE/LE`, `validateBigIntBuffer`, `isNative`
 - Conversion: `bigintToBuf`, `bufToBigint`, `bigintToHex`, `hexToBigint`, `bigintToText`, `textToBigint`, `bigintToBase64`, `base64ToBigint`, `bufToHex`, `hexToBuf`, `textToBuf`, `bufToText`, `parseHex`
 
+All helpers are available as named exports in both ESM and CJS. TypeScript types are included.
+
 All helpers are endian-safe and validated across Node and browser builds.
 
 ---
  
 ## Support
-- Version: 1.4.5 (FixedPoint, native bindings out-of-the-box, improved JS fallback)
+- Version: 1.4.6 (FixedPoint, native bindings out-of-the-box, improved JS fallback, robust loader, and stable exports)
 - Node: 20+ (tested through 24 LTS under CI)
 - Issues: https://github.com/gsknnft/bigint-buffer/issues
