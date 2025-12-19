@@ -30,6 +30,7 @@
     "dist/",
     "helper/",
     "src/bigint-buffer.c",
+    "build/Release/bigint_buffer.node",
     "binding.gyp",
     "scripts/postinstall.cjs",
     "README.md",
