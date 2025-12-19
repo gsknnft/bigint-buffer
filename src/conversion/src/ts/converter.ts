@@ -161,7 +161,7 @@ export function loadNative(): ConverterInterface | undefined {
         module_root: moduleRoot,
       }) as ConverterInterface;
     }
->>>>>>> dev
+
     return bindings("bigint_buffer") as ConverterInterface;
   } catch (err) {
     nativeLoadError = err;
