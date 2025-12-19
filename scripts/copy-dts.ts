@@ -15,7 +15,7 @@ const targets = [
   },
 ];
 
-async function ensureDirectory(filePath) {
+async function ensureDirectory(filePath: string) {
   const dir = path.dirname(filePath);
   await fs.mkdir(dir, { recursive: true });
 }

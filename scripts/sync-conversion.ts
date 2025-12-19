@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 import { cp, mkdir, rm, stat } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 const sourceDir = path.resolve(rootDir, "src", "conversion", "dist");
 const targetDir = path.resolve(rootDir, "dist", "conversion");

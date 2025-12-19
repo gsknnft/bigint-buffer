@@ -10,7 +10,7 @@ const extraTargets = [
   path.join(rootDir, "src", "conversion", "dist", "build", "Release", "bigint_buffer.node"),
 ];
 
-async function fileExists(filePath) {
+async function fileExists(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);
     return true;
@@ -19,7 +19,7 @@ async function fileExists(filePath) {
   }
 }
 
-async function ensureDirectory(filePath) {
+async function ensureDirectory(filePath: string) {
   const dir = path.dirname(filePath);
   await fs.mkdir(dir, { recursive: true });
 }

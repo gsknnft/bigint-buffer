@@ -17,8 +17,9 @@ let nativeLoadError: unknown;
 
 export const IS_BROWSER =
   typeof globalThis !== "undefined" &&
-  typeof (globalThis as { document?: unknown }).document
-  let path: PathModule | undefined;
+  typeof (globalThis as { document?: unknown }).document !== "undefined";
+
+let path: PathModule | undefined;
 let fs: FsModule | undefined;
 
 // Only import Node.js modules in Node, never in browser/renderer

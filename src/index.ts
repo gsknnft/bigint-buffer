@@ -245,6 +245,20 @@ const findModuleRoot = (): string | undefined => {
   return undefined;
 };
 
+const loadWithNodeGypBuild = (): ConverterInterface | undefined => {
+  if (!path) return undefined;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const loader = require("node-gyp-build") as (dir: string) => ConverterInterface;
+    const pkgRoot = resolvePackageRoot();
+    if (!pkgRoot) return undefined;
+    return loader(pkgRoot);
+  } catch (err) {
+    nativeLoadError = err;
+    return undefined;
+  }
+};
+
 const resolveBindings = (candidate: unknown): BindingsLoader => {
   if (typeof candidate === "function") {
     return candidate as BindingsLoader;
@@ -271,6 +285,9 @@ export let isNative = false;
 
 const loadNative = (): ConverterInterface | undefined => {
   nativeLoadError = undefined;
+  const fromNodeGypBuild = loadWithNodeGypBuild();
+  if (fromNodeGypBuild) return fromNodeGypBuild;
+
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const rawBindings = require("bindings");
@@ -284,7 +301,7 @@ const loadNative = (): ConverterInterface | undefined => {
     }
     return bindings("bigint_buffer") as ConverterInterface;
   } catch (err) {
-    nativeLoadError = err;
+    nativeLoadError = nativeLoadError ?? err;
     return undefined;
   }
 };
@@ -478,7 +495,16 @@ export function base64ToBigint(base64: string): bigint {
  * Returns the absolute path to the package root, or undefined if not found.
  */
 function resolvePackageRoot(): string | undefined {
-  if (!path || !fs) return undefined;
+  if (!path) return undefined;
+  try {
+    // Resolve the installed package root even when bundled/aliased.
+    const pkgPath = require.resolve("@gsknnft/bigint-buffer/package.json");
+    return path.dirname(pkgPath);
+  } catch {
+    // Fall back to walking up from the current file.
+  }
+
+  if (!fs) return undefined;
   let dir = __dirname;
   while (true) {
     const pkgPath = path.join(dir, "package.json");
