@@ -21,7 +21,8 @@
 
 ---
 
-## Release Summary (v1.4.6)
+
+## Release Summary (v1.4.7)
 - Native N-API binding with prebuilt binaries for Node/Electron.
 - Pure JS fallback for browser and non-native environments.
 - All conversion helpers (hex, base64, text, buffer, FixedPoint) are available as named exports.
@@ -29,6 +30,10 @@
 - Loader logic covers Node, Electron, browser, and asar-unpacked scenarios.
 - Electron packaging guidance and browser polyfill requirements are documented.
 - CI-verified for Node 20–24 and Electron.
+
+## 1.4.7 — Update Release
+- Version bump for release and documentation updates.
+- All references and docs now reflect 1.4.7.
 
 ## 1.4.6 — Import/Build Fixes
 - Fixed import path issues in FixedPoint utilities (no more unresolved #pkg errors)

@@ -1,6 +1,6 @@
 {
   "name": "@gsknnft/bigint-buffer",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "bigint to buffer conversion with native support and built-in conversion helpers",
   "main": "dist/index.cjs",
   "module": "dist/index.js",

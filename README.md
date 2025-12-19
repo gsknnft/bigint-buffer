@@ -5,7 +5,7 @@
 
 Secure BigInt ⇆ Buffer conversion with native bindings, browser fallbacks, and the `bigint-conversion` helper APIs built in. This is the actively maintained fork of the original `bigint-buffer`.
 
-**Upgrade notice:** The current 1.4.x line ships chunked, allocation-free BE/LE converters (Buffer.read/writeBigUInt64* when available) that are fuzzed across empty, tiny, and huge buffers, alongside FixedPoint utilities and packaged native bindings. CI-verified for Node 20–24. Upgrade for the fastest conversions and consistent behaviour across environments.
+**Upgrade notice:** The current 1.4.7 line ships chunked, allocation-free BE/LE converters (Buffer.read/writeBigUInt64* when available) that are fuzzed across empty, tiny, and huge buffers, alongside FixedPoint utilities and packaged native bindings. CI-verified for Node 20–24. Upgrade for the fastest conversions and consistent behaviour across environments.
 
 ---
 
@@ -139,7 +139,6 @@ All helpers are endian-safe and validated across Node and browser builds.
 
 ---
  
-## Support
-- Version: 1.4.6 (FixedPoint, native bindings out-of-the-box, improved JS fallback, robust loader, and stable exports)
+- Version: 1.4.7 (FixedPoint, native bindings out-of-the-box, improved JS fallback, robust loader, and stable exports)
 - Node: 20+ (tested through 24 LTS under CI)
 - Issues: https://github.com/gsknnft/bigint-buffer/issues
