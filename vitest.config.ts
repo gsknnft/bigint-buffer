@@ -14,6 +14,8 @@ export default defineConfig({
       exclude: [
         "dist/**",
         "src/conversion/.types/**",
+        "src/conversion/index.ts",
+        "src/conversion/src/index.ts",
         "**/*.d.ts",
         "src/index.bench.ts"
       ]

@@ -1,39 +1,33 @@
-> @gsknnft/bigint-buffer@1.4.0 benchmark C:\Users\G\Desktop\Builds\bigint-buffer
-> node -r ts-node/register src/index.bench.ts
+﻿# Benchmark Snapshot
 
+Environment:
+- Package: `@gsknnft/bigint-buffer@1.5.0`
+- Runtime: `Node 24` on `win32 x64`
+- Runner: `tsx src/index.bench.ts`
+- Date: `2026-02-20`
 
-no-op: 125443549±6.32% ops/s 7.97±2.181 ns/op (72 runs)
-bigint from hex string (small): 12405683±4.05% ops/s 80.61±14.601 ns/op (77 runs)
-bigint from hex string from buffer (small): 4287077±2.09% ops/s 233.26±22.770 ns/op (84 runs)
-BN from hex string from buffer (small): 3729239±2.66% ops/s 268.15±33.594 ns/op (85 runs)
-LE bigint-buffer ToBigInt (small): 9799041±1.88% ops/s 102.05±9.048 ns/op (85 runs)
-BE bigint-buffer ToBigInt (small): 5346386±8.90% ops/s 187.04±59.429 ns/op (49 runs)
-bigint from hex string (mid, aligned): 8752620±2.88% ops/s 114.25±14.136 ns/op (71 runs)
-bigint from hex string from buffer (mid, aligned): 2395828±3.48% ops/s 417.39±67.444 ns/op (83 runs)
-BN from hex string from buffer (mid, aligned): 2866862±2.97% ops/s 348.81±46.652 ns/op (78 runs)
-LE bigint-buffer ToBigInt (mid, aligned): 7704130±3.38% ops/s 129.80±19.542 ns/op (76 runs)
-BE bigint-buffer ToBigInt (mid, aligned): 8839368±2.21% ops/s 113.13±11.462 ns/op (81 runs)
-bigint from hex string (huge): 3328408±2.96% ops/s 300.44±40.387 ns/op (79 runs)
-bigint from hex string from buffer (huge): 1595249±2.17% ops/s 626.86±61.624 ns/op (79 runs)
-BN from hex string from buffer (huge): 1511177±2.47% ops/s 661.74±76.004 ns/op (83 runs)
-LE bigint-buffer ToBigInt (huge): 6078419±2.88% ops/s 164.52±21.600 ns/op (80 runs)
-BE bigint-buffer ToBigInt (huge): 5828211±3.52% ops/s 171.58±26.859 ns/op (76 runs)
-LE bigint to hex string to buffer (small): 1152961±9.75% ops/s 867.33±295.771 ns/op (47 runs)
-BE bigint to hex string to buffer (small): 1930577±3.55% ops/s 517.98±83.386 ns/op (79 runs)
-BN to buffer (small): 6905613±2.44% ops/s 144.81±16.221 ns/op (81 runs)
-LE bigint-buffer to buffer (small): 7025032±3.01% ops/s 142.35±19.303 ns/op (78 runs)
-BE bigint-buffer to buffer (small): 7389852±2.71% ops/s 135.32±16.828 ns/op (81 runs)
-LE bigint to hex string to buffer (large): 2611889±2.08% ops/s 382.86±36.489 ns/op (81 runs)
-BE bigint to hex string to buffer (large): 2654530±3.20% ops/s 376.71±53.974 ns/op (77 runs)
-BN to buffer (large): 0.00±0.00% ops/s 0.00±0.000 ns/op (0 run)
-LE bigint-buffer to buffer (large): 5820853±2.74% ops/s 171.80±21.097 ns/op (77 runs)
-BE bigint-buffer to buffer (large): 6444295±1.99% ops/s 155.18±13.997 ns/op (79 runs)
-LE bigint to hex string to buffer (large): 3025729±2.27% ops/s 330.50±34.592 ns/op (82 runs)
-BE bigint to hex string to buffer (large): 3516791±1.83% ops/s 284.35±24.886 ns/op (88 runs)
-LE bigint-buffer to buffer (large, truncated): 4266246±8.53% ops/s 234.40±72.865 ns/op (51 runs)
-BE bigint-buffer to buffer (large, truncated): 7246142±2.69% ops/s 138.00±16.623 ns/op (77 runs)
-Buffer equality comparison: 17964320±2.68% ops/s 55.67±6.858 ns/op (81 runs)
-BN equality comparison: 41485431±5.74% ops/s 24.10±5.949 ns/op (71 runs)
-bigint equality comparison: 97898301±7.97% ops/s 10.21±3.272 ns/op (62 runs)
-BN multiply: 4440097±3.31% ops/s 225.22±34.201 ns/op (81 runs)
-bigint multiply: 117949248±6.81% ops/s 8.48±2.484 ns/op (71 runs)
+## Results (ops/s, ns/op)
+
+- LE bigint-buffer ToBigInt (small): 11,557,896 ops/s, 86.52 ns/op
+- BE bigint-buffer ToBigInt (small): 11,645,445 ops/s, 85.87 ns/op
+- LE bigint-buffer ToBigInt (mid, aligned): 10,877,869 ops/s, 91.93 ns/op
+- BE bigint-buffer ToBigInt (mid, aligned): 10,869,145 ops/s, 92.00 ns/op
+- LE bigint-buffer ToBigInt (huge): 7,476,468 ops/s, 133.75 ns/op
+- BE bigint-buffer ToBigInt (huge): 7,522,035 ops/s, 132.94 ns/op
+
+- LE bigint-buffer to buffer (small): 10,261,093 ops/s, 97.46 ns/op
+- BE bigint-buffer to buffer (small): 9,572,074 ops/s, 104.47 ns/op
+- LE bigint-buffer to buffer (large): 7,372,083 ops/s, 135.65 ns/op
+- BE bigint-buffer to buffer (large): 7,329,966 ops/s, 136.43 ns/op
+- LE bigint-buffer to buffer (large, truncated): 9,472,302 ops/s, 105.57 ns/op
+- BE bigint-buffer to buffer (large, truncated): 10,317,251 ops/s, 96.93 ns/op
+
+- BN to buffer (large): 5,555,777 ops/s, 179.99 ns/op
+- BN multiply: 5,346,543 ops/s, 187.04 ns/op
+- bigint multiply: 31,271,348 ops/s, 31.98 ns/op
+
+## Reproduce
+
+```bash
+pnpm run benchmark
+```

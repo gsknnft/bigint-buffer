@@ -12,16 +12,13 @@ export {
   fixedPointToBigInt,
   toBigIntValue,
 } from "./conversion/src/ts/index";
+import {
+  IS_BROWSER,
+  loadNative,
+  type ConverterInterface,
+} from "./conversion/src/ts/converter";
 
-type PathModule = typeof import("path");
-type FsModule = typeof import("fs");
-type BindingsLoader = ((name: string) => unknown) &
-  ((options: { bindings: string; module_root?: string }) => unknown);
-
-interface ConverterInterface {
-  toBigInt(buf: Buffer, bigEndian?: boolean): bigint;
-  fromBigInt(num: bigint, buf: Buffer, bigEndian?: boolean): Buffer;
-}
+type ByteInput = Buffer | Uint8Array | ArrayBuffer;
 
 type ReadUint64 = (buf: Buffer, offset: number) => bigint;
 type WriteUint64 = (buf: Buffer, offset: number, value: bigint) => void;
@@ -168,6 +165,20 @@ const byteLengthFromBigint = (value: bigint): number => {
   return bytes;
 };
 
+const assertWidth = (width: number, fnName: string): void => {
+  if (!Number.isInteger(width) || width < 0) {
+    throw new RangeError(`${fnName} width must be a non-negative integer`);
+  }
+};
+
+const toBufferInput = (input: ByteInput): Buffer => {
+  if (Buffer.isBuffer(input)) return input;
+  if (input instanceof Uint8Array) {
+    return Buffer.from(input.buffer, input.byteOffset, input.byteLength);
+  }
+  return Buffer.from(input);
+};
+
 const jsConverter: ConverterInterface = {
   toBigInt: (buf: Buffer, bigEndian = true) =>
     bigEndian ? bufferToBigIntBE(buf) : bufferToBigIntLE(buf),
@@ -177,179 +188,14 @@ const jsConverter: ConverterInterface = {
       : writeBigIntToBufferLE(num, buf),
 };
 
-const IS_BROWSER =
-  typeof globalThis !== "undefined" &&
-  typeof (globalThis as { document?: unknown }).document !== "undefined";
-
 let converter: ConverterInterface = jsConverter;
 export let isNative = false;
-let path: PathModule | undefined;
-let fs: FsModule | undefined;
-
-if (!IS_BROWSER) {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  path = require("path") as PathModule;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  fs = require("fs") as FsModule;
-}
-
-
-const candidateRoots = (): string[] => {
-  if (!path) return [];
-  const pkgRoot = resolvePackageRoot();
-
-  const roots = new Set<string>();
-  const add = (value?: string) => {
-    if (!value) return;
-    roots.add(path.resolve(value));
-  };
-
-  add(process.env?.BIGINT_BUFFER_NATIVE_PATH);
-  add(pkgRoot);
-  add(pkgRoot ? path.join(pkgRoot, "dist") : undefined);
-
-  const resourcesPath =
-    typeof process !== "undefined"
-      ? (process as { resourcesPath?: string }).resourcesPath
-      : undefined;
-  if (resourcesPath) {
-    add(
-      path.join(
-        resourcesPath,
-        "app.asar.unpacked",
-        "node_modules",
-        "@gsknnft",
-        "bigint-buffer"
-      )
-    );
-  }
-
-  const out = Array.from(roots);
-  if (process.env.BIGINT_BUFFER_DEBUG) {
-    console.log("bigint-buffer: candidateRoots:", out);
-  }
-  return out;
-};
-
-const findModuleRoot = (): string | undefined => {
-  if (!path || !fs) return undefined;
-  for (const root of candidateRoots()) {
-    const directCandidate = path.join(
-      root,
-      "build",
-      "Release",
-      "bigint_buffer.node"
-    );
-    if (process.env.BIGINT_BUFFER_DEBUG) {
-      console.log("bigint-buffer: checking for native at", directCandidate);
-    }
-    if (fs.existsSync(directCandidate)) {
-      if (process.env.BIGINT_BUFFER_DEBUG) {
-        console.log("bigint-buffer: found native at", directCandidate);
-      }
-      return root;
-    }
-    const distCandidate = path.join(
-      root,
-      "dist",
-      "build",
-      "Release",
-      "bigint_buffer.node"
-    );
-    if (process.env.BIGINT_BUFFER_DEBUG) {
-      console.log("bigint-buffer: checking for native at", distCandidate);
-    }
-    if (fs.existsSync(distCandidate)) {
-      if (process.env.BIGINT_BUFFER_DEBUG) {
-        console.log("bigint-buffer: found native at", distCandidate);
-      }
-      return path.join(root, "dist");
-    }
-  }
-  if (process.env.BIGINT_BUFFER_DEBUG) {
-    console.warn("bigint-buffer: native binary not found in any candidate root");
-  }
-  return undefined;
-};
-
-const loadWithNodeGypBuild = (): ConverterInterface | undefined => {
-  if (!path) return undefined;
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const loader = require("node-gyp-build") as (dir: string) => ConverterInterface;
-    const pkgRoot = resolvePackageRoot();
-    if (!pkgRoot) return undefined;
-    return loader(pkgRoot);
-  } catch (err) {
-    nativeLoadError = err;
-    return undefined;
-  }
-};
-
-const resolveBindings = (candidate: unknown): BindingsLoader => {
-  if (typeof candidate === "function") {
-    return candidate as BindingsLoader;
-  }
-  if (candidate && typeof candidate === "object") {
-    const maybeDefault = (candidate as { default?: unknown }).default;
-    if (typeof maybeDefault === "function") {
-      return maybeDefault as BindingsLoader;
-    }
-    if (
-      maybeDefault &&
-      typeof maybeDefault === "object" &&
-      typeof (maybeDefault as { default?: unknown }).default === "function"
-    ) {
-      return (maybeDefault as { default: unknown }).default as BindingsLoader;
-    }
-  }
-  throw new TypeError("bindings is not a function");
-};
-
-let nativeLoadError: unknown;
-
-const loadNative = (): ConverterInterface | undefined => {
-  nativeLoadError = undefined;
-  const fromNodeGypBuild = loadWithNodeGypBuild();
-  if (fromNodeGypBuild) return fromNodeGypBuild;
-
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const rawBindings = require("bindings");
-    const bindings = resolveBindings(rawBindings);
-    const pkgRoot = resolvePackageRoot();
-    const moduleRoot = findModuleRoot() ?? pkgRoot;
-
-    // When this module is bundled into another package, `bindings("bigint_buffer")` will
-    // search relative to the host bundle's path (e.g. `packages/QField/dist/...`).
-    // Always prefer searching relative to the bigint-buffer package root when we can find it.
-    if (moduleRoot) {
-      return bindings({
-        bindings: "bigint_buffer",
-        module_root: moduleRoot,
-      }) as ConverterInterface;
-    }
-
-    return bindings("bigint_buffer") as ConverterInterface;
-  } catch (err) {
-    nativeLoadError = nativeLoadError ?? err;
-    return undefined;
-  }
-};
 
 if (!IS_BROWSER) {
   const nativeConverter = loadNative();
   if (nativeConverter !== undefined) {
     converter = nativeConverter;
     isNative = true;
-  } else if (
-    nativeLoadError !== undefined &&
-    process.env?.BIGINT_BUFFER_SILENT_NATIVE_FAIL !== "1"
-  ) {
-    console.warn(
-      "bigint-buffer: Failed to load native bindings; using pure JS fallback. Run npm run rebuild to restore native.",
-      nativeLoadError
-    );
   }
 }
 
@@ -358,8 +204,8 @@ if (!IS_BROWSER) {
  * @param buf The little-endian buffer to convert
  * @returns A BigInt with the little-endian representation of buf.
  */
-export function toBigIntLE(buf: Buffer): bigint {
-  return converter.toBigInt(buf, false);
+export function toBigIntLE(buf: ByteInput): bigint {
+  return converter.toBigInt(toBufferInput(buf), false);
 }
 
 export function validateBigIntBuffer(): boolean {
@@ -376,8 +222,8 @@ export function validateBigIntBuffer(): boolean {
  * @param buf The big-endian buffer to convert.
  * @returns A BigInt with the big-endian representation of buf.
  */
-export function toBigIntBE(buf: Buffer): bigint {
-  return converter.toBigInt(buf, true);
+export function toBigIntBE(buf: ByteInput): bigint {
+  return converter.toBigInt(toBufferInput(buf), true);
 }
 
 /**
@@ -387,9 +233,7 @@ export function toBigIntBE(buf: Buffer): bigint {
  * @returns A little-endian buffer representation of num.
  */
 export function toBufferLE(num: bigint, width: number): Buffer {
-  if (width < 0) {
-    throw new RangeError("toBufferLE width must be non-negative");
-  }
+  assertWidth(width, "toBufferLE");
   const target = width === 0 ? Buffer.alloc(0) : Buffer.allocUnsafe(width);
   return converter.fromBigInt(num, target, false);
 }
@@ -401,9 +245,7 @@ export function toBufferLE(num: bigint, width: number): Buffer {
  * @returns A big-endian buffer representation of num.
  */
 export function toBufferBE(num: bigint, width: number): Buffer {
-  if (width < 0) {
-    throw new RangeError("toBufferBE width must be non-negative");
-  }
+  assertWidth(width, "toBufferBE");
   const target = width === 0 ? Buffer.alloc(0) : Buffer.allocUnsafe(width);
   return converter.fromBigInt(num, target, true);
 }
@@ -430,7 +272,7 @@ export function bigintToBuf(num: bigint): Buffer {
  * @param buf The buffer to convert
  * @returns A bigint representation of the buffer
  */
-export function bufToBigint(buf: Buffer): bigint {
+export function bufToBigint(buf: ByteInput): bigint {
   return toBigIntBE(buf);
 }
 
@@ -511,71 +353,16 @@ export function base64ToBigint(base64: string): bigint {
   if (!base64?.trim()) {
     throw new Error("base64ToBigint: input string cannot be empty");
   }
-  // Trim whitespace and validate base64 format (allows padding)
+  // Accept both standard and URL-safe base64 variants.
   const cleaned = base64.trim();
-  if (!/^[A-Za-z0-9+/]+=*$/.test(cleaned)) {
+  if (!/^[A-Za-z0-9+/=_-]+$/.test(cleaned)) {
     throw new Error("base64ToBigint: invalid base64 string format");
   }
-  const buf = Buffer.from(cleaned, "base64");
+  let normalized = cleaned.replace(/-/g, "+").replace(/_/g, "/");
+  while (normalized.length % 4 !== 0) {
+    normalized += "=";
+  }
+  const buf = Buffer.from(normalized, "base64");
   return bufToBigint(buf);
 }
 
-/**
- * Attempt to resolve the root directory of the current package.
- * Looks for the nearest directory containing a package.json, starting from __dirname.
- * Returns the absolute path to the package root, or undefined if not found.
- */
-function resolvePackageRoot(): string | undefined {
-  if (!path || !fs) return undefined;
-
-  // Prefer resolving the real installed package location, even when this code has been bundled
-  // into another package (where `require.resolve` may be unavailable or stubbed).
-  let searchDir = __dirname;
-  while (true) {
-    const nmCandidate = path.join(
-      searchDir,
-      "node_modules",
-      "@gsknnft",
-      "bigint-buffer",
-      "package.json"
-    );
-    if (fs.existsSync(nmCandidate)) {
-      return path.dirname(nmCandidate);
-    }
-    const parent = path.dirname(searchDir);
-    if (parent === searchDir) break;
-    searchDir = parent;
-  }
-
-  const canResolve =
-    typeof require === "function" &&
-    typeof (require as unknown as { resolve?: unknown }).resolve === "function";
-
-  const tryResolve = (id: string): string | undefined => {
-    if (!canResolve) return undefined;
-    try {
-      return (require as unknown as { resolve: (id: string) => string }).resolve(id);
-    } catch {
-      return undefined;
-    }
-  };
-
-  // NOTE: Resolving `@gsknnft/bigint-buffer/package.json` fails when `exports` doesn't allow it.
-  // Instead, resolve the entrypoint, then walk up to find the nearest package.json.
-  const entry =
-    tryResolve("@gsknnft/bigint-buffer") ??
-    tryResolve("@gsknnft/bigint-buffer/dist/index.cjs") ??
-    tryResolve("@gsknnft/bigint-buffer/dist/index.js");
-
-  let dir = entry ? path.dirname(entry) : __dirname;
-  while (true) {
-    const pkgPath = path.join(dir, "package.json");
-    if (fs.existsSync(pkgPath)) {
-      return dir;
-    }
-    const parent = path.dirname(dir);
-    if (parent === dir) break;
-    dir = parent;
-  }
-  return undefined;
-}

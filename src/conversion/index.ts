@@ -1,2 +1,1 @@
-export * from "./src/ts/index";
-export * from "./src/ts/converter";
+export * from "./src/index";

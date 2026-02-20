@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false
+  },
+  "include": [
+    "src/index.ts",
+    "src/conversion/index.ts",
+    "src/conversion/src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.bench.ts"
+  ]
+}

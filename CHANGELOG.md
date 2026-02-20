@@ -1,68 +1,54 @@
-
 # Changelog
 
-# UnReleased
+All notable changes to this project are documented in this file.
 
-## Conversion Performance (Unreleased)
-- JS BE/LE converters now use chunked Buffer.read/writeBigUInt64* (with manual fallback) instead of hex string round-trips, removing extra allocations and copies.
-- `toBuffer*`/`toBigInt*` share the same zero-allocation paths as the native binding, preserving low-order bytes and handling empty through very large buffers consistently.
-- README now documents the optimized, size-agnostic conversions and the expanded test coverage across buffer sizes and environments.
-- Documented browser polyfill requirements for `buffer`, `path`, and `fs` plus guidance on using native/SIMD paths when extreme throughput is needed.
-- Native loader now searches installed package roots, Electron `resources/app.asar.unpacked`, and env override; README clarifies packaging the `.node` file via `extraResources`/`asarUnpack`.
+## [1.5.0] - 2026-02-20
 
-## Migration Guide
+### Added
+- Added `tsconfig.declarations.json` to emit only publishable declarations.
+- Added `pnpm-workspace.yaml` for pnpm workspace compatibility.
 
-- If upgrading from legacy `bigint-buffer`, switch all imports to `@gsknnft/bigint-buffer`.
-- All helpers are now available as named exports (no default export).
-- For Electron, ensure the native binary is included in `extraResources` or `asarUnpack` so it ends up under `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/build/Release/`.
-- If your packager relocates files, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node` before launching the app.
-- For browser, add polyfills for `Buffer`, `path`, and `fs` as needed.
-- ESM, CJS, and TypeScript types are all supported out of the box.
+### Changed
+- Improved native module resolution robustness for bundled/relocated installs.
+- Optimized conversion fallback paths in `src/conversion` to use chunked byte operations instead of hex round-trips.
+- Normalized declaration generation flow (`declare` script) to clean stale type artifacts before emit.
+- Moved TypeScript build info output out of `dist` via `tsBuildInfoFile` to prevent publish noise.
+- Restored browser export for `./conversion` subpath in package exports.
+- Cleaned release documentation and runtime guidance (Node/Electron/browser/native fallback behavior).
+- De-duplicated top-level loader logic to reuse shared converter loader path.
+- Expanded byte-input compatibility (`Buffer | Uint8Array | ArrayBuffer`) for top-level and conversion endian APIs.
+- Replaced flaky benchmark harness with deterministic `tsx`/`perf_hooks` runner and refreshed benchmark snapshots.
 
----
+### Fixed
+- Removed stale/duplicate publish artifacts from package file list and declaration output process.
+- Reduced false native load misses in host-bundled runtime layouts by preferring explicit package-root/module-root probing.
+- Raised full-suite LCOV to >80% lines with deterministic fallback/runtime branch tests.
+- Removed emitted bench/test JS and duplicate conversion native payload from publish tarball output.
 
+## [1.4.7] - 2026-02-19
 
-## Release Summary (v1.4.7)
-- Native N-API binding with prebuilt binaries for Node/Electron.
-- Pure JS fallback for browser and non-native environments.
-- All conversion helpers (hex, base64, text, buffer, FixedPoint) are available as named exports.
-- ESM, CJS, and TypeScript types supported out of the box.
-- Loader logic covers Node, Electron, browser, and asar-unpacked scenarios.
-- Electron packaging guidance and browser polyfill requirements are documented.
-- CI-verified for Node 20–24 and Electron.
+### Added
+- Added FixedPoint helper exports and integrated conversion helpers at top-level package surface.
 
-## 1.4.7 — Update Release
-- Version bump for release and documentation updates.
-- All references and docs now reflect 1.4.7.
+### Changed
+- Shipped native binary with package and maintained JS fallback behavior.
 
-## 1.4.6 — Import/Build Fixes
-- Fixed import path issues in FixedPoint utilities (no more unresolved #pkg errors)
-- Cleaned up build artifacts and ensured all exports resolve correctly
-- All tests and CI green
-- Users should upgrade to avoid runtime errors in 1.4.5
+## [1.4.6] - 2026-02-18
 
-# Released 
+### Fixed
+- Fixed import/build path issues in FixedPoint utilities.
 
-## 1.4.5 — FixedPoint, Native Bindings, JS Fallback - (ISSUES WITH ARTIFACTS)
+## [1.4.5] - 2026-02-17
 
-- Added FixedPoint utilities: `toFixedPoint`, `fromFixedPoint`, `addFixedPoint`, `subtractFixedPoint`, `averageFixedPoint`, `compareFixedPoint`, and `FixedPoint` type.
-- Native bindings (`build/Release/bigint_buffer.node`) now included out-of-the-box in npm package.
-- Improved JS fallback for environments without native bindings.
-- CI-verified for Node 20–24 on all platforms.
+### Added
+- Added FixedPoint utility family and initial native packaging updates.
 
-## 1.4.4 — CI-Verified
+## [1.4.4] - 2026-02-16
 
-- Built and published under the green CI matrix (Node 20–24 across ubuntu/macos/windows).
-- Switched workflows to `npm ci` for deterministic installs.
-- No code changes from 1.4.3; this formalizes the verified pipeline.
+### Changed
+- CI/release pipeline hardening and deterministic install flow.
 
-## 1.4.3 — Stability & Stewardship
+## [1.4.3] - 2026-02-15
 
-- Verified native bindings across Node 18–24 with npm-driven CI on Linux/macOS/Windows.
-- Added npm-based release automation and kept manual trigger/permissions intact.
-- Cleaned lint config after removing gts; ESLint now targets source/tests without linting built artifacts.
-- Clarified README with npm instructions and fork status; removed corrupted text.
-- Deprecated 1.4.1/1.3.x and documented the upgrade path to 1.4.3.
-- Tagged before the final green CI run; superseded by 1.4.4 for verified status.
-
-`1.4.3` is the stability beacon release: pin to this version to guarantee proper bindings, CI-backed builds, and active maintainership while the older `1.3.x` line is fully deprecated.
+### Changed
+- Project stewardship and stability updates.

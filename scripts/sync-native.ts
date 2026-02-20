@@ -7,7 +7,6 @@ const distTarget = path.join(rootDir, "dist", "build", "Release", "bigint_buffer
 
 const extraTargets = [
   path.join(rootDir, "src", "conversion", "build", "Release", "bigint_buffer.node"),
-  path.join(rootDir, "src", "conversion", "dist", "build", "Release", "bigint_buffer.node"),
 ];
 
 async function fileExists(filePath: string): Promise<boolean> {

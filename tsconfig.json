@@ -3,6 +3,7 @@
     "composite": true,
     "rootDir": "./src",
     "outDir": "dist",
+    "tsBuildInfoFile": "build/main.tsbuildinfo",
     "declaration": true,
     "target" : "ESNext",
     "module": "esnext",
@@ -21,10 +22,13 @@
     "src/*.ts",
     "src/**/*.ts",
     "src/conversion/src/ts/**/*.ts",
-    "src/conversion/test/**/*.ts",
     "src/conversion/src/ts/converter.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "src/**/*.bench.ts",
+    "src/conversion/test/**/*"
   ]
 }

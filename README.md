@@ -1,144 +1,148 @@
-![CI](https://github.com/gsknknft/bigint-buffer/actions/workflows/ci.yaml/badge.svg)
-![Release](https://github.com/gsknknft/bigint-buffer/actions/workflows/release.yaml/badge.svg)
-
 # @gsknnft/bigint-buffer
-
-Secure BigInt ⇆ Buffer conversion with native bindings, browser fallbacks, and the `bigint-conversion` helper APIs built in. This is the actively maintained fork of the original `bigint-buffer`.
-
-**Upgrade notice:** The current 1.4.7 line ships chunked, allocation-free BE/LE converters (Buffer.read/writeBigUInt64* when available) that are fuzzed across empty, tiny, and huge buffers, alongside FixedPoint utilities and packaged native bindings. CI-verified for Node 20–24. Upgrade for the fastest conversions and consistent behaviour across environments.
-
----
-
-## Migration Guide
-
-- If upgrading from legacy `bigint-buffer`, switch all imports to `@gsknnft/bigint-buffer`.
-- All helpers are now available as named exports (no default export).
-- For Electron, ensure the native binary is included in `extraResources` or `asarUnpack` so it ends up under `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/build/Release/`.
-- If your packager relocates files, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node` before launching the app.
-- For browser, add polyfills for `Buffer`, `path`, and `fs` as needed (see below).
-- ESM, CJS, and TypeScript types are all supported out of the box.
-
----
 
 [![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
 [![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
 
----
-
-## Why This Package
-
-- Native N-API binding with pure-JS fallback for browsers and constrained environments.
-- Conversion helpers from `bigint-conversion` in-core (no extra deps).
-- ESM and CJS exports plus a UMD/browser bundle.
-- Actively maintained; legacy `bigint-buffer` is deprecated and flagged by audits.
-
----
+BigInt <-> Buffer conversion with native bindings, fast JS fallback paths, and built-in conversion helpers.
 
 ## Install
+
 ```bash
 npm install @gsknnft/bigint-buffer
-# or pnpm/yarn if preferred
 ```
-
----
 
 ## Quick Start
+
 ```ts
 import {
-  toBigIntBE, toBigIntLE, toBufferBE, toBufferLE,
-  bigintToBuf, bufToBigint, bigintToHex, hexToBigint,
-  bigintToText, textToBigint, bigintToBase64, base64ToBigint,
-  // New in 1.4.5
-  toFixedPoint, fromFixedPoint, addFixedPoint, subtractFixedPoint,
-  averageFixedPoint, compareFixedPoint, type FixedPoint,
+  toBigIntBE,
+  toBigIntLE,
+  toBufferBE,
+  toBufferLE,
+  bigintToHex,
+  hexToBigint,
+  bigintToBase64,
+  base64ToBigint,
 } from "@gsknnft/bigint-buffer";
 
-toBigIntBE(Buffer.from("deadbeef", "hex")); // 3735928559n
-toBufferLE(0xdeadbeefn, 6);                 // <Buffer ef be ad de 00 00>
-bigintToHex(123456789n);                    // "075bcd15"
-textToBigint("Hello");                      // 0x48656c6c6f
-bigintToBase64(123456789n);                 // "B1vNFQ=="
+const value = toBigIntBE(Buffer.from("deadbeef", "hex"));
+const out = toBufferLE(value, 8);
 
-// FixedPoint usage
-const fp = toFixedPoint(123456789n, 18);    // Convert bigint to FixedPoint
-const sum = addFixedPoint(fp, fp);          // Add two FixedPoints
-const avg = averageFixedPoint([fp, fp]);    // Average FixedPoints
+const hex = bigintToHex(123456789n); // "075bcd15"
+const roundTrip = hexToBigint(hex);
+
+const b64 = bigintToBase64(123456789n);
+const fromB64 = base64ToBigint(b64);
 ```
 
-// Browser usage (with polyfills)
-import { toBigIntBE } from "@gsknnft/bigint-buffer";
-// Polyfill Buffer if needed:
-// import { Buffer } from "buffer";
+## FixedPoint Helpers
 
-// CJS usage
-const { toBigIntBE } = require("@gsknnft/bigint-buffer");
-```
-
-### Performance
-- BE/LE conversions now stream bytes directly from buffers (64-bit chunks via Buffer.read/writeBigUInt64* when available) with no intermediate hex copies.
-- JS fallback matches the native binding semantics and is exercised against empty, tiny, and very large inputs in CI.
-- Native bindings still load automatically when present; the optimized fallback keeps browser and non-native runtimes fast.
-- Browser bundlers must polyfill Node built-ins: add a node polyfill plugin (e.g. `rollup-plugin-polyfill-node`) or explicit aliases for `buffer`, `path`, and `fs` so the fallback loader can resolve.
-
-### Pushing Performance Further
-- For very large buffers, consider enabling the native binding (included in npm tarball) or adding SIMD/native glue in your host app if you need throughput beyond JS.
-
-### Electron Packaging
-- Ensure the native binding ships with your app: add `node_modules/@gsknnft/bigint-buffer/build/Release/bigint_buffer.node` to `extraResources`/`asarUnpack` so it ends up under `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/build/Release/`.
-- If your packager relocates files, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node` before launching the app.
-
-The loader will check, in order:
-- `dist/build/Release/bigint_buffer.node`
-- `build/Release/bigint_buffer.node`
-- Electron asar-unpacked path
-- `BIGINT_BUFFER_NATIVE_PATH` (if set)
-
-### Conversion Utilities
 ```ts
-import { conversionUtils } from "@gsknnft/bigint-buffer";
+import {
+  toFixedPoint,
+  fromFixedPoint,
+  addFixedPoint,
+  subtractFixedPoint,
+  averageFixedPoint,
+  compareFixedPoint,
+} from "@gsknnft/bigint-buffer";
 
-const arrBuf = conversionUtils.bigintToBuf(123456789n, true); // ArrayBuffer
-const hex = conversionUtils.bigintToHex(123456789n, true);    // '0x...' format
-const text = conversionUtils.bigintToText(123456789n);
+const a = toFixedPoint(12.34, 9);
+const b = toFixedPoint(7.66, 9);
+const sum = addFixedPoint(a, b);
+const avg = averageFixedPoint([a, b]);
+const cmp = compareFixedPoint(a, b);
+const n = fromFixedPoint(sum, 9);
 ```
 
-// All helpers are available as named exports:
-import { bigintToBuf, bufToBigint, bigintToHex, hexToBigint } from "@gsknnft/bigint-buffer";
+## Native Loading
+
+The package tries native first, then falls back to JS:
+
+1. `node-gyp-build` prebuild lookup from installed package root
+2. `bindings` lookup with explicit `module_root` when resolvable
+3. pure JS fallback
+
+Set `BIGINT_BUFFER_NATIVE_PATH` to override lookup root when needed.
+
+Enable debug logging:
+
+```bash
+BIGINT_BUFFER_DEBUG=1 node your-app.js
 ```
 
----
+Silence fallback warning:
 
-## Runtime
-- Native binary: `build/Release/bigint_buffer.node` (included in npm package; loads automatically when available).
-- Fallback: pure JS bundle for browser and non-native installs (now improved in 1.4.5).
-- Check which path loaded:
-  ```ts
-  import { isNative } from "@gsknnft/bigint-buffer";
-  console.log(isNative); // true when native binding is active
-  ```
+```bash
+BIGINT_BUFFER_SILENT_NATIVE_FAIL=1 node your-app.js
+```
 
----
+## Electron Packaging
+
+Include the native binary in unpacked resources:
+
+- `node_modules/@gsknnft/bigint-buffer/build/Release/bigint_buffer.node`
+
+Common location at runtime:
+
+- `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/build/Release/bigint_buffer.node`
+
+If your packager relocates native files, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node`.
+
+## Browser Notes
+
+This package supports browser builds via fallback paths and conversion bundles.
+
+If your bundler does not polyfill Node globals/modules automatically, add polyfills for:
+
+- `Buffer`
+- `path`
+- `fs`
+
+## Exports
+
+Top-level package exports:
+
+- ESM: `dist/index.js`
+- CJS: `dist/index.cjs`
+- Types: `dist/index.d.ts`
+- Native binary export: `./build/Release/bigint_buffer.node`
+- Conversion subpath: `@gsknnft/bigint-buffer/conversion`
 
 ## Commands
+
 ```bash
-npm run build           # bundle + declarations + type check
-npm test                # vitest with coverage
-npm run test:node       # mocha against built JS (after build/compile)
-npm run rebuild:native  # rebuild the N-API binding
+npm run build        # bundle + declarations + conversion sync + native sync
+npm run compile      # build + typecheck
+npm test             # vitest
+npm run check        # eslint
+npm run rebuild      # node-gyp rebuild + build + conversion build
+npm run prebuilds    # prebuildify for native binaries
 ```
 
----
+## Quality Snapshot
 
-## API Surface (high level)
-- Core: `toBigIntBE/LE`, `toBufferBE/LE`, `validateBigIntBuffer`, `isNative`
-- Conversion: `bigintToBuf`, `bufToBigint`, `bigintToHex`, `hexToBigint`, `bigintToText`, `textToBigint`, `bigintToBase64`, `base64ToBigint`, `bufToHex`, `hexToBuf`, `textToBuf`, `bufToText`, `parseHex`
+Latest local run (Node 24, Vitest v4, v8 coverage):
 
-All helpers are available as named exports in both ESM and CJS. TypeScript types are included.
+- Tests: `141 passed`
+- Coverage: `Statements 84.15%`, `Branches 72.36%`, `Functions 88.37%`, `Lines 85.88%`
+- Benchmark snapshot: see `benchmark.md`
+- Publish dry-run: clean tarball (no test/bench JS artifacts)
 
-All helpers are endian-safe and validated across Node and browser builds.
+Reproduce:
 
----
- 
-- Version: 1.4.7 (FixedPoint, native bindings out-of-the-box, improved JS fallback, robust loader, and stable exports)
-- Node: 20+ (tested through 24 LTS under CI)
-- Issues: https://github.com/gsknnft/bigint-buffer/issues
+```bash
+pnpm exec vitest run --coverage --pool=forks
+pnpm run benchmark
+pnpm pack --dry-run
+```
+
+## Runtime Compatibility
+
+- Node: `>=20`
+- Package format: ESM + CJS
+- Native addon: N-API (`bigint_buffer.node`)
+
+## License
+
+Apache-2.0

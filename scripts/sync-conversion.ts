@@ -28,6 +28,7 @@ async function syncConversion() {
   await rm(targetDir, { recursive: true, force: true });
   await mkdir(path.dirname(targetDir), { recursive: true });
   await cp(sourceDir, targetDir, { recursive: true });
+  await rm(path.join(targetDir, "build"), { recursive: true, force: true });
 }
 
 syncConversion().catch((error) => {

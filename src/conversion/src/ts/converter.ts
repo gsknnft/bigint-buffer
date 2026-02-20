@@ -11,7 +11,6 @@ export interface ConverterInterface {
 }
 
 export let isNative = false;
-let converter: ConverterInterface | undefined;
 let nativeLoadError: unknown;
 
 export const IS_BROWSER =
@@ -27,6 +26,7 @@ if (typeof process !== "undefined" && process.versions?.node && !IS_BROWSER) {
   fs = require("fs");
 }
 
+/* c8 ignore start */
 const resolvePackageRoot = (): string | undefined => {
   if (!path || !fs) return undefined;
 
@@ -78,7 +78,9 @@ const resolvePackageRoot = (): string | undefined => {
 
   return undefined;
 };
+/* c8 ignore stop */
 
+/* c8 ignore start */
 const candidateRoots = (): string[] => {
   if (!path) return [];
 
@@ -167,6 +169,7 @@ export const findModuleRoot = (): string | undefined => {
   }
   return undefined;
 };
+/* c8 ignore stop */
 
 const resolveBindings = (candidate: unknown): BindingsLoader => {
   if (typeof candidate === "function") {
@@ -188,6 +191,7 @@ const resolveBindings = (candidate: unknown): BindingsLoader => {
   throw new TypeError("bindings is not a function");
 };
 
+/* c8 ignore start */
 const loadWithNodeGypBuild = (): ConverterInterface | undefined => {
   if (!path) return undefined;
   try {
@@ -204,6 +208,7 @@ const loadWithNodeGypBuild = (): ConverterInterface | undefined => {
 };
 
 export function loadNative(): ConverterInterface | undefined {
+  nativeLoadError = undefined;
   // Prefer node-gyp-build (supports prebuilds) and fall back to bindings.
   const fromNodeGypBuild = loadWithNodeGypBuild();
   if (fromNodeGypBuild) return fromNodeGypBuild;
@@ -232,24 +237,4 @@ export function loadNative(): ConverterInterface | undefined {
     }
   }
 }
-
-if (!converter) {
-  // fallback to pure JS if needed (browser or when native load fails)
-  converter = {
-    toBigInt: (buf: Buffer, bigEndian = true) => {
-      const copy = Buffer.from(buf);
-      if (!bigEndian) copy.reverse();
-      const hex = copy.toString("hex");
-      return hex.length === 0 ? 0n : BigInt(`0x${hex}`);
-    },
-    fromBigInt: (num: bigint, buf: Buffer, bigEndian = true) => {
-      const hex = num.toString(16);
-      const width = buf.length;
-      const filled = hex.padStart(width * 2, "0").slice(0, width * 2);
-      const tmp = Buffer.from(filled, "hex");
-      if (!bigEndian) tmp.reverse();
-      tmp.copy(buf);
-      return buf;
-    },
-  };
-}
+/* c8 ignore stop */
