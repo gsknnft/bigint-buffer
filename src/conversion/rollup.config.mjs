@@ -11,14 +11,14 @@ import terser from "@rollup/plugin-terser";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const input = path.resolve(__dirname, "index.ts");
-const distPath = (...segments) => path.resolve(__dirname, "dist", ...segments);
+const input = path.resolve(__dirname, "src/ts/index.ts");
+const distPath = (...segments) => path.resolve(__dirname, "../../dist/conversion", ...segments);
 
 const builtinIds = [...new Set([...builtinModules, ...builtinModules.map((m) => `node:${m}`)])];
 const externalNode = ["bindings", ...builtinIds];
 const extensions = [".ts", ".js", ".mjs", ".cjs", ".json"];
 
-const tsconfigPath = path.resolve(__dirname, "tsconfig.rollup.json");
+const tsconfigPath = path.resolve(__dirname, "tsconfig.json");
 
 const makeTsPlugin = (outDir) =>
   typescript({
@@ -116,7 +116,7 @@ export default [
       name: "BigIntBuffer",
       inlineDynamicImports: true,
     },
-    plugins: makeBrowserPlugins(path.resolve(__dirname, "dist")),
+    plugins: makeBrowserPlugins(distPath(".")),
     treeshake: false,
   },
   {
@@ -128,7 +128,7 @@ export default [
       name: "BigIntBuffer",
       inlineDynamicImports: true,
     },
-    plugins: makeBrowserPlugins(path.resolve(__dirname, "dist")),
+    plugins: makeBrowserPlugins(distPath(".")),
     treeshake: false,
   },
   {

@@ -181,6 +181,8 @@ const IS_BROWSER =
   typeof globalThis !== "undefined" &&
   typeof (globalThis as { document?: unknown }).document !== "undefined";
 
+let converter: ConverterInterface = jsConverter;
+export let isNative = false;
 let path: PathModule | undefined;
 let fs: FsModule | undefined;
 
@@ -191,32 +193,42 @@ if (!IS_BROWSER) {
   fs = require("fs") as FsModule;
 }
 
+
 const candidateRoots = (): string[] => {
   if (!path) return [];
   const pkgRoot = resolvePackageRoot();
-  const resourcesPath =
-    typeof process !== "undefined" &&
-    (process as { resourcesPath?: string }).resourcesPath;
 
-  return [
-    process.env?.BIGINT_BUFFER_NATIVE_PATH,
-    pkgRoot,
-    pkgRoot ? path.join(pkgRoot, "dist") : undefined,
-    resourcesPath
-      ? path.join(
-          resourcesPath,
-          "app.asar.unpacked",
-          "node_modules",
-          "@gsknnft",
-          "bigint-buffer"
-        )
-      : undefined,
-    path.resolve(__dirname, ".."),
-    path.resolve(__dirname, "."),
-    path.resolve(__dirname, "../.."),
-    path.resolve(__dirname, "../../.."),
-    path.resolve(__dirname, "../../../.."),
-  ].filter((p): p is string => Boolean(p));
+  const roots = new Set<string>();
+  const add = (value?: string) => {
+    if (!value) return;
+    roots.add(path.resolve(value));
+  };
+
+  add(process.env?.BIGINT_BUFFER_NATIVE_PATH);
+  add(pkgRoot);
+  add(pkgRoot ? path.join(pkgRoot, "dist") : undefined);
+
+  const resourcesPath =
+    typeof process !== "undefined"
+      ? (process as { resourcesPath?: string }).resourcesPath
+      : undefined;
+  if (resourcesPath) {
+    add(
+      path.join(
+        resourcesPath,
+        "app.asar.unpacked",
+        "node_modules",
+        "@gsknnft",
+        "bigint-buffer"
+      )
+    );
+  }
+
+  const out = Array.from(roots);
+  if (process.env.BIGINT_BUFFER_DEBUG) {
+    console.log("bigint-buffer: candidateRoots:", out);
+  }
+  return out;
 };
 
 const findModuleRoot = (): string | undefined => {
@@ -228,7 +240,13 @@ const findModuleRoot = (): string | undefined => {
       "Release",
       "bigint_buffer.node"
     );
+    if (process.env.BIGINT_BUFFER_DEBUG) {
+      console.log("bigint-buffer: checking for native at", directCandidate);
+    }
     if (fs.existsSync(directCandidate)) {
+      if (process.env.BIGINT_BUFFER_DEBUG) {
+        console.log("bigint-buffer: found native at", directCandidate);
+      }
       return root;
     }
     const distCandidate = path.join(
@@ -238,9 +256,18 @@ const findModuleRoot = (): string | undefined => {
       "Release",
       "bigint_buffer.node"
     );
+    if (process.env.BIGINT_BUFFER_DEBUG) {
+      console.log("bigint-buffer: checking for native at", distCandidate);
+    }
     if (fs.existsSync(distCandidate)) {
+      if (process.env.BIGINT_BUFFER_DEBUG) {
+        console.log("bigint-buffer: found native at", distCandidate);
+      }
       return path.join(root, "dist");
     }
+  }
+  if (process.env.BIGINT_BUFFER_DEBUG) {
+    console.warn("bigint-buffer: native binary not found in any candidate root");
   }
   return undefined;
 };
@@ -279,9 +306,7 @@ const resolveBindings = (candidate: unknown): BindingsLoader => {
   throw new TypeError("bindings is not a function");
 };
 
-let converter: ConverterInterface = jsConverter;
 let nativeLoadError: unknown;
-export let isNative = false;
 
 const loadNative = (): ConverterInterface | undefined => {
   nativeLoadError = undefined;
@@ -292,13 +317,19 @@ const loadNative = (): ConverterInterface | undefined => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const rawBindings = require("bindings");
     const bindings = resolveBindings(rawBindings);
-    const moduleRoot = findModuleRoot();
+    const pkgRoot = resolvePackageRoot();
+    const moduleRoot = findModuleRoot() ?? pkgRoot;
+
+    // When this module is bundled into another package, `bindings("bigint_buffer")` will
+    // search relative to the host bundle's path (e.g. `packages/QField/dist/...`).
+    // Always prefer searching relative to the bigint-buffer package root when we can find it.
     if (moduleRoot) {
       return bindings({
         bindings: "bigint_buffer",
         module_root: moduleRoot,
       }) as ConverterInterface;
     }
+
     return bindings("bigint_buffer") as ConverterInterface;
   } catch (err) {
     nativeLoadError = nativeLoadError ?? err;
@@ -495,17 +526,48 @@ export function base64ToBigint(base64: string): bigint {
  * Returns the absolute path to the package root, or undefined if not found.
  */
 function resolvePackageRoot(): string | undefined {
-  if (!path) return undefined;
-  try {
-    // Resolve the installed package root even when bundled/aliased.
-    const pkgPath = require.resolve("@gsknnft/bigint-buffer/package.json");
-    return path.dirname(pkgPath);
-  } catch {
-    // Fall back to walking up from the current file.
+  if (!path || !fs) return undefined;
+
+  // Prefer resolving the real installed package location, even when this code has been bundled
+  // into another package (where `require.resolve` may be unavailable or stubbed).
+  let searchDir = __dirname;
+  while (true) {
+    const nmCandidate = path.join(
+      searchDir,
+      "node_modules",
+      "@gsknnft",
+      "bigint-buffer",
+      "package.json"
+    );
+    if (fs.existsSync(nmCandidate)) {
+      return path.dirname(nmCandidate);
+    }
+    const parent = path.dirname(searchDir);
+    if (parent === searchDir) break;
+    searchDir = parent;
   }
 
-  if (!fs) return undefined;
-  let dir = __dirname;
+  const canResolve =
+    typeof require === "function" &&
+    typeof (require as unknown as { resolve?: unknown }).resolve === "function";
+
+  const tryResolve = (id: string): string | undefined => {
+    if (!canResolve) return undefined;
+    try {
+      return (require as unknown as { resolve: (id: string) => string }).resolve(id);
+    } catch {
+      return undefined;
+    }
+  };
+
+  // NOTE: Resolving `@gsknnft/bigint-buffer/package.json` fails when `exports` doesn't allow it.
+  // Instead, resolve the entrypoint, then walk up to find the nearest package.json.
+  const entry =
+    tryResolve("@gsknnft/bigint-buffer") ??
+    tryResolve("@gsknnft/bigint-buffer/dist/index.cjs") ??
+    tryResolve("@gsknnft/bigint-buffer/dist/index.js");
+
+  let dir = entry ? path.dirname(entry) : __dirname;
   while (true) {
     const pkgPath = path.join(dir, "package.json");
     if (fs.existsSync(pkgPath)) {

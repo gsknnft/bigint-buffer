@@ -23,9 +23,11 @@ if (process.platform === "win32" && !forceRebuild) {
   process.exit(0);
 }
 
-const bindingPath = join(__dirname, "..", "dist", "build", "Release", "bigint_buffer.node");
-if (existsSync(bindingPath) && !forceRebuild) {
-  console.log("bigint-buffer: native addon already present in dist; skipping rebuild");
+
+const distBindingPath = join(__dirname, "..", "dist", "build", "Release", "bigint_buffer.node");
+const buildBindingPath = join(__dirname, "..", "build", "Release", "bigint_buffer.node");
+if ((existsSync(distBindingPath) || existsSync(buildBindingPath)) && !forceRebuild) {
+  console.log("bigint-buffer: native addon already present in dist or build; skipping rebuild");
   process.exit(0);
 }
 
