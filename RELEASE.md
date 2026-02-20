@@ -1,11 +1,10 @@
 # Release 1.5.0
-
-Date: 2026-02-20
+Date: 2026‑02‑20
 
 ## Highlights
 - Hardened native loader behavior across Node/Electron/bundled runtime layouts.
-- Unified loader logic to prevent drift between top-level and conversion entrypoints.
-- Expanded byte-input support (`Buffer | Uint8Array | ArrayBuffer`) for endian conversion APIs.
+- Unified loader logic to prevent drift between top‑level and conversion entrypoints.
+- Expanded byte‑input support (`Buffer | Uint8Array | ArrayBuffer`) for endian conversion APIs.
 - Improved JS fallback conversion performance with chunked operations.
 - Reworked benchmark harness for deterministic, reproducible results.
 - Significantly increased coverage with targeted runtime/fallback tests.
