@@ -29,6 +29,8 @@ async function writeManifests() {
 async function writeCompatStubs() {
   const cjsStubPath = path.join(distDir, "cjs", "index.node.js");
   const esmStubPath = path.join(distDir, "esm", "index.node.js");
+  await ensureDir(cjsStubPath);
+  await ensureDir(esmStubPath);
   await fs.writeFile(
     cjsStubPath,
     "'use strict';\nconst mod = require('./index.js');\nmodule.exports = mod;\nmodule.exports.default = mod;\n",
