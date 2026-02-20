@@ -24,6 +24,8 @@ All notable changes to this project are documented in this file.
 - Reduced false native load misses in host-bundled runtime layouts by preferring explicit package-root/module-root probing.
 - Raised full-suite LCOV to >80% lines with deterministic fallback/runtime branch tests.
 - Removed emitted bench/test JS and duplicate conversion native payload from publish tarball output.
+- Fixed conversion workspace post-build path alignment so CI can always generate `dist/cjs/index.node.js` and `dist/esm/index.node.js` stubs.
+- Replaced `ts-node` invocation with `tsx` for root TypeScript build scripts to avoid ESM `.ts` extension failures on GitHub Actions.
 
 ## [1.4.7] - 2026-02-19
 

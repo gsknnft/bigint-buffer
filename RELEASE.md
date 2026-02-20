@@ -1,14 +1,16 @@
 # Release 1.5.0
-Date: 2026‑02‑20
+
+Date: 2026-02-20
 
 ## Highlights
 - Hardened native loader behavior across Node/Electron/bundled runtime layouts.
-- Unified loader logic to prevent drift between top‑level and conversion entrypoints.
-- Expanded byte‑input support (`Buffer | Uint8Array | ArrayBuffer`) for endian conversion APIs.
+- Unified loader logic to prevent drift between top-level and conversion entrypoints.
+- Expanded byte-input support (`Buffer | Uint8Array | ArrayBuffer`) for endian conversion APIs.
 - Improved JS fallback conversion performance with chunked operations.
 - Reworked benchmark harness for deterministic, reproducible results.
 - Significantly increased coverage with targeted runtime/fallback tests.
 - Cleaned publish tarball to exclude bench/test artifacts and duplicate native payloads.
+- Stabilized CI build scripting and conversion post-build outputs on clean runners.
 
 ## Validation
 - Tests: `141 passed`
@@ -18,6 +20,7 @@ Date: 2026‑02‑20
   - Functions: `88.37%`
   - Lines: `85.88%`
 - Packaging: `npm pack --dry-run` clean for publishable artifacts.
+- Runtime audit: `npm audit --omit=dev` -> `0 vulnerabilities`.
 
 ## Release Checklist
 1. `pnpm run build`

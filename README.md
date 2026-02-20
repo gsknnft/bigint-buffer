@@ -120,6 +120,8 @@ npm run rebuild      # node-gyp rebuild + build + conversion build
 npm run prebuilds    # prebuildify for native binaries
 ```
 
+Internal build scripts (`scripts/*.ts`) are executed via `tsx` for stable ESM compatibility in local and CI environments.
+
 ## Quality Snapshot
 
 Latest local run (Node 24, Vitest v4, v8 coverage):
