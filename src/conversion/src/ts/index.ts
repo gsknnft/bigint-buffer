@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 import { ConverterInterface, IS_BROWSER, loadNative } from "./converter";
 
 let converter: ConverterInterface | undefined;

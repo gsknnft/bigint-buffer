@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.5.1] - 2026-02-20
+
+### Fixed
+- Fixed browser bundler compatibility regression introduced in `1.5.0` where Vite/Rollup could resolve `bigint-buffer` to a non-browser-safe entry and fail on Solana named imports.
+- Added a dedicated root browser ESM shim (`dist/index.browser.js`) that re-exports the browser conversion surface with stable named exports.
+- Corrected conversion browser ESM output so `dist/conversion/esm/index.browser.js` emits real ESM named exports (not CommonJS-style `exports.*` assignments).
+- Fixed browser runtime `Buffer is not defined` failures by explicitly importing `Buffer` in source paths consumed by browser builds.
+
+### Changed
+- Root package `browser` and `exports["."].browser` now target the browser-safe root shim instead of Node/UMD entries.
+- Added regression coverage for browser entry packaging/export wiring to prevent future Vite/Solana breakage.
+
 ## [1.5.0] - 2026-02-20
 
 ### Added

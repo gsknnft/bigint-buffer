@@ -1,8 +1,12 @@
-# Release 1.5.0
+# Release 1.5.1
 
 Date: 2026-02-20
 
 ## Highlights
+- Fixes the `1.5.0` browser bundler regression affecting Vite/Rollup consumers (including Solana `@solana/buffer-layout-utils` imports of `bigint-buffer`).
+- Adds a dedicated root browser ESM shim (`dist/index.browser.js`) for stable browser-safe named exports.
+- Ensures browser conversion build emits real ESM named exports and no Node-only root imports.
+- Fixes browser runtime `Buffer is not defined` issues by importing `Buffer` explicitly in browser-consumed code paths.
 - Hardened native loader behavior across Node/Electron/bundled runtime layouts.
 - Unified loader logic to prevent drift between top-level and conversion entrypoints.
 - Expanded byte-input support (`Buffer | Uint8Array | ArrayBuffer`) for endian conversion APIs.
@@ -21,11 +25,12 @@ Date: 2026-02-20
   - Lines: `85.88%`
 - Packaging: `npm pack --dry-run` clean for publishable artifacts.
 - Runtime audit: `npm audit --omit=dev` -> `0 vulnerabilities`.
+- Browser packaging regression test: root browser entry shim and export mapping validated.
 
 ## Release Checklist
 1. `pnpm run build`
 2. `pnpm test`
 3. `pnpm run benchmark`
 4. `npm pack --dry-run`
-5. `git tag v1.5.0`
+5. `git tag v1.5.1`
 6. `npm publish`

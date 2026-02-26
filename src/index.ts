@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 // Export robust Buffer/BigInt methods at top level
 export {
   FIXED_POINT_DECIMALS,

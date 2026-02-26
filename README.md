@@ -91,13 +91,35 @@ If your packager relocates native files, set `BIGINT_BUFFER_NATIVE_PATH` to the 
 
 ## Browser Notes
 
-This package supports browser builds via fallback paths and conversion bundles.
+This package supports browser builds via a dedicated browser-safe root entry and conversion bundles.
 
-If your bundler does not polyfill Node globals/modules automatically, add polyfills for:
+Recommended browser import (works with Vite/Rollup and Solana packages that import `bigint-buffer`):
 
-- `Buffer`
-- `path`
-- `fs`
+```ts
+import { toBigIntBE, toBigIntLE, toBufferBE, toBufferLE } from "@gsknnft/bigint-buffer";
+```
+
+The package routes browser bundlers to `dist/index.browser.js`, which re-exports the browser conversion implementation and avoids Node-only imports (`node:*`, native loader paths).
+
+If you want the browser-only surface explicitly, you can also import:
+
+```ts
+import { toBigIntBE, toBigIntLE, toBufferBE, toBufferLE } from "@gsknnft/bigint-buffer/conversion";
+```
+
+Electron usage guidance:
+
+- Main / preload (Node context): `@gsknnft/bigint-buffer`
+- Renderer (browser context): `@gsknnft/bigint-buffer` or `@gsknnft/bigint-buffer/conversion`
+
+The browser-safe root entry is designed to avoid Node-only imports in browser bundles.
+
+If you are upgrading from `1.5.0` and still see browser build/runtime errors, clear bundler caches and reinstall:
+
+```bash
+rm -rf node_modules/.vite
+pnpm install
+```
 
 ## Exports
 
@@ -121,6 +143,11 @@ npm run prebuilds    # prebuildify for native binaries
 ```
 
 Internal build scripts (`scripts/*.ts`) are executed via `tsx` for stable ESM compatibility in local and CI environments.
+
+## Version Note
+
+- `1.5.0` introduced major runtime/packaging improvements but had a browser bundler export regression in some Vite/Rollup + Solana setups.
+- Upgrade to `1.5.1+` for the browser-safe root entry fix.
 
 ## Quality Snapshot
 

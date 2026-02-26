@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+import { Buffer } from "buffer";
 
 export type PathModule = typeof import("path");
 export type FsModule = typeof import("fs");
