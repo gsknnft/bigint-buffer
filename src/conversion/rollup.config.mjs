@@ -24,8 +24,8 @@ const makeTsPlugin = (outDir) =>
   typescript({
     tsconfig: tsconfigPath,
     compilerOptions: {
-      module: "NodeNext",
-      moduleResolution: "NodeNext",
+      module: "ESNext",
+      moduleResolution: "Bundler",
       outDir,
     },
   });

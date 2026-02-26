@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { cp, mkdir, rm, stat } from "node:fs/promises";
+import { cp, mkdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -9,6 +9,7 @@ const __dirname = dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 const sourceDir = path.resolve(rootDir, "src", "conversion", "dist");
 const targetDir = path.resolve(rootDir, "dist", "conversion");
+const rootBrowserEntry = path.resolve(rootDir, "dist", "index.browser.js");
 
 async function ensureSource() {
   try {
@@ -29,6 +30,18 @@ async function syncConversion() {
   await mkdir(path.dirname(targetDir), { recursive: true });
   await cp(sourceDir, targetDir, { recursive: true });
   await rm(path.join(targetDir, "build"), { recursive: true, force: true });
+  await writeRootBrowserEntry();
+}
+
+async function writeRootBrowserEntry() {
+  await mkdir(path.dirname(rootBrowserEntry), { recursive: true });
+  // Browser-safe root facade that preserves named exports for bundlers (e.g. Vite/Rollup + Solana deps).
+  const contents = [
+    'export * from "./conversion/esm/index.browser.js";',
+    "export const isNative = false;",
+    "",
+  ].join("\n");
+  await writeFile(rootBrowserEntry, contents, "utf8");
 }
 
 syncConversion().catch((error) => {

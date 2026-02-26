@@ -145,6 +145,10 @@ pnpm pack --dry-run
 - Package format: ESM + CJS
 - Native addon: N-API (`bigint_buffer.node`)
 
+## Security
+
+Security policy and supply-chain notes are documented in `SECURITY.md`.
+
 ## License
 
 Apache-2.0
