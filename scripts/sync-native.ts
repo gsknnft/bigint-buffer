@@ -28,12 +28,15 @@ async function removeDistArtifacts() {
 
 async function copyNative() {
   if (!(await fileExists(source))) {
-    throw new Error(`sync-native: source native binary not found at ${source}`);
+    // Native addon is optional — skip silently when not built.
+    await removeDistArtifacts();
+    return;
   }
 
   await removeDistArtifacts();
   await ensureDirectory(distTarget);
   await fs.copyFile(source, distTarget);
+  console.log("sync-native: copied native addon to dist/");
 
   for (const target of extraTargets) {
     await ensureDirectory(target);
@@ -42,6 +45,6 @@ async function copyNative() {
 }
 
 copyNative().catch((error) => {
-  console.error("Failed to synchronize native binaries:", error);
+  console.error("sync-native: unexpected error:", error);
   process.exitCode = 1;
 });

@@ -14,7 +14,6 @@ coverage/
 # Native binary build artifacts (the published .node ships from prebuilds/)
 *.node
 !prebuilds/**/*.node
-!build/Release/bigint_buffer.node
 
 # Logs
 logs/
