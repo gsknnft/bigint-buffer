@@ -260,6 +260,7 @@ export function loadNative(): ConverterInterface | undefined {
         nativeLoadError
       );
     }
+    return undefined;
   }
 }
 /* c8 ignore stop */

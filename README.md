@@ -3,7 +3,7 @@
 [![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
 [![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
 
-BigInt <-> Buffer conversion with native bindings, fast JS fallback paths, and built-in conversion helpers.
+Modern, ESM-only BigInt ↔ Buffer conversion with optional native acceleration, a zero-allocation write API, and built-in fixed-point and base-conversion helpers. Works in Node and the browser from a single entry point — no bundler polyfills required.
 
 ## Install
 
@@ -19,6 +19,8 @@ import {
   toBigIntLE,
   toBufferBE,
   toBufferLE,
+  toBufferBEInto,
+  toBufferLEInto,
   bigintToHex,
   hexToBigint,
   bigintToBase64,
@@ -29,11 +31,29 @@ const value = toBigIntBE(Buffer.from("deadbeef", "hex"));
 const out = toBufferLE(value, 8);
 
 const hex = bigintToHex(123456789n); // "075bcd15"
-const roundTrip = hexToBigint(hex);
+const back = hexToBigint(hex);
 
 const b64 = bigintToBase64(123456789n);
 const fromB64 = base64ToBigint(b64);
 ```
+
+## Zero-Allocation Writes (new in 2.0)
+
+For hot paths — network framing, ring buffers, batch serialization — write directly into a pre-allocated target instead of returning a fresh `Buffer` each call:
+
+```ts
+import { toBufferBEInto, toBufferLEInto } from "@gsknnft/bigint-buffer";
+
+const scratch = Buffer.alloc(1024);
+let offset = 0;
+
+for (const n of values) {
+  offset += toBufferBEInto(n, 8, scratch, offset);
+}
+// scratch now contains all values BE-packed, zero per-iteration allocation.
+```
+
+The `*Into` family accepts `Buffer` or `Uint8Array` targets (including subarrays with non-zero `byteOffset`), bounds-checks the write region, returns the byte count written, and enforces a 256 MiB safety ceiling on `width` to fail loudly on hostile inputs.
 
 ## FixedPoint Helpers
 
@@ -52,129 +72,85 @@ const b = toFixedPoint(7.66, 9);
 const sum = addFixedPoint(a, b);
 const avg = averageFixedPoint([a, b]);
 const cmp = compareFixedPoint(a, b);
-const n = fromFixedPoint(sum, 9);
+const back = fromFixedPoint(sum, 9);
 ```
 
 ## Native Loading
 
-The package tries native first, then falls back to JS:
+On Node, the package tries the C++ N-API addon first and falls back to a pure-JS implementation if it can't load:
 
-1. `node-gyp-build` prebuild lookup from installed package root
-2. `bindings` lookup with explicit `module_root` when resolvable
-3. pure JS fallback
+1. `node-gyp-build` looks for a prebuild rooted at the installed package
+2. `bindings` resolves with an explicit `module_root` when one is available
+3. Pure JS fallback (uses `Buffer.prototype.readBigUInt64*`/`writeBigUInt64*` when present, otherwise a manual byte loop)
 
-Set `BIGINT_BUFFER_NATIVE_PATH` to override lookup root when needed.
+Override the search root with `BIGINT_BUFFER_NATIVE_PATH` (treat as code-execution-equivalent — see [SECURITY.md](SECURITY.md)). Enable verbose path logging with `BIGINT_BUFFER_DEBUG=1`, or silence the JS-fallback warning with `BIGINT_BUFFER_SILENT_NATIVE_FAIL=1`. Skip the postinstall rebuild entirely with `BIGINT_BUFFER_SKIP_NATIVE=1`.
 
-Enable debug logging:
+## Browser Support
 
-```bash
-BIGINT_BUFFER_DEBUG=1 node your-app.js
-```
-
-Silence fallback warning:
-
-```bash
-BIGINT_BUFFER_SILENT_NATIVE_FAIL=1 node your-app.js
-```
-
-## Electron Packaging
-
-Include the native binary in unpacked resources:
-
-- `node_modules/@gsknnft/bigint-buffer/build/Release/bigint_buffer.node`
-
-Common location at runtime:
-
-- `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/build/Release/bigint_buffer.node`
-
-If your packager relocates native files, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node`.
-
-## Browser Notes
-
-This package supports browser builds via a dedicated browser-safe root entry and conversion bundles.
-
-Recommended browser import (works with Vite/Rollup and Solana packages that import `bigint-buffer`):
+The same `dist/index.js` works in Node and browsers. The Node-only imports (`node:module`, `node:url`, `bindings`) are gated behind `IS_BROWSER` detection and only loaded under Node — bundlers (Vite, Rollup, esbuild, webpack 5) won't pull them into a browser bundle.
 
 ```ts
-import { toBigIntBE, toBigIntLE, toBufferBE, toBufferLE } from "@gsknnft/bigint-buffer";
+// Vite / Rollup / esbuild / webpack 5 / Bun / Deno — all work:
+import { toBigIntBE, toBufferLE } from "@gsknnft/bigint-buffer";
 ```
 
-The package routes browser bundlers to `dist/index.browser.js`, which re-exports the browser conversion implementation and avoids Node-only imports (`node:*`, native loader paths).
+There is no separate browser entry to remember and no required polyfill plugin. `Buffer` is the only browser-side dependency, which all modern bundlers polyfill automatically.
 
-If you want the browser-only surface explicitly, you can also import:
+## Electron
 
-```ts
-import { toBigIntBE, toBigIntLE, toBufferBE, toBufferLE } from "@gsknnft/bigint-buffer/conversion";
-```
+Native addon for the main process; pure JS fallback in the renderer.
 
-Electron usage guidance:
+- Main / preload (Node): `@gsknnft/bigint-buffer`
+- Renderer (browser): `@gsknnft/bigint-buffer`
 
-- Main / preload (Node context): `@gsknnft/bigint-buffer`
-- Renderer (browser context): `@gsknnft/bigint-buffer` or `@gsknnft/bigint-buffer/conversion`
-
-The browser-safe root entry is designed to avoid Node-only imports in browser bundles.
-
-If you are upgrading from `1.5.0` and still see browser build/runtime errors, clear bundler caches and reinstall:
-
-```bash
-rm -rf node_modules/.vite
-pnpm install
-```
+If your packager relocates `bigint_buffer.node`, set `BIGINT_BUFFER_NATIVE_PATH` to the directory containing `build/Release/bigint_buffer.node`. The typical asar-unpacked path is `resources/app.asar.unpacked/node_modules/@gsknnft/bigint-buffer/`.
 
 ## Exports
 
-Top-level package exports:
+| Subpath | Purpose |
+|---|---|
+| `@gsknnft/bigint-buffer` | Full public API (BigInt↔Buffer, hex/base64/text helpers, fixed-point) |
+| `@gsknnft/bigint-buffer/conversion` | Just the conversion helpers (no native loader surface) |
+| `@gsknnft/bigint-buffer/build/Release/bigint_buffer.node` | Direct path to the native addon for custom packagers |
 
-- ESM: `dist/index.js`
-- CJS: `dist/index.cjs`
-- Types: `dist/index.d.ts`
-- Native binary export: `./build/Release/bigint_buffer.node`
-- Conversion subpath: `@gsknnft/bigint-buffer/conversion`
+ESM-only. The published tarball contains a single `dist/index.js`, types, and the native addon. No CJS build.
 
-## Commands
+## Scripts
 
 ```bash
-npm run build        # bundle + declarations + conversion sync + native sync
-npm run compile      # build + typecheck
-npm test             # vitest
-npm run check        # eslint
-npm run rebuild      # node-gyp rebuild + build + conversion build
-npm run prebuilds    # prebuildify for native binaries
+npm test               # vitest run (node + browser projects)
+npm run test:node      # node-only suite (vitest)
+npm run test:browser   # real chromium via @vitest/browser + playwright
+npm run coverage       # vitest --coverage (v8 provider)
+npm run benchmark      # tsx bench/index.bench.ts
+npm run build          # vite build + tsc + declarations + native sync
+npm run rebuild        # node-gyp rebuild then build
+npm run prebuilds      # prebuildify the native addon
+npm run lint           # eslint (flat config)
+npm run fix            # eslint --fix + prettier --write
 ```
-
-Internal build scripts (`scripts/*.ts`) are executed via `tsx` for stable ESM compatibility in local and CI environments.
-
-## Version Note
-
-- `1.5.0` introduced major runtime/packaging improvements but had a browser bundler export regression in some Vite/Rollup + Solana setups.
-- Upgrade to `1.5.1+` for the browser-safe root entry fix.
 
 ## Quality Snapshot
 
-Latest local run (Node 24, Vitest v4, v8 coverage):
-
-- Tests: `141 passed`
-- Coverage: `Statements 84.15%`, `Branches 72.36%`, `Functions 88.37%`, `Lines 85.88%`
-- Benchmark snapshot: see `benchmark.md`
-- Publish dry-run: clean tarball (no test/bench JS artifacts)
-
-Reproduce:
-
-```bash
-pnpm exec vitest run --coverage --pool=forks
-pnpm run benchmark
-pnpm pack --dry-run
-```
+- **Tests:** 187 in Node, 8 in real chromium
+- **Coverage:** 100% lines, 100% functions
+- **Vulnerabilities:** 0 (`npm audit`)
+- **Dependencies:** 2 runtime, 16 devDeps, 0 optional
 
 ## Runtime Compatibility
 
-- Node: `>=20`
-- Package format: ESM + CJS
-- Native addon: N-API (`bigint_buffer.node`)
+- Node ≥ 20
+- ESM-only (no CJS build)
+- Native addon: N-API v3+ (`bigint_buffer.node`)
+- Tested browsers: Chromium-latest via @vitest/browser
 
 ## Security
 
-Security policy and supply-chain notes are documented in `SECURITY.md`.
+Reporting, environment-variable risks, input-size considerations, and provenance verification are documented in [SECURITY.md](SECURITY.md). Releases are published with [npm provenance](https://docs.npmjs.com/generating-provenance-statements) attestations.
+
+## Upgrading from 1.x
+
+2.0.0 is ESM-only and removes the CJS build, the nested `bigint-conversion` sub-package, and the separate browser entry. See [CHANGELOG.md](CHANGELOG.md) for the migration notes.
 
 ## License
 

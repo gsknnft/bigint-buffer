@@ -1,33 +1,45 @@
-node_modules
-dist
-src/conversion/dist
-build
-package/
-coverage/
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
 *.tsbuildinfo
-.rollup.cache
-.vscode
+.rollup.cache/
+
+# Test output / coverage
+coverage/
+.types/
+
+# Native binary build artifacts (the published .node ships from prebuilds/)
+*.node
+!prebuilds/**/*.node
+!build/Release/bigint_buffer.node
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Dependency directories
-node_modules
-
-# Output of 'npm pack'
+# Packaging artifacts
 *.tgz
+package/
 
-# Coverage
-coverage
+# Editor
+.vscode/
+.idea/
 
-# Environment files
+# Environment / secrets
 *.env
+.env.*
+!.env.example
 
-# Test temporal files
-.mocha-ts
-.tsconfig.json
-.types
+# OS
+.DS_Store
+Thumbs.db
 
-# docs temporal files
+# Docs scratch
 .nojekyll
+docs/

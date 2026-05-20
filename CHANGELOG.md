@@ -2,6 +2,61 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.0.0] - 2026-05-20
+
+Major release. ESM-only, single package, polyfill-free browser support, 100% line coverage, zero vulnerabilities.
+
+### Added
+- **Zero-allocation write API**: `toBufferBEInto(num, width, target, offset?)` and `toBufferLEInto(num, width, target, offset?)` write directly into a pre-allocated `Buffer` or `Uint8Array` (including subarrays with non-zero `byteOffset`). Bounds-checked, returns `bytesWritten`, inherits native acceleration when available.
+- **256 MiB safety ceiling** on `width` for all buffer-allocating and buffer-writing entrypoints. Calls with `width > 2^28` throw `RangeError`, blocking DoS-by-allocation from hostile or buggy callers.
+- **Real-browser test runtime**: `npm run test:browser` runs the public API against the actual `dist/index.js` in headless chromium via `@vitest/browser` + `playwright`. Catches Node-leak regressions that source-only Node tests miss.
+- **npm provenance** at publish (`npm run publish:release` uses `--provenance --access public`).
+- Expanded `SECURITY.md` covering env-var attack surface (`BIGINT_BUFFER_NATIVE_PATH` is a code-execution sink), input-size considerations for unbounded helpers, and release-verification guidance.
+
+### Changed (Breaking)
+- **ESM-only.** Dropped the CJS build (`dist/index.cjs`) and the UMD build. The `main`, `module`, and `exports.import` fields all point at the same `dist/index.js`. Consumers must use `import`, dynamic `import()`, or a bundler that handles ESM.
+- **Flattened the `bigint-conversion` sub-package** into the root. The standalone `bigint-conversion` npm package is no longer published. All previously re-exported helpers (`bigintToBuf`, `bufToBigint`, `bigintToHex`, `bigintToBase64`, `parseHex`, `toFixedPoint`, etc.) remain available from `@gsknnft/bigint-buffer` and `@gsknnft/bigint-buffer/conversion`. Direct imports from the deep `dist/conversion/...` paths are gone.
+- **Single browser-safe build.** Removed the separate `dist/index.browser.js` shim. The same `dist/index.js` works in Node and the browser; Node-only modules (`node:module`, `node:url`, `bindings`, `node-gyp-build`) are loaded via gated dynamic imports and tree-shake out of browser bundles.
+- **Browser API surface in source matches Node.** Bundlers (Vite, Rollup, esbuild, webpack 5, Bun, Deno) no longer need `vite-plugin-node-polyfills` or similar to import this package.
+- `engines.npm` raised from `>=9` to `>=10`, matching the floor for Node 20.
+
+### Removed
+- `dist/index.cjs`, `dist/index.umd.js`, `dist/conversion/cjs/*` — no CJS or UMD output.
+- `dist/index.browser.js` — single browser-safe ESM build replaces it.
+- `bigint-conversion@0.2.0` workspace package and the entire `src/conversion/` tree (sub-`package.json`, sub-rollup, sub-vite, sub-tsconfig, sub-node_modules).
+- `vite-plugin-node-polyfills` (eliminated the `elliptic` / `crypto-browserify` / `node-stdlib-browser` chain of advisories).
+- `@rollup/plugin-terser` and the minified browser bundle target (eliminated the `serialize-javascript` advisory chain).
+- Legacy test stack: karma + 5 karma-* plugins, mocha, chai, puppeteer, ts-standard, ts-loader, ts-node, webpack, webpack-cli — all unused since the vitest migration.
+- Dead build configs: `rollup.cjs.config.js`, `rollup.esm.config.js`, `rollup.conversion.{cjs,esm}.config.js`, `karma.conf.js`.
+- `scripts/sync-conversion.ts` and `src/browser-entry.spec.ts` — the separate browser-entry generation step is obsolete.
+
+### Security
+- **31 vulnerabilities → 0** in the dependency tree (1 critical, 12 high, 10 moderate, 8 low → none).
+- Fixed a real browser-crash bug in [src/converter.ts](src/converter.ts): top-level `import "node:module"` / `import "node:url"` previously executed before the `IS_BROWSER` guard ran, crashing any browser consumer who hit the source path through their own bundler. Now lifted into a gated dynamic import.
+- Added the `width` safety ceiling described above.
+- `prepublishOnly` now runs `npm test && npm audit --omit=dev` before publishing.
+- **Native addon hardening pass** ([src/bigint-buffer.c](src/bigint-buffer.c)) — every `assert(status == napi_ok)` replaced with a `NAPI_CHECK` macro that throws a JavaScript error and returns. Asserts compile out under `NDEBUG`, so previously any N-API failure in a release build would proceed with garbage state (CWE-617 Reachable Assertion / CWE-754 Improper Check for Unusual or Exceptional Conditions). Other fixes in the same pass:
+  - CWE-690 Unchecked Return for Null Pointer: `malloc()` results are checked; `ENOMEM` thrown on failure
+  - CWE-704 Incorrect Type Conversion: arguments are type-validated via `napi_is_buffer` / `napi_typeof` before use (`TypeError` thrown on mismatch)
+  - Edge cases: empty input (`len == 0` in `toBigInt`, `byte_width == 0` in `fromBigInt`) handled explicitly instead of relying on incidental behavior of downstream N-API calls
+  - `init_all` propagates failures from every `napi_*` call instead of silently ignoring them
+
+### Infrastructure
+- **Tests moved from `src/` to `tests/`.** `src/` is code-only.
+- **Benchmarks moved to `bench/`** (`bench/index.bench.ts`).
+- Single `tsconfig.json` (was three across the workspace). Single `vitest.config.ts` with `node` and `browser` projects.
+- Strict TypeScript flags enabled: `strict`, `noImplicitOverride`, `noImplicitReturns`, `noFallthroughCasesInSwitch`, `isolatedModules`.
+- ESLint flat config (`eslint.config.js`) with separate rule sets for source vs. test files.
+- 100% line coverage, 100% function coverage across 187 Node tests + 8 chromium tests.
+
+### Migration
+
+Most consumers can upgrade with no code changes — the public API is unchanged. Three scenarios require attention:
+
+- **CJS consumers** (`require("@gsknnft/bigint-buffer")`): switch to `import`. If you can't move to ESM, pin to `1.5.x`.
+- **Direct imports from `@gsknnft/bigint-buffer/dist/conversion/...`**: these paths are gone. Use the public exports (`@gsknnft/bigint-buffer` or `@gsknnft/bigint-buffer/conversion`).
+- **Anyone depending on `bigint-conversion` standalone**: that package is no longer published. The same API is available at `@gsknnft/bigint-buffer/conversion`.
+
 ## [1.5.1] - 2026-02-20
 
 ### Fixed

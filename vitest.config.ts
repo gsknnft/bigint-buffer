@@ -21,7 +21,7 @@ export default defineConfig({
       exclude: [
         "dist/**",
         "**/*.d.ts",
-        "src/index.bench.ts",
+        "bench/**",
         "tests/**/*.browser.test.ts",
         "src/**/*.browser.spec.ts",
       ],

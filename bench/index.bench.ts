@@ -1,7 +1,7 @@
 ﻿import { performance } from 'node:perf_hooks';
 import BN from 'bn.js';
-import * as conv from './conversion.js';
-import * as rootLib from './index';
+import * as conv from '../src/conversion.js';
+import * as rootLib from '../src/index.js';
 
 type BenchCase = {
   name: string;

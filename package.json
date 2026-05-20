@@ -40,8 +40,8 @@
     "test:watch": "vitest watch",
     "coverage": "vitest run --coverage --pool=forks",
     "lint": "eslint .",
-    "fix": "eslint . --fix && prettier --write .",
-    "benchmark": "tsx src/index.bench.ts",
+    "fix": "eslint . --fix",
+    "benchmark": "tsx bench/index.bench.ts",
     "typedoc": "typedoc --out docs src/index.ts src/conversion.ts --excludePrivate --excludeProtected --exclude '**/*+(spec|test|bench).ts'",
     "sync:native": "tsx ./scripts/sync-native.ts",
     "declare": "node -e \"require('node:fs').rmSync('dist/types',{recursive:true,force:true})\" && tsc -p tsconfig.declarations.json --declaration --emitDeclarationOnly --outDir dist/types && tsx ./scripts/copy-dts.ts",
@@ -78,12 +78,6 @@
     "bindings": "^1.5.0",
     "node-gyp-build": "^4.8.4"
   },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-arm64-gnu": "4.53.3",
-    "@rollup/rollup-linux-arm64-musl": "4.53.3",
-    "@rollup/rollup-linux-x64-gnu": "4.53.3",
-    "@rollup/rollup-win32-x64-gnu": "4.53.3"
-  },
   "devDependencies": {
     "@types/bn.js": "^5.2.0",
     "@types/node": "^24.10.1",
@@ -93,10 +87,8 @@
     "bn.js": "^5.2.2",
     "eslint": "^9.39.1",
     "globals": "^17.6.0",
-    "happy-dom": "^20.9.0",
     "playwright": "^1.60.0",
     "prebuildify": "^6.0.1",
-    "prettier": "^3.2.2",
     "tsx": "^4.20.3",
     "typedoc": "^0.28.14",
     "typescript": "^5.9.3",

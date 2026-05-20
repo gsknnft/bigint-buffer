@@ -47,6 +47,17 @@ The conversion helpers operate on arbitrary-precision `BigInt` values. Inputs of
 - `toBufferBE(n, width)` and `toBufferLE(n, width)` enforce a `width` ceiling of 2^28 bytes (256 MiB). Calls above that throw `RangeError`. The same ceiling applies to `toBufferBEInto`/`toBufferLEInto`.
 - `bigintToBuf(n)`, `bigintToHex(n)`, `bigintToBase64(n)`, `base64ToBigint(s)`, `hexToBigint(s)`, and `textToBigint(s)` do not bound their inputs. If you accept these inputs from untrusted sources, enforce your own size limits on the source string / bigint before calling.
 
+## Native Addon Hardening
+
+The N-API native addon ([src/bigint-buffer.c](src/bigint-buffer.c)) follows defensive practice:
+
+- Every N-API call's return value is checked and surfaced as a JavaScript error on failure. Asserts are not relied upon (they compile out under `NDEBUG`).
+- Arguments are type-validated (`napi_is_buffer`, `napi_typeof`) before use; type mismatches throw `TypeError`.
+- `malloc()` results are NULL-checked; allocation failure throws `ENOMEM`.
+- Empty inputs are handled at the function head before any pointer arithmetic.
+
+If you ship a custom build of the native addon, please preserve these checks — the JS layer trusts the C side to either return a valid value or throw.
+
 ## Release Verification
 
 Releases on npm are published with [npm provenance](https://docs.npmjs.com/generating-provenance-statements) attestation. Verify with `npm view @gsknnft/bigint-buffer --json | jq '.dist.attestations'` before depending on a new version in production.
