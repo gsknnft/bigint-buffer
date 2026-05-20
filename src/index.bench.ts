@@ -1,6 +1,7 @@
 ﻿import { performance } from 'node:perf_hooks';
 import BN from 'bn.js';
-const conv = await import('./conversion/src/ts/index');
+import * as conv from './conversion.js';
+import * as rootLib from './index';
 
 type BenchCase = {
   name: string;
@@ -118,6 +119,36 @@ const cases: BenchCase[] = [
 
   { name: 'LE bigint-buffer to buffer (large, truncated)', fn: () => conv.toBufferLE(largeValue, 8) },
   { name: 'BE bigint-buffer to buffer (large, truncated)', fn: () => conv.toBufferBE(largeValue, 8) },
+
+  ...(() => {
+    const scratchSmall = Buffer.alloc(1024);
+    const scratchLarge = Buffer.alloc(4096);
+    let offSmall = 0;
+    let offLarge = 0;
+    return [
+      {
+        name: 'BE toBufferBEInto (small, zero-alloc)',
+        fn: () => {
+          rootLib.toBufferBEInto(smallValue, 8, scratchSmall, offSmall);
+          offSmall = (offSmall + 8) % (scratchSmall.length - 8);
+        },
+      },
+      {
+        name: 'LE toBufferLEInto (small, zero-alloc)',
+        fn: () => {
+          rootLib.toBufferLEInto(smallValue, 8, scratchSmall, offSmall);
+          offSmall = (offSmall + 8) % (scratchSmall.length - 8);
+        },
+      },
+      {
+        name: 'BE toBufferBEInto (large, zero-alloc)',
+        fn: () => {
+          rootLib.toBufferBEInto(largeValue, 48, scratchLarge, offLarge);
+          offLarge = (offLarge + 48) % (scratchLarge.length - 48);
+        },
+      },
+    ];
+  })(),
 
   { name: 'Buffer equality comparison', fn: () => b1.compare(b2) === 0 },
   { name: 'BN equality comparison', fn: () => bn1.eq(bn2) },

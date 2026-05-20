@@ -4,15 +4,12 @@
     "composite": false,
     "incremental": false
   },
-  "include": [
-    "src/index.ts",
-    "src/conversion/index.ts",
-    "src/conversion/src/**/*.ts"
-  ],
+  "include": ["src/index.ts", "src/conversion.ts", "src/converter.ts"],
   "exclude": [
     "node_modules",
     "dist",
     "build",
+    "tests",
     "**/*.test.ts",
     "**/*.spec.ts",
     "**/*.bench.ts"

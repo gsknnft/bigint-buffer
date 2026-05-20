@@ -10,8 +10,12 @@ const targets = [
     destination: path.join(rootDir, "dist", "index.d.ts"),
   },
   {
-    source: path.join(typesDir, "conversion", "index.d.ts"),
-    destination: path.join(rootDir, "dist", "conversion", "index.d.ts"),
+    source: path.join(typesDir, "conversion.d.ts"),
+    destination: path.join(rootDir, "dist", "conversion.d.ts"),
+  },
+  {
+    source: path.join(typesDir, "converter.d.ts"),
+    destination: path.join(rootDir, "dist", "converter.d.ts"),
   },
 ];
 
@@ -22,8 +26,12 @@ async function ensureDirectory(filePath: string) {
 
 async function copyFiles() {
   for (const { source, destination } of targets) {
-    await ensureDirectory(destination);
-    await fs.copyFile(source, destination);
+    try {
+      await ensureDirectory(destination);
+      await fs.copyFile(source, destination);
+    } catch (err) {
+      console.warn(`copy-dts: could not copy ${source}: ${(err as Error).message}`);
+    }
   }
 }
 

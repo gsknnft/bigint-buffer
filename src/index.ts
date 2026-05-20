@@ -12,12 +12,12 @@ export {
   compareFixedPoint,
   fixedPointToBigInt,
   toBigIntValue,
-} from "./conversion/src/ts/index";
+} from "./conversion.js";
 import {
   IS_BROWSER,
   loadNative,
   type ConverterInterface,
-} from "./conversion/src/ts/converter";
+} from "./converter.js";
 
 type ByteInput = Buffer | Uint8Array | ArrayBuffer;
 
@@ -166,9 +166,19 @@ const byteLengthFromBigint = (value: bigint): number => {
   return bytes;
 };
 
+// Hard ceiling on width to prevent DoS / OOM from a hostile or buggy caller.
+// 2^28 = 256 MiB — well above any legitimate bigint serialization use
+// (RSA-16384 is 2 KiB, post-quantum schemes top out in the low tens of KiB).
+const MAX_WIDTH = 1 << 28;
+
 const assertWidth = (width: number, fnName: string): void => {
   if (!Number.isInteger(width) || width < 0) {
     throw new RangeError(`${fnName} width must be a non-negative integer`);
+  }
+  if (width > MAX_WIDTH) {
+    throw new RangeError(
+      `${fnName} width ${width} exceeds maximum ${MAX_WIDTH}`,
+    );
   }
 };
 
@@ -249,6 +259,59 @@ export function toBufferBE(num: bigint, width: number): Buffer {
   assertWidth(width, "toBufferBE");
   const target = width === 0 ? Buffer.alloc(0) : Buffer.allocUnsafe(width);
   return converter.fromBigInt(num, target, true);
+}
+
+function writeInto(
+  num: bigint,
+  width: number,
+  target: Buffer | Uint8Array,
+  offset: number,
+  bigEndian: boolean,
+  fnName: string,
+): number {
+  assertWidth(width, fnName);
+  if (!Number.isInteger(offset) || offset < 0) {
+    throw new RangeError(`${fnName}: offset must be a non-negative integer`);
+  }
+  if (offset + width > target.length) {
+    throw new RangeError(
+      `${fnName}: write of ${width} bytes at offset ${offset} exceeds target length ${target.length}`,
+    );
+  }
+  if (width === 0) return 0;
+
+  const view = Buffer.isBuffer(target)
+    ? target.subarray(offset, offset + width)
+    : Buffer.from(target.buffer, target.byteOffset + offset, width);
+
+  converter.fromBigInt(num, view, bigEndian);
+  return width;
+}
+
+/**
+ * Write a BigInt into an existing buffer using big-endian encoding, starting at `offset`.
+ * Does not allocate. Returns the number of bytes written (always === width).
+ */
+export function toBufferBEInto(
+  num: bigint,
+  width: number,
+  target: Buffer | Uint8Array,
+  offset: number = 0,
+): number {
+  return writeInto(num, width, target, offset, true, "toBufferBEInto");
+}
+
+/**
+ * Write a BigInt into an existing buffer using little-endian encoding, starting at `offset`.
+ * Does not allocate. Returns the number of bytes written (always === width).
+ */
+export function toBufferLEInto(
+  num: bigint,
+  width: number,
+  target: Buffer | Uint8Array,
+  offset: number = 0,
+): number {
+  return writeInto(num, width, target, offset, false, "toBufferLEInto");
 }
 
 // ========== Conversion Utilities ==========

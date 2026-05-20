@@ -5,9 +5,7 @@ const rootDir = process.cwd();
 const source = path.join(rootDir, "build", "Release", "bigint_buffer.node");
 const distTarget = path.join(rootDir, "dist", "build", "Release", "bigint_buffer.node");
 
-const extraTargets = [
-  path.join(rootDir, "src", "conversion", "build", "Release", "bigint_buffer.node"),
-];
+const extraTargets: string[] = [];
 
 async function fileExists(filePath: string): Promise<boolean> {
   try {

@@ -5,30 +5,21 @@
     "outDir": "dist",
     "tsBuildInfoFile": "build/main.tsbuildinfo",
     "declaration": true,
-    "target" : "ESNext",
+    "target": "ESNext",
     "module": "esnext",
     "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "lib" : [ "ESNext", "dom" ],
+    "lib": ["ESNext", "dom"],
     "sourceMap": true,
     "types": ["node"],
-    "typeRoots": ["./src/types", "node_modules/@types"],
-    "paths": {
-      "#pkg": ["./src/conversion/src/ts/index.ts"],
-      "@gsknnft/bigint-buffer/conversion": ["./src/conversion/src/ts/index.ts"]
-    }
+    "typeRoots": ["./src/types", "node_modules/@types"]
   },
-  "include": [
-    "src/*.ts",
-    "src/**/*.ts",
-    "src/conversion/src/ts/**/*.ts",
-    "src/conversion/src/ts/converter.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": [
     "node_modules",
+    "tests",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
-    "src/**/*.bench.ts",
-    "src/conversion/test/**/*"
+    "src/**/*.bench.ts"
   ]
 }
