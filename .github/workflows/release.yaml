@@ -41,21 +41,23 @@ jobs:
       - name: Build artifacts
         run: npm run build
 
-      - name: Run unit tests
-        run: npm run test
+      - name: Build native addon (optional)
+        run: node-gyp rebuild && npm run sync:native
+        continue-on-error: true
 
-      - name: Run posttests
+      - name: Check native bindings (informational)
+        run: |
+          if [ -f ./build/Release/bigint_buffer.node ]; then
+            echo "Native addon present — will be included in publish."
+          else
+            echo "Native addon absent — publishing pure-JS build (fallback will be used at runtime)."
+          fi
+
+      - name: Run unit tests
         run: npm run test
 
       - name: prepublish
         run: npm run prepublishOnly
-
-      - name: check native bindings
-        run: |
-          if [ ! -f ./build/Release/bigint_buffer.node ]; then
-            echo "Native bindings not found!"
-            exit 1
-          fi
 
       - name: Release
         env:

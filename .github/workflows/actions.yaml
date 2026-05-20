@@ -53,8 +53,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Rebuild native bindings
+      - name: Build
+        run: npm run build
+
+      - name: Try native rebuild (optional)
         run: npm run rebuild
+        continue-on-error: true
 
       - name: Lint
         run: npm run lint

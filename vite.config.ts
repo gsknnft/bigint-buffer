@@ -11,20 +11,23 @@ const externalDeps = ["bindings", "node-gyp-build", ...nodeBuiltins];
 export default defineConfig({
   build: {
     lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
-      name: "bigint-buffer",
+      entry: {
+        index: path.resolve(__dirname, "src/index.ts"),
+        conversion: path.resolve(__dirname, "src/conversion.ts"),
+        converter: path.resolve(__dirname, "src/converter.ts"),
+      },
       formats: ["es"],
-      fileName: () => "index.js",
+      fileName: (_format, entryName) => `${entryName}.js`,
     },
     outDir: "dist",
+    emptyOutDir: true,
     rollupOptions: {
       external: externalDeps,
       output: {
-        globals: {
-          buffer: "Buffer",
-          path: "path",
-          fs: "fs",
-        },
+        // Ensure cross-entry imports (e.g. index.js -> conversion.js) stay
+        // as separate files instead of being inlined.
+        preserveModules: false,
+        chunkFileNames: "[name].js",
       },
     },
   },

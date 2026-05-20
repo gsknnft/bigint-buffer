@@ -77,13 +77,22 @@ const back = fromFixedPoint(sum, 9);
 
 ## Native Loading
 
-On Node, the package tries the C++ N-API addon first and falls back to a pure-JS implementation if it can't load:
+By default the package is pure JS — zero required runtime dependencies. A C++ N-API addon is available for maximum throughput on large buffers, but it is strictly optional and never compiled automatically on install.
 
-1. `node-gyp-build` looks for a prebuild rooted at the installed package
-2. `bindings` resolves with an explicit `module_root` when one is available
-3. Pure JS fallback (uses `Buffer.prototype.readBigUInt64*`/`writeBigUInt64*` when present, otherwise a manual byte loop)
+**Default (pure JS):** Node ≥ 20 provides `Buffer.readBigUInt64BE/LE` and `writeBigUInt64BE/LE` natively, so the pure-JS path is fast for all typical use cases (≤ 256 bytes).
 
-Override the search root with `BIGINT_BUFFER_NATIVE_PATH` (treat as code-execution-equivalent — see [SECURITY.md](SECURITY.md)). Enable verbose path logging with `BIGINT_BUFFER_DEBUG=1`, or silence the JS-fallback warning with `BIGINT_BUFFER_SILENT_NATIVE_FAIL=1`. Skip the postinstall rebuild entirely with `BIGINT_BUFFER_SKIP_NATIVE=1`.
+**Opt-in native:** Run `npm run rebuild` once in the package directory. On subsequent loads the runtime will find and use `build/Release/bigint_buffer.node` automatically.
+
+```bash
+npm run rebuild   # compiles the N-API addon and rebuilds dist
+```
+
+The loader tries:
+1. `node-gyp-build` — looks for a prebuild or an already-compiled `.node`
+2. `bindings` — resolves with an explicit `module_root`
+3. Pure JS fallback (always available)
+
+Override the search root with `BIGINT_BUFFER_NATIVE_PATH` (treat as code-execution-equivalent — see [SECURITY.md](SECURITY.md)). Enable verbose path logging with `BIGINT_BUFFER_DEBUG=1`, silence the fallback warning with `BIGINT_BUFFER_SILENT_NATIVE_FAIL=1`, or skip the install script with `BIGINT_BUFFER_SKIP_NATIVE=1`.
 
 ## Browser Support
 
@@ -132,10 +141,10 @@ npm run fix            # eslint --fix + prettier --write
 
 ## Quality Snapshot
 
-- **Tests:** 187 in Node, 8 in real chromium
+- **Tests:** 195 in Node, 8 in real chromium
 - **Coverage:** 100% lines, 100% functions
 - **Vulnerabilities:** 0 (`npm audit`)
-- **Dependencies:** 2 runtime, 16 devDeps, 0 optional
+- **Dependencies:** 0 required runtime, 2 optional (native addon), 16 devDeps
 
 ## Runtime Compatibility
 

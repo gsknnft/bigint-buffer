@@ -22,16 +22,16 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "build/Release/bigint_buffer.node",
     "dist/",
+    "build/Release/bigint_buffer.node",
     "src/bigint-buffer.c",
     "binding.gyp",
-    "scripts/postinstall.cjs",
+    "scripts/install.cjs",
+    "prebuilds/",
     "README.md",
     "CHANGELOG.md",
     "SECURITY.md",
-    "LICENSE",
-    "prebuilds/"
+    "LICENSE"
   ],
   "scripts": {
     "test": "vitest run",
@@ -50,8 +50,8 @@
     "prebuilds": "prebuildify --napi --strip --target 24.10.0 --platform win32 --arch x64",
     "clean": "rm -rf build/* dist/* node_modules package-lock.json",
     "clean:js": "rm -rf build/* dist/*",
-    "postinstall": "node ./scripts/postinstall.cjs",
-    "prepublishOnly": "npm run test && npm audit --omit=dev && rm -rf build/Makefile build/gyp-* build/*.mk build/*.Makefile *.tgz",
+    "install": "node ./scripts/install.cjs",
+    "prepublishOnly": "npm run clean:js && npm run build && npm run test && npm audit --omit=dev && rm -rf build/Makefile build/gyp-* build/*.mk build/*.Makefile *.tgz",
     "publish:release": "npm publish --provenance --access public"
   },
   "repository": {
@@ -74,7 +74,7 @@
     "web3"
   ],
   "license": "Apache-2.0",
-  "dependencies": {
+  "optionalDependencies": {
     "bindings": "^1.5.0",
     "node-gyp-build": "^4.8.4"
   },
@@ -93,7 +93,7 @@
     "typedoc": "^0.28.14",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.4",
-    "vite": "^8.0.13",
+    "vite": "^7.0.0",
     "vitest": "^4.1.7"
   },
   "engines": {
