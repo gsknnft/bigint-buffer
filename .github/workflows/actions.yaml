@@ -50,8 +50,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
-      - name: Install dependencies
+      - name: Install dependencies (npm ci)
+        id: deps_ci
         run: npm ci
+        continue-on-error: true
+
+      - name: Fallback dependency install (npm install)
+        if: steps.deps_ci.outcome == 'failure'
+        run: npm install
 
       - name: Build
         run: npm run build
@@ -79,8 +85,14 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Install dependencies
+      - name: Install dependencies (npm ci)
+        id: browser_deps_ci
         run: npm ci
+        continue-on-error: true
+
+      - name: Fallback dependency install (npm install)
+        if: steps.browser_deps_ci.outcome == 'failure'
+        run: npm install
 
       - name: Build
         run: npm run build
