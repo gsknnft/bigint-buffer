@@ -1,6 +1,6 @@
 {
   "name": "@gsknnft/bigint-buffer",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "Modern, ESM-only bigint/Buffer conversion with optional native acceleration and fixed-point helpers",
   "main": "dist/index.js",
@@ -26,7 +26,6 @@
     "build/Release/bigint_buffer.node",
     "src/bigint-buffer.c",
     "binding.gyp",
-    "scripts/install.cjs",
     "prebuilds/",
     "README.md",
     "CHANGELOG.md",
@@ -50,7 +49,6 @@
     "prebuilds": "prebuildify --napi --strip --target 24.10.0 --platform win32 --arch x64",
     "clean": "node -e \"const fs=require('node:fs');for(const p of ['build','dist','node_modules'])fs.rmSync(p,{recursive:true,force:true});fs.rmSync('package-lock.json',{force:true});\"",
     "clean:js": "node -e \"const fs=require('node:fs');for(const p of ['build','dist'])fs.rmSync(p,{recursive:true,force:true});\"",
-    "install": "node ./scripts/install.cjs",
     "prepublishOnly": "npm run clean:js && npm run build && npm run test && npm audit --omit=dev && node -e \"const fs=require('node:fs');const path=require('node:path');if(fs.existsSync('build')){for(const f of fs.readdirSync('build')){if(/^(Makefile|gyp-.*|.*\\.mk|.*\\.Makefile)$/.test(f))fs.rmSync(path.join('build',f),{force:true});}}for(const f of fs.readdirSync('.'))if(f.endsWith('.tgz'))fs.rmSync(f,{force:true});\"",
     "publish:release": "npm publish --provenance --access public"
   },

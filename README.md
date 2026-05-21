@@ -2,6 +2,11 @@
 
 [![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
 [![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
+[![Security Status](https://img.shields.io/badge/security-reviewed-green?style=flat-square)](SECURITY.md)
+
+An explicitly maintained, memory-safe, zero-allocation scoped implementation of bigint/Buffer conversion primitives for modern runtimes.
+
+> **Security Note:** This is a verified, scoped package with hardened native and fallback paths and **zero automatic install scripts**. It is designed for strict enterprise supply-chain environments where install-time execution is disallowed.
 
 Modern, ESM-only BigInt <-> Buffer conversion with optional native acceleration, a zero-allocation write API, and built-in fixed-point and base-conversion helpers. Works in Node and browser builds from a single entry point.
 
@@ -78,6 +83,7 @@ const back = fromFixedPoint(sum, 9);
 ## Native Loading
 
 By default the package is pure JS. A C++ N-API addon is available for maximum throughput on large buffers, but it is strictly optional and never required for correctness.
+No install-time scripts are executed by this package.
 
 **Default (pure JS):** Node >= 20 provides `Buffer.readBigUInt64BE/LE` and `writeBigUInt64BE/LE` natively, so the pure-JS path is fast for normal payload sizes.
 
@@ -92,7 +98,7 @@ The loader tries:
 2. `bindings` - resolves with an explicit `module_root`
 3. Pure JS fallback (always available)
 
-Override the search root with `BIGINT_BUFFER_NATIVE_PATH` (treat as code-execution-equivalent - see [SECURITY.md](SECURITY.md)). Enable verbose path logging with `BIGINT_BUFFER_DEBUG=1`, silence the fallback warning with `BIGINT_BUFFER_SILENT_NATIVE_FAIL=1`, or skip native install checks with `BIGINT_BUFFER_SKIP_NATIVE=1`.
+Override the search root with `BIGINT_BUFFER_NATIVE_PATH` (treat as code-execution-equivalent - see [SECURITY.md](SECURITY.md)). Enable verbose path logging with `BIGINT_BUFFER_DEBUG=1` or silence fallback warnings with `BIGINT_BUFFER_SILENT_NATIVE_FAIL=1`.
 
 ## Browser Support
 

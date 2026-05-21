@@ -13,30 +13,15 @@ If private advisory flow is unavailable, open an issue and request a secure cont
 This package intentionally includes:
 
 - Native addon artifacts (`*.node`) for performance-critical bigint/buffer conversion.
-- Install-time script (`scripts/postinstall.cjs`) to ensure native availability when prebuilt artifacts are missing.
+- Optional native build tooling via explicit user action (`npm run rebuild`).
 
-### What the postinstall script does
-
-`scripts/postinstall.cjs` only:
-
-- Reads environment variables to honor skip/force flags.
-- Checks for presence of native binary under package-local `build/` and `dist/`.
-- Optionally runs `node-gyp rebuild` in-place.
-
-It does not intentionally:
-
-- Perform network requests.
-- Write outside the package directory.
-- Modify git hooks or global shell/profile configuration.
-- Exfiltrate local data.
+This package does not run install-time lifecycle scripts.
 
 ## Environment Variables
 
 The package reads the following environment variables. Treat them with the same trust as the rest of the process environment — anyone who can set them can already influence process behavior.
 
 - `BIGINT_BUFFER_NATIVE_PATH` — appended to the search path for the `bigint_buffer.node` native binding. If an attacker controls this variable they can cause the package to load and execute an arbitrary `.node` binary. **Do not propagate untrusted environment variables into Node processes that import this package.**
-- `BIGINT_BUFFER_SKIP_NATIVE` / `BIGINT_BUFFER_SKIP_POSTINSTALL` — disable native rebuild at install time; the JS fallback is used instead. Safe.
-- `BIGINT_BUFFER_FORCE_REBUILD` — opt in to running `node-gyp rebuild` during postinstall. Requires a working build toolchain.
 - `BIGINT_BUFFER_SILENT_NATIVE_FAIL` — suppress the warning printed when the native binding fails to load.
 - `BIGINT_BUFFER_DEBUG` — enables verbose path-resolution logging. Do not enable in production; paths may be logged to wherever stdout is routed.
 
@@ -67,7 +52,6 @@ Releases on npm are published with [npm provenance](https://docs.npmjs.com/gener
 Before consuming a new release:
 
 1. Inspect package tarball contents with `npm pack --dry-run`.
-2. Review install script behavior in `scripts/postinstall.cjs`.
+2. Confirm there are no install-time scripts in `package.json`.
 3. Validate production dependency advisories with `npm audit --omit=dev`.
 4. Confirm npm provenance attestation is present on the published version.
-

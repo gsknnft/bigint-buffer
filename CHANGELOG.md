@@ -5,6 +5,8 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Changed
+- Removed install-time lifecycle execution from published package surface (`install` script removed). Native builds remain explicit opt-in via `npm run rebuild`.
+- Updated SECURITY/README to document the no-install-script trust model and explicit native build flow.
 - Native addon internals (`src/bigint-buffer.c`) received an additional staging/alignment pass:
   - normalized stack staging constants (`STACK_TMP_BYTES` / `STACK_TMP_WORDS`)
   - removed dead macros/includes
