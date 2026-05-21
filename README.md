@@ -3,7 +3,7 @@
 [![NPM Version](https://img.shields.io/npm/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://www.npmjs.com/package/@gsknnft/bigint-buffer)
 [![Node Version](https://img.shields.io/node/v/@gsknnft/bigint-buffer.svg?style=flat-square)](https://nodejs.org)
 
-Modern, ESM-only BigInt ↔ Buffer conversion with optional native acceleration, a zero-allocation write API, and built-in fixed-point and base-conversion helpers. Works in Node and the browser from a single entry point — no bundler polyfills required.
+Modern, ESM-only BigInt <-> Buffer conversion with optional native acceleration, a zero-allocation write API, and built-in fixed-point and base-conversion helpers. Works in Node and browser builds from a single entry point.
 
 ## Install
 
@@ -39,7 +39,7 @@ const fromB64 = base64ToBigint(b64);
 
 ## Zero-Allocation Writes (new in 2.0)
 
-For hot paths — network framing, ring buffers, batch serialization — write directly into a pre-allocated target instead of returning a fresh `Buffer` each call:
+For hot paths (network framing, ring buffers, batch serialization), write directly into a pre-allocated target instead of returning a fresh `Buffer` each call:
 
 ```ts
 import { toBufferBEInto, toBufferLEInto } from "@gsknnft/bigint-buffer";
@@ -77,9 +77,9 @@ const back = fromFixedPoint(sum, 9);
 
 ## Native Loading
 
-By default the package is pure JS — zero required runtime dependencies. A C++ N-API addon is available for maximum throughput on large buffers, but it is strictly optional and never compiled automatically on install.
+By default the package is pure JS. A C++ N-API addon is available for maximum throughput on large buffers, but it is strictly optional and never required for correctness.
 
-**Default (pure JS):** Node ≥ 20 provides `Buffer.readBigUInt64BE/LE` and `writeBigUInt64BE/LE` natively, so the pure-JS path is fast for all typical use cases (≤ 256 bytes).
+**Default (pure JS):** Node >= 20 provides `Buffer.readBigUInt64BE/LE` and `writeBigUInt64BE/LE` natively, so the pure-JS path is fast for normal payload sizes.
 
 **Opt-in native:** Run `npm run rebuild` once in the package directory. On subsequent loads the runtime will find and use `build/Release/bigint_buffer.node` automatically.
 
@@ -88,22 +88,40 @@ npm run rebuild   # compiles the N-API addon and rebuilds dist
 ```
 
 The loader tries:
-1. `node-gyp-build` — looks for a prebuild or an already-compiled `.node`
-2. `bindings` — resolves with an explicit `module_root`
+1. `node-gyp-build` - looks for a prebuild or an already-compiled `.node`
+2. `bindings` - resolves with an explicit `module_root`
 3. Pure JS fallback (always available)
 
-Override the search root with `BIGINT_BUFFER_NATIVE_PATH` (treat as code-execution-equivalent — see [SECURITY.md](SECURITY.md)). Enable verbose path logging with `BIGINT_BUFFER_DEBUG=1`, silence the fallback warning with `BIGINT_BUFFER_SILENT_NATIVE_FAIL=1`, or skip the install script with `BIGINT_BUFFER_SKIP_NATIVE=1`.
+Override the search root with `BIGINT_BUFFER_NATIVE_PATH` (treat as code-execution-equivalent - see [SECURITY.md](SECURITY.md)). Enable verbose path logging with `BIGINT_BUFFER_DEBUG=1`, silence the fallback warning with `BIGINT_BUFFER_SILENT_NATIVE_FAIL=1`, or skip native install checks with `BIGINT_BUFFER_SKIP_NATIVE=1`.
 
 ## Browser Support
 
-The same `dist/index.js` works in Node and browsers. The Node-only imports (`node:module`, `node:url`, `bindings`) are gated behind `IS_BROWSER` detection and only loaded under Node — bundlers (Vite, Rollup, esbuild, webpack 5) won't pull them into a browser bundle.
+The same `dist/index.js` works in Node and browsers. Node-only imports (`node:module`, `node:url`, `bindings`) are gated behind `IS_BROWSER` detection and only loaded under Node.
 
 ```ts
-// Vite / Rollup / esbuild / webpack 5 / Bun / Deno — all work:
+// Vite / Rollup / esbuild / webpack 5 / Bun / Deno:
 import { toBigIntBE, toBufferLE } from "@gsknnft/bigint-buffer";
 ```
 
-There is no separate browser entry to remember and no required polyfill plugin. `Buffer` is the only browser-side dependency, which all modern bundlers polyfill automatically.
+Important: browser environments still need a `Buffer` implementation. Many toolchains provide one automatically, but Vite often requires explicit config.
+
+Vite example:
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      buffer: "buffer",
+    },
+  },
+  optimizeDeps: {
+    include: ["buffer"],
+  },
+});
+```
 
 ## Electron
 
@@ -118,7 +136,7 @@ If your packager relocates `bigint_buffer.node`, set `BIGINT_BUFFER_NATIVE_PATH`
 
 | Subpath | Purpose |
 |---|---|
-| `@gsknnft/bigint-buffer` | Full public API (BigInt↔Buffer, hex/base64/text helpers, fixed-point) |
+| `@gsknnft/bigint-buffer` | Full public API (BigInt<->Buffer, hex/base64/text helpers, fixed-point) |
 | `@gsknnft/bigint-buffer/conversion` | Just the conversion helpers (no native loader surface) |
 | `@gsknnft/bigint-buffer/build/Release/bigint_buffer.node` | Direct path to the native addon for custom packagers |
 
@@ -136,19 +154,19 @@ npm run build          # vite build + tsc + declarations + native sync
 npm run rebuild        # node-gyp rebuild then build
 npm run prebuilds      # prebuildify the native addon
 npm run lint           # eslint (flat config)
-npm run fix            # eslint --fix + prettier --write
+npm run fix            # eslint --fix
 ```
 
 ## Quality Snapshot
 
-- **Tests:** 195 in Node, 8 in real chromium
-- **Coverage:** 100% lines, 100% functions
+- **Tests:** 195 passing
+- **Coverage:** 100% lines, 97%+ functions
 - **Vulnerabilities:** 0 (`npm audit`)
-- **Dependencies:** 0 required runtime, 2 optional (native addon), 16 devDeps
+- **Dependencies:** 0 required runtime, 2 optional (native addon)
 
 ## Runtime Compatibility
 
-- Node ≥ 20
+- Node >= 20
 - ESM-only (no CJS build)
 - Native addon: N-API v3+ (`bigint_buffer.node`)
 - Tested browsers: Chromium-latest via @vitest/browser

@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.unmock("../src/converter");
 
 type BufferProtoPatched = {
   readBigUInt64LE?: Buffer["readBigUInt64LE"];
@@ -17,7 +18,6 @@ const restoreBufferProto = (original: BufferProtoPatched) => {
 
 afterEach(() => {
   vi.resetModules();
-  vi.unmock("../src/converter");
 });
 
 describe("top-level manual fallback branches", () => {
@@ -60,7 +60,7 @@ describe("top-level manual fallback branches", () => {
       expect(mod.toBigIntLE(mod.toBufferLE(tail, 9))).toBe(tail);
 
       // Same for the bigint-from-buffer tail reads in
-      // bufferToBigInt{BE,LE} — these only run when len & 7 !== 0.
+      // bufferToBigInt{BE,LE} - these only run when len & 7 !== 0.
       const buf7 = Buffer.from("11223344556677", "hex");
       expect(mod.toBigIntBE(buf7)).toBe(tail);
       expect(mod.toBigIntLE(Buffer.from("77665544332211", "hex"))).toBe(tail);
@@ -69,4 +69,3 @@ describe("top-level manual fallback branches", () => {
     }
   });
 });
-

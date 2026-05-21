@@ -48,10 +48,10 @@
     "build": "vite build && tsc -p tsconfig.json && npm run declare && npm run sync:native",
     "rebuild": "node-gyp rebuild && npm run build",
     "prebuilds": "prebuildify --napi --strip --target 24.10.0 --platform win32 --arch x64",
-    "clean": "rm -rf build/* dist/* node_modules package-lock.json",
-    "clean:js": "rm -rf build/* dist/*",
+    "clean": "node -e \"const fs=require('node:fs');for(const p of ['build','dist','node_modules'])fs.rmSync(p,{recursive:true,force:true});fs.rmSync('package-lock.json',{force:true});\"",
+    "clean:js": "node -e \"const fs=require('node:fs');for(const p of ['build','dist'])fs.rmSync(p,{recursive:true,force:true});\"",
     "install": "node ./scripts/install.cjs",
-    "prepublishOnly": "npm run clean:js && npm run build && npm run test && npm audit --omit=dev && rm -rf build/Makefile build/gyp-* build/*.mk build/*.Makefile *.tgz",
+    "prepublishOnly": "npm run clean:js && npm run build && npm run test && npm audit --omit=dev && node -e \"const fs=require('node:fs');const path=require('node:path');if(fs.existsSync('build')){for(const f of fs.readdirSync('build')){if(/^(Makefile|gyp-.*|.*\\.mk|.*\\.Makefile)$/.test(f))fs.rmSync(path.join('build',f),{force:true});}}for(const f of fs.readdirSync('.'))if(f.endsWith('.tgz'))fs.rmSync(f,{force:true});\"",
     "publish:release": "npm publish --provenance --access public"
   },
   "repository": {

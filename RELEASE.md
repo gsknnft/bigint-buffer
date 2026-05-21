@@ -1,36 +1,58 @@
-# Release 1.5.1
+# Release Runbook
 
-Date: 2026-02-20
+This project publishes from the root package `@gsknnft/bigint-buffer`.
 
-## Highlights
-- Fixes the `1.5.0` browser bundler regression affecting Vite/Rollup consumers (including Solana `@solana/buffer-layout-utils` imports of `bigint-buffer`).
-- Adds a dedicated root browser ESM shim (`dist/index.browser.js`) for stable browser-safe named exports.
-- Ensures browser conversion build emits real ESM named exports and no Node-only root imports.
-- Fixes browser runtime `Buffer is not defined` issues by importing `Buffer` explicitly in browser-consumed code paths.
-- Hardened native loader behavior across Node/Electron/bundled runtime layouts.
-- Unified loader logic to prevent drift between top-level and conversion entrypoints.
-- Expanded byte-input support (`Buffer | Uint8Array | ArrayBuffer`) for endian conversion APIs.
-- Improved JS fallback conversion performance with chunked operations.
-- Reworked benchmark harness for deterministic, reproducible results.
-- Significantly increased coverage with targeted runtime/fallback tests.
-- Cleaned publish tarball to exclude bench/test artifacts and duplicate native payloads.
-- Stabilized CI build scripting and conversion post-build outputs on clean runners.
+## Pre-release checks
 
-## Validation
-- Tests: `141 passed`
-- Coverage:
-  - Statements: `84.15%`
-  - Branches: `72.36%`
-  - Functions: `88.37%`
-  - Lines: `85.88%`
-- Packaging: `npm pack --dry-run` clean for publishable artifacts.
-- Runtime audit: `npm audit --omit=dev` -> `0 vulnerabilities`.
-- Browser packaging regression test: root browser entry shim and export mapping validated.
+Run from repo root:
 
-## Release Checklist
-1. `pnpm run build`
-2. `pnpm test`
-3. `pnpm run benchmark`
-4. `npm pack --dry-run`
-5. `git tag v1.5.1`
-6. `npm publish`
+```bash
+npm ci
+npm run build
+npm run lint
+npm run test
+npm audit --omit=dev
+npm pack --dry-run
+```
+
+Expected outcomes:
+- build succeeds
+- lint is clean
+- all tests pass
+- `npm audit --omit=dev` reports `0 vulnerabilities`
+- tarball only contains publishable artifacts (`dist/`, native addon artifacts, docs, license)
+
+## Versioning
+
+1. Update `package.json` version.
+2. Add release notes in `CHANGELOG.md` under a new version header.
+3. Commit changes.
+4. Create and push a tag:
+
+```bash
+git tag vX.Y.Z
+git push origin main --tags
+```
+
+## Publish
+
+```bash
+npm publish --provenance --access public
+```
+
+## Post-publish verification
+
+```bash
+npm view @gsknnft/bigint-buffer version
+npm view @gsknnft/bigint-buffer dist-tags --json
+```
+
+Then verify:
+- npm package page shows the new version
+- CI release workflow is green
+- downstream consumers install and build successfully
+
+## Notes
+
+- Native addon is optional; pure JS fallback must always remain functional.
+- Browser consumers still need a `Buffer` implementation in their bundler/runtime.

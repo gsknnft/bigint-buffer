@@ -167,7 +167,7 @@ const byteLengthFromBigint = (value: bigint): number => {
 };
 
 // Hard ceiling on width to prevent DoS / OOM from a hostile or buggy caller.
-// 2^28 = 256 MiB — well above any legitimate bigint serialization use
+// 2^28 = 256 MiB - well above any legitimate bigint serialization use
 // (RSA-16384 is 2 KiB, post-quantum schemes top out in the low tens of KiB).
 const MAX_WIDTH = 1 << 28;
 

@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.unmock("../../src/converter.js");
 import {
   averageFixedPoint,
   base64ToBigint,
@@ -12,12 +13,11 @@ import {
 
 afterEach(() => {
   vi.resetModules();
-  vi.unmock("../../src/converter.js");
 });
 
 describe("conversion error & edge branches", () => {
   it("bufToText rejects unsupported input types", () => {
-    // @ts-expect-error — deliberately invalid input
+    // @ts-expect-error - deliberately invalid input
     expect(() => bufToText(42)).toThrow(TypeError);
   });
 

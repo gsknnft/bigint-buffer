@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-// Browser smoke test — runs in real chromium under @vitest/browser+playwright.
+// Browser smoke test - runs in real chromium under @vitest/browser+playwright.
 // Imports the source through vite's transform so we verify the polyfill-free
 // build path actually works in a browser environment end-to-end.
 

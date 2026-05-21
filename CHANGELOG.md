@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Changed
+- Native addon internals (`src/bigint-buffer.c`) received an additional staging/alignment pass:
+  - normalized stack staging constants (`STACK_TMP_BYTES` / `STACK_TMP_WORDS`)
+  - removed dead macros/includes
+  - hardened `toBigInt` aligned-word staging path
+  - fixed `fromBigInt` staging-size logic to allocate/swap using full target width
+- Test harness cleanup for Vitest hoist semantics: `vi.unmock(...)` moved to top-level in affected specs to avoid future hard errors.
+- CI dependency install made deterministic by switching workflow installs to `npm ci`.
+- Build/publish scripts made cross-platform by replacing shell `rm -rf` usage with Node `fs.rmSync(...)` cleanup scripts.
+
 ## [2.0.0] - 2026-05-20
 
 Major release. ESM-only, single package, polyfill-free browser support, 100% line coverage, zero vulnerabilities.

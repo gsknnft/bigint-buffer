@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.unmock("../../src/converter.js");
 
 type BufferProtoPatched = {
   readBigUInt64LE?: Buffer["readBigUInt64LE"];
@@ -17,7 +18,6 @@ const restoreBufferProto = (original: BufferProtoPatched) => {
 
 afterEach(() => {
   vi.resetModules();
-  vi.unmock("../../src/converter.js");
 });
 
 describe("conversion manual fallback branches", () => {

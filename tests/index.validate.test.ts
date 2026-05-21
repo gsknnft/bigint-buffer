@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.unmock("../src/converter");
 
 afterEach(() => {
   vi.resetModules();
-  vi.unmock("../src/converter");
 });
 
 describe("root validateBigIntBuffer catch path", () => {

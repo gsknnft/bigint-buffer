@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.unmock("../../src/converter.js");
 
 afterEach(() => {
   vi.resetModules();
-  vi.unmock("../../src/converter.js");
 });
 
 describe("conversion: no native binding, Buffer builtins intact", () => {

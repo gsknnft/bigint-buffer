@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.unmock("../src/converter");
 
 afterEach(() => {
   vi.resetModules();
-  vi.unmock("../src/converter");
 });
 
 describe("no native binding, Buffer builtins available", () => {
-  // Covers the "native-Buffer-builtin" branches of read64/write64 — the
+  // Covers the "native-Buffer-builtin" branches of read64/write64 - the
   // single-line delegations to Buffer.prototype.{read,write}BigUInt64{LE,BE}.
   // The pure-JS fallback spec patches those builtins to undefined, so it
   // never reaches them; this spec leaves them intact and only suppresses the

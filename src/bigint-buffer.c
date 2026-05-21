@@ -3,14 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <limits.h>
 
 #define BIT_MASK(n) (~( ((~0ull) << ((n)-1)) << 1 ))
 
-// The maximum size we'll store on the stack. If we need a larger temporary
-// buffer malloc will be called.
-#define BUFFER_STACK_SIZE 32
+// Temporary staging capacity for conversion paths. Keeps small payloads on
+// stack and avoids heap churn on hot paths.
+#define STACK_TMP_BYTES 256u
+#define STACK_TMP_WORDS (STACK_TMP_BYTES / sizeof(uint64_t))
 
 #if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
 #define bswap64(x) _byteswap_uint64(x)
@@ -28,15 +27,6 @@
       napi_throw_error((env), NULL, (msg));                             \
       return NULL;                                                       \
     }                                                                    \
-  } while (0)
-
-#define NAPI_CHECK_FREE(env, status, msg, ptr)                          \
-  do {                                                                   \
-    if ((status) != napi_ok) {                                           \
-      free(ptr);                                                          \
-      napi_throw_error((env), NULL, (msg));                              \
-      return NULL;                                                        \
-    }                                                                     \
   } while (0)
 
 /**
@@ -95,12 +85,11 @@ napi_value toBigInt(napi_env env, napi_callback_info info) {
   size_t overflow_len = not_64_aligned ? 8 - (len & 0x7) : 0;
   size_t aligned_len = len + overflow_len;
   size_t len_in_words = not_64_aligned ? (len >> 3) + 1 : (len >> 3);
-  bool fits_in_stack = aligned_len <= BUFFER_STACK_SIZE;
-
-  uint8_t copy[BUFFER_STACK_SIZE];
+  uint64_t stack_words[STACK_TMP_WORDS];
+  bool fits_in_stack = aligned_len <= sizeof(stack_words);
   uint8_t* bufTemp = NULL;
   if (fits_in_stack) {
-    bufTemp = copy;
+    bufTemp = (uint8_t*)stack_words;
   } else {
     bufTemp = (uint8_t*)malloc(aligned_len);
     if (bufTemp == NULL) {
@@ -228,30 +217,36 @@ napi_value fromBigInt(napi_env env, napi_callback_info info) {
   if (word_count > word_width) {
     word_count = word_width; // silent truncation matches JS toBufferBE semantics
   }
-  size_t word_width_bytes = (word_count << 3);
-  bool fits_in_stack = word_width_bytes <= BUFFER_STACK_SIZE;
-
-  uint64_t* conv_buffer = (uint64_t*)raw_buffer;
-  uint64_t stack_buffer[BUFFER_STACK_SIZE];
+  // Always use an internal aligned staging area so we never alias/write
+  // uint64_t words through a potentially unaligned Buffer pointer.
+  uint64_t stack_buffer[STACK_TMP_WORDS];
+  size_t staged_word_count = original_word_width;
+  size_t staged_bytes = staged_word_count * sizeof(uint64_t);
+  size_t stack_capacity_bytes = sizeof(stack_buffer);
+  bool fits_in_stack = staged_bytes <= stack_capacity_bytes;
+  uint64_t* conv_buffer = NULL;
   bool allocated = false;
-  if (not_64_aligned) {
-    if (fits_in_stack) {
-      conv_buffer = stack_buffer;
-    } else {
-      conv_buffer = (uint64_t*)malloc(byte_width + overflow_len);
-      if (conv_buffer == NULL) {
-        napi_throw_error(env, "ENOMEM", "fromBigInt: allocation failed");
-        return NULL;
-      }
-      allocated = true;
+  if (fits_in_stack) {
+    conv_buffer = stack_buffer;
+  } else {
+    conv_buffer = (uint64_t*)malloc(staged_bytes);
+    if (conv_buffer == NULL) {
+      napi_throw_error(env, "ENOMEM", "fromBigInt: allocation failed");
+      return NULL;
     }
+    allocated = true;
   }
 
-  memset(conv_buffer, 0, byte_width + overflow_len);
+  memset(conv_buffer, 0, staged_bytes);
   status = napi_get_value_bigint_words(env, argv[0], &sign_bit, &word_count, conv_buffer);
   if (status != napi_ok) {
     if (allocated) free(conv_buffer);
     napi_throw_error(env, NULL, "fromBigInt: napi_get_value_bigint_words failed");
+    return NULL;
+  }
+  if (sign_bit != 0) {
+    if (allocated) free(conv_buffer);
+    napi_throw_range_error(env, "EINVAL", "fromBigInt: negative bigint values are not supported");
     return NULL;
   }
 
@@ -271,14 +266,13 @@ napi_value fromBigInt(napi_env env, napi_callback_info info) {
       conv_buffer[conv_words / 2] = bswap64(conv_buffer[conv_words / 2]);
     }
   }
-  if (not_64_aligned) {
-    memcpy(raw_buffer,
-           big_endian ? (uint64_t*)(((uint8_t*)conv_buffer) + (8 - (byte_width & 7)))
-                      : conv_buffer,
-           byte_width);
-    if (allocated) {
-      free(conv_buffer);
-    }
+  const uint8_t* src_bytes =
+      (const uint8_t*)(big_endian && not_64_aligned
+                           ? (((uint8_t*)conv_buffer) + (8 - (byte_width & 7)))
+                           : (uint8_t*)conv_buffer);
+  memcpy(raw_buffer, src_bytes, byte_width);
+  if (allocated) {
+    free(conv_buffer);
   }
   return argv[1];
 }
