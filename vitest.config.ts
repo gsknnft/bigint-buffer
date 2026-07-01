@@ -1,11 +1,19 @@
 import { defineConfig } from "vitest/config";
 import { playwright } from "@vitest/browser-playwright";
 import path from "node:path";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
 
 const sharedAlias = {
   "#pkg": path.resolve(__dirname, "src/conversion.ts"),
   "@gsknnft/bigint-buffer/conversion": path.resolve(__dirname, "src/conversion.ts"),
   qwormhole: path.resolve(__dirname, "src"),
+};
+
+const browserAlias = {
+  ...sharedAlias,
+  buffer: require.resolve("buffer/"),
 };
 
 export default defineConfig({
@@ -52,7 +60,7 @@ export default defineConfig({
             "tests/**/*.browser.test.ts",
             "src/**/*.browser.spec.ts",
           ],
-          alias: sharedAlias,
+          alias: browserAlias,
           browser: {
             enabled: true,
             provider: playwright(),

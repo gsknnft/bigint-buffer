@@ -85,7 +85,7 @@ const back = fromFixedPoint(sum, 9);
 By default the package is pure JS. A C++ N-API addon is available for maximum throughput on large buffers, but it is strictly optional and never required for correctness.
 No install-time scripts are executed by this package.
 
-**Default (pure JS):** Node >= 20 provides `Buffer.readBigUInt64BE/LE` and `writeBigUInt64BE/LE` natively, so the pure-JS path is fast for normal payload sizes.
+**Default (pure JS):** Node >= 24.9 provides `Buffer.readBigUInt64BE/LE` and `writeBigUInt64BE/LE` natively, so the pure-JS path is fast for normal payload sizes.
 
 **Opt-in native:** Run `npm run rebuild` once in the package directory. On subsequent loads the runtime will find and use `build/Release/bigint_buffer.node` automatically.
 
@@ -109,7 +109,7 @@ The same `dist/index.js` works in Node and browsers. Node-only imports (`node:mo
 import { toBigIntBE, toBufferLE } from "@gsknnft/bigint-buffer";
 ```
 
-Important: browser environments still need a `Buffer` implementation. Many toolchains provide one automatically, but Vite often requires explicit config.
+Browser builds use the package's `buffer` dependency. Vite and some strict browser bundlers may still need an explicit alias so `buffer` resolves to that polyfill instead of a Node builtin external.
 
 Vite example:
 
@@ -168,11 +168,11 @@ npm run fix            # eslint --fix
 - **Tests:** 195 passing
 - **Coverage:** 100% lines, 97%+ functions
 - **Vulnerabilities:** 0 (`npm audit`)
-- **Dependencies:** 0 required runtime, 2 optional (native addon)
+- **Dependencies:** 1 required runtime (`buffer` for browser builds), 2 optional (native addon)
 
 ## Runtime Compatibility
 
-- Node >= 20
+- Node >= 24.9
 - ESM-only (no CJS build)
 - Native addon: N-API v3+ (`bigint_buffer.node`)
 - Tested browsers: Chromium-latest via @vitest/browser

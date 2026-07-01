@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-07-01
+
+### Fixed
+- Removed top-level await from the emitted native-loader path by using synchronous process.getBuiltinModule access for Node built-ins. This unblocks CJS/ESM bridge consumers that cannot load modules containing TLA.
+- Raised the package engine floor to Node >=24.9.0 to match the runtime contract used by downstream gateway deployments.
+- Added explicit buffer runtime dependency for browser builds and test aliasing so Vite resolves the browser polyfill instead of externalizing Node buffer.
+
 ### Changed
 - Removed install-time lifecycle execution from published package surface (`install` script removed). Native builds remain explicit opt-in via `npm run rebuild`.
 - Updated SECURITY/README to document the no-install-script trust model and explicit native build flow.
