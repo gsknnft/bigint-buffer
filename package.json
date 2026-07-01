@@ -1,6 +1,6 @@
 {
   "name": "@gsknnft/bigint-buffer",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "type": "module",
   "description": "Modern, ESM-only bigint/Buffer conversion with optional native acceleration and fixed-point helpers",
   "main": "dist/index.js",
