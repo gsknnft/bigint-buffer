@@ -28,16 +28,23 @@ let path: PathModule | undefined;
 let fs: FsModule | undefined;
 
 if (typeof process !== "undefined" && process.versions?.node && !IS_BROWSER) {
-  const [{ createRequire }, { fileURLToPath }] = await Promise.all([
-    import("node:module"),
-    import("node:url"),
-  ]);
-  __filename = fileURLToPath(import.meta.url);
-  const lastSep = Math.max(__filename.lastIndexOf("/"), __filename.lastIndexOf("\\"));
-  __dirname = lastSep >= 0 ? __filename.slice(0, lastSep) : __filename;
-  require = createRequire(import.meta.url);
-  path = require("path");
-  fs = require("fs");
+  // Synchronous builtin access (Node 22.3+) — avoids the top-level `await import`
+  // that made this ESM module un-require()-able from CJS consumers
+  // (ERR_REQUIRE_ASYNC_MODULE). Guarded so browsers / older node fall through to
+  // the pure-JS path.
+  const getBuiltin = (
+    process as unknown as { getBuiltinModule?: (id: string) => any }
+  ).getBuiltinModule;
+  const moduleMod = getBuiltin ? getBuiltin.call(process, "node:module") : undefined;
+  const urlMod = getBuiltin ? getBuiltin.call(process, "node:url") : undefined;
+  if (moduleMod && urlMod) {
+    __filename = urlMod.fileURLToPath(import.meta.url);
+    const lastSep = Math.max(__filename.lastIndexOf("/"), __filename.lastIndexOf("\\"));
+    __dirname = lastSep >= 0 ? __filename.slice(0, lastSep) : __filename;
+    require = moduleMod.createRequire(import.meta.url);
+    path = require("path");
+    fs = require("fs");
+  }
 }
 
 /* c8 ignore start */
